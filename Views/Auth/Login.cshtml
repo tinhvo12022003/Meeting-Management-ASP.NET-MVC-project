@@ -1,0 +1,343 @@
+@using MeetingManagement.Models.DTOs
+@model LoginDTO
+
+@{
+    ViewData["Title"] = "Login - Meeting Management";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #999;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 12px 15px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: #bbb;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .alert-danger {
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+            background-color: #f8d7da;
+            color: #721c24;
+            margin-bottom: 20px;
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+        .alert-danger ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .alert-danger li {
+            margin: 5px 0;
+        }
+
+        .test-account {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #0c5aa0;
+        }
+
+        .test-account strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .test-account code {
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .loading-spinner {
+            display: none;
+            position: relative;
+            top: 2px;
+            margin-right: 8px;
+        }
+
+        .btn-login.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .btn-login.loading .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #764ba2;
+        }
+
+        .input-group .form-control {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+        }
+
+        .input-icon .form-control {
+            padding-left: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="login-header">
+                <h1>📅 Meeting Management</h1>
+                <p>Sign in to your account</p>
+            </div>
+
+            <!-- Error Messages -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @if (ViewData.ModelState.Values.SelectMany(v => v.Errors).Count() > 0)
+                    {
+                        <ul>
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    }
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Login Form -->
+            <form method="post" id="loginForm">
+                @Html.AntiForgeryToken()
+
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <div class="input-icon">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="username" 
+                            name="Username" 
+                            placeholder="Enter your username"
+                            value="@Model?.Username"
+                            autocomplete="username"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-icon">
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="password" 
+                            name="Password" 
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="btn btn-login" id="loginBtn">
+                    <span class="loading-spinner"></span>
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Test Account Info -->
+            <div class="test-account">
+                <strong>🔑 Test Account:</strong>
+                <div>Username: <code>admin</code></div>
+                <div>Password: <code>12345678</code></div>
+            </div>
+
+            <!-- Footer -->
+            <div class="forgot-password">
+                <p style="color: #999; font-size: 12px; margin: 0;">© 2026 Meeting Management System</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Form validation
+            $('#loginForm').on('submit', function(e) {
+                const username = $('#username').val().trim();
+                const password = $('#password').val().trim();
+
+                if (!username || !password) {
+                    e.preventDefault();
+                    alert('Please fill in all fields');
+                    return false;
+                }
+
+                // Show loading state
+                const $btn = $('#loginBtn');
+                $btn.addClass('loading');
+                $btn.prop('disabled', true);
+            });
+
+            // Clear error alert on input
+            $('#username, #password').on('input', function() {
+                const $alert = $('.alert-danger');
+                if ($alert.length && !$('#loginForm').hasClass('was-validated')) {
+                    // Don't auto-dismiss for better UX
+                }
+            });
+
+            // Focus on first input
+            $('#username').focus();
+        });
+    </script>
+</body>
+</html>
