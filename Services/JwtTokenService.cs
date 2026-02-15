@@ -21,7 +21,6 @@ public class JwtTokenService : IJwtTokenService
         _context = context;
     }
 
-    // account Id, Username, 
     public async Task<string> GenerateAccessToken(string Id, string Username, string UserId)
     {
         var permissions = await _context.Permission.Where(x => x.UserId == UserId).ToListAsync();
@@ -76,7 +75,7 @@ public class JwtTokenService : IJwtTokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task<string> GenerateRefreshToken()
+    public string GenerateRefreshToken()
     {
         return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }

@@ -37,14 +37,18 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("CreateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("CreateBy");
+                        .HasDefaultValue("SYSTEM");
 
                     b.Property<string>("HashPassword")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("NVARCHAR(150)")
                         .HasColumnName("Password");
+
+                    b.Property<int>("RowStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -53,7 +57,9 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("UpdateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
+                        .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
 
                     b.Property<string>("UserId")
@@ -65,9 +71,6 @@ namespace MeetingManagement.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(100)")
                         .HasColumnName("Username");
-
-                    b.Property<int>("rowStatus")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -97,13 +100,17 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("CreateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("CreateBy");
+                        .HasDefaultValue("SYSTEM");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(255)")
                         .HasColumnName("Name");
+
+                    b.Property<int>("RowStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -112,11 +119,10 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("UpdateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
+                        .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
-
-                    b.Property<int>("rowStatus")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -143,13 +149,17 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("CreateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("CreateBy");
+                        .HasDefaultValue("SYSTEM");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(255)")
                         .HasColumnName("Name");
+
+                    b.Property<int>("RowStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -158,11 +168,10 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("UpdateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
+                        .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
-
-                    b.Property<int>("rowStatus")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -191,8 +200,9 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("CreateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("CreateBy");
+                        .HasDefaultValue("SYSTEM");
 
                     b.Property<string>("DepartmentId")
                         .IsRequired()
@@ -207,6 +217,9 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("DATETIME2")
                         .HasColumnName("EndAt");
 
+                    b.Property<int>("MeetingStatus")
+                        .HasColumnType("int");
+
                     b.Property<string>("Organization")
                         .HasColumnType("NVARCHAR(255)")
                         .HasColumnName("Organization");
@@ -216,15 +229,12 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("NVARCHAR(100)")
                         .HasColumnName("RoomId");
 
+                    b.Property<int>("RowStatus")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("DATETIME2")
                         .HasColumnName("StartAt");
-
-                    b.Property<byte>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TINYINT")
-                        .HasDefaultValue((byte)1)
-                        .HasColumnName("Status");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -242,15 +252,14 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("UpdateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
+                        .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
 
                     b.Property<string>("Url")
                         .HasColumnType("NVARCHAR(255)")
                         .HasColumnName("Url");
-
-                    b.Property<int>("rowStatus")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -283,13 +292,17 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("CreateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("CreateBy");
+                        .HasDefaultValue("SYSTEM");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(255)")
                         .HasColumnName("Name");
+
+                    b.Property<int>("RowStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -298,11 +311,10 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("UpdateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
+                        .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
-
-                    b.Property<int>("rowStatus")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -319,12 +331,10 @@ namespace MeetingManagement.Migrations
                         .HasColumnName("Id");
 
                     b.Property<string>("Action")
-                        .IsRequired()
                         .HasColumnType("NVARCHAR(50)")
                         .HasColumnName("Action");
 
                     b.Property<string>("Controller")
-                        .IsRequired()
                         .HasColumnType("NVARCHAR(50)")
                         .HasColumnName("Controller");
 
@@ -375,6 +385,7 @@ namespace MeetingManagement.Migrations
             modelBuilder.Entity("MeetingManagement.Models.RefreshTokenModel", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
                         .HasColumnName("Id");
 
@@ -391,8 +402,9 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("CreateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("CreateBy");
+                        .HasDefaultValue("SYSTEM");
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("DATETIME2")
@@ -410,6 +422,9 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("DATETIME2")
                         .HasColumnName("RevokedAt");
 
+                    b.Property<int>("RowStatus")
+                        .HasColumnType("int");
+
                     b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(1000)")
@@ -422,11 +437,10 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("UpdateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
+                        .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
-
-                    b.Property<int>("rowStatus")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -470,8 +484,9 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("CreateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("CreateBy");
+                        .HasDefaultValue("SYSTEM");
 
                     b.Property<string>("DepartmentId")
                         .IsRequired()
@@ -494,6 +509,9 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("NVARCHAR(50)")
                         .HasColumnName("Phone");
 
+                    b.Property<int>("RowStatus")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("DATETIME2")
@@ -501,11 +519,10 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("UpdateBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
+                        .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
-
-                    b.Property<int>("rowStatus")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

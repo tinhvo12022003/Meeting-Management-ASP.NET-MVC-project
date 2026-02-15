@@ -1,8 +1,10 @@
 using System.Text;
 using MeetingManagement.Config;
 using MeetingManagement.Config.Mapper;
+using MeetingManagement.Data;
 using MeetingManagement.Data.Context;
 using MeetingManagement.Handler;
+using MeetingManagement.Helper;
 using MeetingManagement.Interface.IRepository;
 using MeetingManagement.Interface.IService;
 using MeetingManagement.Interface.IUnitOfWork;
@@ -28,7 +30,7 @@ builder.Services.AddAutoMapper(
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtConfig>()!;
@@ -39,20 +41,29 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    
+
 }).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true, 
-        ValidateAudience = true,   
-        ValidateLifetime = true, 
-        ValidateIssuerSigningKey = true, 
-        ValidIssuer              = jwtSettings.Issuer,
-        ValidAudience            = jwtSettings.Audience,
-        IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
     };
-    
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["access_token"];
+            return Task.CompletedTask;
+        }
+    };
+
 });
 
 
@@ -72,12 +83,15 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
+
+builder.Services.AddScoped<UserHelper>();
 builder.Services.AddScoped<HashingLibrary>();
+
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -89,8 +103,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
-app.UseAuthentication();   
+app.UseAuthentication();
 
 app.UseAuthorization();
 
@@ -100,5 +113,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
+await DbSeeder.SeedAccount(app.Services);
 app.Run();

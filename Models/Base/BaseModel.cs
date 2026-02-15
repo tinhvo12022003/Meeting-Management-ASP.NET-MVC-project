@@ -7,7 +7,7 @@ public abstract class BaseModel
     public string CreateBy {get; set;} = null!;
     public string UpdateBy {get; set;} = null!;
 
-    public DateTime CreateAt;
-    public DateTime UpdateAt;
-    public RowStatus rowStatus {get; set;}
+    public DateTime CreateAt { get; set; }
+    public DateTime UpdateAt { get; set; }
+    public RowStatus RowStatus {get; set;} = RowStatus.ACTIVE;
 }

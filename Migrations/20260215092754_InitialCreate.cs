@@ -18,11 +18,11 @@ namespace MeetingManagement.Migrations
                     Id = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     Address = table.Column<string>(type: "NVARCHAR(255)", nullable: false),
                     Name = table.Column<string>(type: "NVARCHAR(255)", nullable: false),
+                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
+                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    rowStatus = table.Column<int>(type: "int", nullable: false)
+                    RowStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -36,11 +36,11 @@ namespace MeetingManagement.Migrations
                     Id = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     Name = table.Column<string>(type: "NVARCHAR(255)", nullable: false),
                     CompanyId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
+                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
+                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    rowStatus = table.Column<int>(type: "int", nullable: false)
+                    RowStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -59,11 +59,11 @@ namespace MeetingManagement.Migrations
                     Id = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     Name = table.Column<string>(type: "NVARCHAR(255)", nullable: false),
                     CompanyId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
+                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
+                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    rowStatus = table.Column<int>(type: "int", nullable: false)
+                    RowStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,12 +88,12 @@ namespace MeetingManagement.Migrations
                     AccountId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DepartmentId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     CompanyId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     Gender = table.Column<byte>(type: "TINYINT", nullable: false),
+                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
+                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
+                    CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    rowStatus = table.Column<int>(type: "int", nullable: false)
+                    RowStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -119,18 +119,18 @@ namespace MeetingManagement.Migrations
                     StartAt = table.Column<DateTime>(type: "DATETIME2", nullable: false),
                     EndAt = table.Column<DateTime>(type: "DATETIME2", nullable: false),
                     Type = table.Column<byte>(type: "TINYINT", nullable: false),
-                    Status = table.Column<byte>(type: "TINYINT", nullable: false, defaultValue: (byte)1),
+                    MeetingStatus = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "NVARCHAR(255)", nullable: true),
                     Organization = table.Column<string>(type: "NVARCHAR(255)", nullable: true),
                     Url = table.Column<string>(type: "NVARCHAR(255)", nullable: true),
                     CompanyId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     DepartmentId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     RoomId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
+                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
+                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    rowStatus = table.Column<int>(type: "int", nullable: false)
+                    RowStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -160,11 +160,11 @@ namespace MeetingManagement.Migrations
                     Username = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     Password = table.Column<string>(type: "NVARCHAR(150)", maxLength: 150, nullable: false),
                     UserId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
+                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
+                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    rowStatus = table.Column<int>(type: "int", nullable: false)
+                    RowStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -181,8 +181,8 @@ namespace MeetingManagement.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    Controller = table.Column<string>(type: "NVARCHAR(50)", nullable: false),
-                    Action = table.Column<string>(type: "NVARCHAR(50)", nullable: false),
+                    Controller = table.Column<string>(type: "NVARCHAR(50)", nullable: true),
+                    Action = table.Column<string>(type: "NVARCHAR(50)", nullable: true),
                     FullPermission = table.Column<bool>(type: "BIT", nullable: false),
                     View = table.Column<bool>(type: "BIT", nullable: false),
                     Edit = table.Column<bool>(type: "BIT", nullable: false),
@@ -239,11 +239,11 @@ namespace MeetingManagement.Migrations
                     RevokedAt = table.Column<DateTime>(type: "DATETIME2", nullable: true),
                     ReplacedByToken = table.Column<string>(type: "NVARCHAR(1000)", nullable: true),
                     AccountId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
+                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
+                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    rowStatus = table.Column<int>(type: "int", nullable: false)
+                    RowStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

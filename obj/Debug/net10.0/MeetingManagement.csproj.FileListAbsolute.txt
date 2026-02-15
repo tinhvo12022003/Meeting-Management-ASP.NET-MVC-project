@@ -225,3 +225,4 @@ C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\D
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\MeetingManagement.pdb
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\MeetingManagement.genruntimeconfig.cache
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\ref\MeetingManagement.dll
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\MeetingManagement.sourcelink.json

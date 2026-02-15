@@ -48,15 +48,19 @@ public class ApplicationDbContext : DbContext
                     .HasDefaultValueSql("GETUTCDATE()");
 
 
-                modelBuilder.Entity(entityType.ClrType).Property<string>("CreateBy")
-                    .HasColumnType(typeName: "NVARCHAR(100)")
-                    .HasColumnName(name: "CreateBy");
+                modelBuilder.Entity(entityType.ClrType)
+                    .Property<string>("CreateBy")
+                    .HasColumnType("NVARCHAR(100)")
+                    .HasDefaultValue("SYSTEM");
 
-                modelBuilder.Entity(entityType.ClrType).Property<string>("UpdateBy")
+                modelBuilder.Entity(entityType.ClrType)
+                    .Property<string>("UpdateBy")
                     .HasColumnType(typeName: "NVARCHAR(100)")
-                    .HasColumnName(name: "UpdateBy");
-
-                // modelBuilder.Entity(entityType.ClrType).Property<bool>("RowStatus")
+                    .HasColumnName(name: "UpdateBy")
+                    .HasDefaultValue("SYSTEM");
+                
+                // modelBuilder.Entity(entityType.ClrType)
+                //     .Property<int>("RowStatus")
                 //     .HasColumnType(typeName: "BIT")
                 //     .HasColumnName(name: "RowStatus")
                 //     .HasDefaultValue(true);
@@ -108,7 +112,6 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Type).HasColumnName(name: "Type").HasColumnType(typeName: "TINYINT").HasConversion<int>();
             entity.Property(e => e.Description).HasColumnName(name: "Description").HasColumnType(typeName: "NVARCHAR(255)");
             entity.Property(e => e.Organization).HasColumnName(name: "Organization").HasColumnType(typeName: "NVARCHAR(255)").HasDefaultValue(null);
-            entity.Property(e => e.Status).HasColumnName(name: "Status").HasColumnType(typeName: "TINYINT").HasConversion<int>().HasDefaultValue(MeetingStatus.PENDING);
             entity.Property(e => e.RoomId).IsRequired().HasColumnName(name: "RoomId").HasColumnType(typeName: "NVARCHAR(100)");
             entity.HasOne(a => a.MeetingRoom).WithMany(p => p.Meetings).HasForeignKey(a => a.RoomId).OnDelete(DeleteBehavior.NoAction);
             entity.Property(e => e.CompanyId).IsRequired().HasColumnName(name: "CompanyId").HasColumnType(typeName: "NVARCHAR(100)");
@@ -147,18 +150,18 @@ public class ApplicationDbContext : DbContext
         {
             entity.ToTable(name: "Permissions");
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).IsRequired().HasColumnName("Id").HasColumnType("NVARCHAR(100)").HasValueGenerator<PrefixStringIdGenerator>().ValueGeneratedOnAdd();
-            entity.Property(e => e.Controller).IsRequired().HasColumnName(name: "Controller").HasColumnType(typeName: "NVARCHAR(50)");
-            entity.Property(e => e.Action).IsRequired().HasColumnName(name: "Action").HasColumnType(typeName: "NVARCHAR(50)");
-            entity.Property(e => e.FullPermission).IsRequired().HasColumnName(name: "FullPermission").HasColumnType(typeName: "BIT");
-            entity.Property(e => e.View).IsRequired().HasColumnName(name: "View").HasColumnType(typeName: "BIT");
-            entity.Property(e => e.Edit).IsRequired().HasColumnName(name: "Edit").HasColumnType(typeName: "BIT");
-            entity.Property(e => e.Insert).IsRequired().HasColumnName(name: "Insert").HasColumnType(typeName: "BIT");
-            entity.Property(e => e.Delete).IsRequired().HasColumnName(name: "Delete").HasColumnType(typeName: "BIT");
-            entity.Property(e => e.EditAll).IsRequired().HasColumnName(name: "EditAll").HasColumnType(typeName: "BIT");
-            entity.Property(e => e.InsertAll).IsRequired().HasColumnName(name: "InsertAll").HasColumnType(typeName: "BIT");
-            entity.Property(e => e.DeleteAll).IsRequired().HasColumnName(name: "DeleteAll").HasColumnType(typeName: "BIT");
-            entity.Property(e => e.UserId).IsRequired().HasColumnName(name: "UserId").HasColumnType(typeName: "NVARCHAR(100)");
+            entity.Property(e => e.Id).HasColumnName("Id").HasColumnType("NVARCHAR(100)").HasValueGenerator<PrefixStringIdGenerator>().ValueGeneratedOnAdd();
+            entity.Property(e => e.Controller).HasColumnName(name: "Controller").HasColumnType(typeName: "NVARCHAR(50)");
+            entity.Property(e => e.Action).HasColumnName(name: "Action").HasColumnType(typeName: "NVARCHAR(50)");
+            entity.Property(e => e.FullPermission).HasColumnName(name: "FullPermission").HasColumnType(typeName: "BIT");
+            entity.Property(e => e.View).HasColumnName(name: "View").HasColumnType(typeName: "BIT");
+            entity.Property(e => e.Edit).HasColumnName(name: "Edit").HasColumnType(typeName: "BIT");
+            entity.Property(e => e.Insert).HasColumnName(name: "Insert").HasColumnType(typeName: "BIT");
+            entity.Property(e => e.Delete).HasColumnName(name: "Delete").HasColumnType(typeName: "BIT");
+            entity.Property(e => e.EditAll).HasColumnName(name: "EditAll").HasColumnType(typeName: "BIT");
+            entity.Property(e => e.InsertAll).HasColumnName(name: "InsertAll").HasColumnType(typeName: "BIT");
+            entity.Property(e => e.DeleteAll).HasColumnName(name: "DeleteAll").HasColumnType(typeName: "BIT");
+            entity.Property(e => e.UserId).HasColumnName(name: "UserId").HasColumnType(typeName: "NVARCHAR(100)");
             entity.HasOne(a => a.User).WithMany(p => p.Permissions).HasForeignKey(a => a.UserId).OnDelete(DeleteBehavior.NoAction);
         });
 
@@ -182,7 +185,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.ToTable(name: "RefreshToken");
             entity.HasKey(x => x.Id);
-            entity.Property(x => x.Id).IsRequired().HasColumnName(name: "Id").HasColumnType(typeName: "NVARCHAR(100)");
+            entity.Property(x => x.Id).IsRequired().HasColumnName(name: "Id").HasColumnType(typeName: "NVARCHAR(100)").HasValueGenerator<PrefixStringIdGenerator>().ValueGeneratedOnAdd();;
             entity.Property(e => e.TokenHash).HasColumnName(name: "TokenHash").HasColumnType(typeName: "NVARCHAR(1000)");
             entity.Property(e => e.ExpiresAt).HasColumnName(name: "ExpiresAt").HasColumnType(typeName: "DATETIME2");
             entity.Property(e => e.LoginAt).HasColumnName(name: "LoginAt").HasColumnType(typeName: "DATETIME2");

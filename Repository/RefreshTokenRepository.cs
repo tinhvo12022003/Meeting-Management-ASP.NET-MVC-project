@@ -25,6 +25,11 @@ public class RefreshTokenRepository : GenericRepository<RefreshTokenModel>, IRef
             .ToListAsync();
     }
 
+    public async Task<RefreshTokenModel?> GetByAccountId (string accountId)
+    {
+        return await _context.RefreshToken.FirstOrDefaultAsync(x => x.AccountId == accountId);
+    }
+
     public async Task<IEnumerable<RefreshTokenModel>> GetActiveByAccountId(string accountId)
     {
         return await _context.RefreshToken
@@ -37,6 +42,7 @@ public class RefreshTokenRepository : GenericRepository<RefreshTokenModel>, IRef
         var hash = _hash.HashRefreshToken(refreshTokenPlain);
         return await _context.RefreshToken
             .Include(x => x.Account)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.TokenHash == hash);
     }
 

@@ -6,7 +6,7 @@ namespace MeetingManagement.Models;
 [IdPrefix(prefix: "TOKEN")]
 public class RefreshTokenModel : BaseModel
 {
-    public string Id {get; set;} = string.Empty;
+    public string Id {get; set;} = null!;
     public string TokenHash {get; set;} = string.Empty;
     public DateTime ExpiresAt { get; set; }
     public DateTime LoginAt { get; set; }

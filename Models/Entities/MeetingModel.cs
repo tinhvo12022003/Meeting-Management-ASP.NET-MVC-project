@@ -12,7 +12,7 @@ public class MeetingModel : BaseModel
     public DateTime StartAt {get; set;}
     public DateTime EndAt {get; set;}
     public MeetingType Type {get; set;} = MeetingType.OFFLINE;
-    public MeetingStatus Status {get; set;} = MeetingStatus.PENDING;
+    public MeetingStatus MeetingStatus {get; set;} = MeetingStatus.PENDING;
     public string? Description {get; set;} = string.Empty;
     public string? Organization {get; set;} = string.Empty;
     public string? Url {get; set;} = string.Empty;
