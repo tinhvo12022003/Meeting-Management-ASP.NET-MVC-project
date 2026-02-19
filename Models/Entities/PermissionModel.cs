@@ -5,7 +5,7 @@ namespace MeetingManagement.Models;
 [IdPrefix(prefix: "PMS")]
 public class PermissionModel
 {
-    public string Id { get; set; } = string.Empty;
+    public string Id { get; set; } = null!;
     public string? Controller { get; set; } = string.Empty;
     public string? Action { get; set; } = string.Empty;
 

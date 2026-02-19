@@ -3,7 +3,7 @@ using MeetingManagement.Models;
 
 public class MeetingUserModel
 {
-    public string UserId { get; set; } = string.Empty;
+    public string UserId { get; set; } = null!;
     public UserModel? User { get; set; }
 
     public RoleMeeting Role {get; set;}

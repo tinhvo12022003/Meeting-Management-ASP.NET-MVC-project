@@ -6,7 +6,7 @@ namespace MeetingManagement.Models;
 [IdPrefix(prefix: "COMP")]
 public class CompanyModel : BaseModel
 {
-    public string Id { get; set; } = string.Empty;
+    public string Id { get; set; } = null!;
     public string Address { get; set; } = string.Empty;
     public string? Name { get; set; } = string.Empty;
 

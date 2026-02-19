@@ -1,3 +1,4 @@
+using MeetingManagement.Attr.Permission;
 using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;

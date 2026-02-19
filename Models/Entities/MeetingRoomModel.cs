@@ -1,5 +1,4 @@
 using MeetingManagement.Attr.IdPrefix;
-using MeetingManagement.Enum;
 using MeetingManagement.Models.Base;
 
 namespace MeetingManagement.Models;
@@ -7,7 +6,7 @@ namespace MeetingManagement.Models;
 [IdPrefix(prefix: "ROOM")]
 public class MeetingRoomModel : BaseModel
 {
-    public string Id {get; set;} = string.Empty;
+    public string Id {get; set;} = null!;
     public string Name {get; set;} = string.Empty;
 
     // relationship

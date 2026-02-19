@@ -150,9 +150,7 @@ C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\D
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\scopedcss\bundle\MeetingManagement.styles.css
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\scopedcss\projectbundle\MeetingManagement.bundle.scp.css
-C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\x4dgnmgdzs-{0}-b9sayid5wm-b9sayid5wm.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\tfaa7g12ij-{0}-61n19gt1b8-61n19gt1b8.gz
-C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\mvoo6ug683-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\mh5pd8m7lm-{0}-bqjiyaj88i-bqjiyaj88i.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\3ufqp5t8of-{0}-c2jlpeoesf-c2jlpeoesf.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\02adbx19zw-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -226,3 +224,5 @@ C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\D
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\MeetingManagement.genruntimeconfig.cache
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\ref\MeetingManagement.dll
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\MeetingManagement.sourcelink.json
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\x4dgnmgdzs-{0}-x8r1izqhtc-x8r1izqhtc.gz
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\mvoo6ug683-{0}-twslrslatk-twslrslatk.gz

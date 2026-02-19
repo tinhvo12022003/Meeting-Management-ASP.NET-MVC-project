@@ -6,7 +6,7 @@ namespace MeetingManagement.Models;
 [IdPrefix(prefix: "ACC")]
 public class AccountModel : BaseModel
 {
-    public string Id {get; set;} = string.Empty;
+    public string Id {get; set;} = null!;
     public string Username {get; set;} = string.Empty;
     public string HashPassword {get; set;} = string.Empty;
 

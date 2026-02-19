@@ -7,7 +7,7 @@ namespace MeetingManagement.Models;
 [IdPrefix(prefix: "MEET")]
 public class MeetingModel : BaseModel
 {
-    public string Id {get; set;} = string.Empty;
+    public string Id {get; set;} = null!;
     public string Title {get; set;} = string.Empty;
     public DateTime StartAt {get; set;}
     public DateTime EndAt {get; set;}
