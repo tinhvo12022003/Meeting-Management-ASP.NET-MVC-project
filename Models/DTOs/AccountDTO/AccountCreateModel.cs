@@ -15,7 +15,7 @@ public class AccountCreateModel
     [Required]
     [NotNull]
     [DataType(DataType.Password)]
-    public string HashPassword {get; set;} = string.Empty;
+    public string PlainPassword {get; set;} = string.Empty;
 
     [Length(minimumLength: 5, maximumLength: 50, ErrorMessage = "Fix length required!")]
     [Required]

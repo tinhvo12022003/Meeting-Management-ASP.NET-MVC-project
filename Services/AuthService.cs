@@ -77,38 +77,63 @@ public class AuthService : IAuthService
 
         var accessToken = await _jwtService.GenerateAccessToken(account.Id, account.Username, user.Id);
         var refreshTokenValue = _jwtService.GenerateRefreshToken();
+        var newRefreshTokenHash = _hashing.HashRefreshToken(refreshTokenValue);
+        var expirationDays = _configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays");
 
-        // store database
-        var refreshTokenEntity = new RefreshTokenModel
+        // Kiểm tra xem browser có gửi kèm refresh token cũ không (Cookie)
+        var currentRefreshTokenCookie = _httpContextAccessor.HttpContext?.Request.Cookies["refresh_token"];
+        RefreshTokenModel? existingTokenEntity = null;
+
+        if (!string.IsNullOrEmpty(currentRefreshTokenCookie))
         {
-            TokenHash = _hashing.HashRefreshToken(refreshToken: refreshTokenValue),
-            AccountId = account.Id,
-
-            // hết hạn
-            ExpiresAt = DateTime.UtcNow.AddDays(_configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays")),
-
-            LoginAt = DateTime.UtcNow,
-            RevokedAt = null,
-            ReplacedByToken = null,
-        };
-
-        var activeTokens = await _unitOfWork.RefreshTokens.GetActiveByAccountId(account.Id);
-
-        if (activeTokens.Count() >= 5)
-        {
-            var oldest = activeTokens.OrderBy(t => t.LoginAt).First();
-            oldest.RevokedAt = DateTime.UtcNow;
-            await _unitOfWork.RefreshTokens.Update(oldest);
+            var oldHash = _hashing.HashRefreshToken(currentRefreshTokenCookie);
+            // Tìm token cũ trong DB (kể cả đã hết hạn)
+            existingTokenEntity = await _unitOfWork.RefreshTokens.GetByTokenHash(oldHash);
         }
 
-        await _unitOfWork.RefreshTokens.Add(refreshTokenEntity); // store
+        // KỊCH BẢN 1: Tái sử dụng dòng cũ (Token Rotation) nếu token cũ thuộc về chính user này
+        if (existingTokenEntity != null && existingTokenEntity.AccountId == account.Id)
+        {
+            existingTokenEntity.TokenHash = newRefreshTokenHash;
+            existingTokenEntity.ExpiresAt = DateTime.UtcNow.AddDays(expirationDays);
+            existingTokenEntity.LoginAt = DateTime.UtcNow;
+            existingTokenEntity.RevokedAt = null;      // Reset trạng thái revoked
+            existingTokenEntity.ReplacedByToken = null; // Reset trạng thái replaced
+            
+            await _unitOfWork.RefreshTokens.Update(existingTokenEntity);
+        }
+        // KỊCH BẢN 2: Tạo mới hoàn toàn (Máy mới hoặc Cookie đã bị xóa)
+        else
+        {
+            var refreshTokenEntity = new RefreshTokenModel
+            {
+                TokenHash = newRefreshTokenHash,
+                AccountId = account.Id,
+                ExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
+                LoginAt = DateTime.UtcNow,
+                RevokedAt = null,
+                ReplacedByToken = null,
+            };
+
+            // Giới hạn 5 thiết bị đăng nhập cùng lúc
+            var activeTokens = await _unitOfWork.RefreshTokens.GetActiveByAccountId(account.Id);
+            if (activeTokens.Count() >= 5)
+            {
+                var oldest = activeTokens.OrderBy(t => t.LoginAt).First();
+                oldest.RevokedAt = DateTime.UtcNow;
+                await _unitOfWork.RefreshTokens.Update(oldest);
+            }
+
+            await _unitOfWork.RefreshTokens.Add(refreshTokenEntity);
+        }
+
         await _unitOfWork.CommitAsync();
 
         return new AccountLoginResponse
         {
             AccessToken = accessToken,
             RefreshToken = refreshTokenValue,
-            RefreshTokenExpiresAt = refreshTokenEntity.ExpiresAt,
+            RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
             User = _mapper.Map<UserViewModel>(user)
         };
     }
@@ -119,7 +144,7 @@ public class AuthService : IAuthService
     {
         var hash = _hashing.HashRefreshToken(refreshToken);
 
-        var tokenData = await _unitOfWork.RefreshTokens.GetByHashToken(hash)
+        var tokenData = await _unitOfWork.RefreshTokens.GetByTokenHash(hash)
             ?? throw new SecurityException("Invalid token");
 
         if (tokenData == null || tokenData.RevokedAt != null || tokenData.ExpiresAt < DateTime.UtcNow)
@@ -134,36 +159,17 @@ public class AuthService : IAuthService
         var now = DateTime.UtcNow;
         var newRefreshPlain = _jwtService.GenerateRefreshToken();
         var newRefreshHash = _hashing.HashRefreshToken(newRefreshPlain);
+        var expirationDays = _configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays");
 
-        // Create new refresh token
-        var newRefreshEntity = new RefreshTokenModel
-        {
-            TokenHash = newRefreshHash,
-            AccountId = tokenData.AccountId,
-            ExpiresAt = now.AddDays(_configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays")),
-            LoginAt = now,
-            CreateBy = _helper.GetCurrentUser(),
-            UpdateBy = _helper.GetCurrentUser(),
-            CreateAt = now,
-            UpdateAt = now,
-            RowStatus = RowStatus.ACTIVE
-        };
-
-        // Add new token first
-        await _unitOfWork.RefreshTokens.Add(newRefreshEntity);
+        // Cập nhật token hiện tại thay vì tạo mới để tránh làm đầy database
+        tokenData.TokenHash = newRefreshHash;
+        tokenData.ExpiresAt = now.AddDays(expirationDays);
+        tokenData.LoginAt = now;
+        tokenData.UpdateBy = _helper.GetCurrentUser();
+        tokenData.UpdateAt = now;
+        
+        await _unitOfWork.RefreshTokens.Update(tokenData);
         await _unitOfWork.CommitAsync();
-
-        // Now update the old token as a separate operation
-        var oldToken = await _unitOfWork.RefreshTokens.GetById(tokenData.Id);
-        if (oldToken != null)
-        {
-            oldToken.RevokedAt = now;
-            oldToken.ReplacedByToken = newRefreshHash;
-            oldToken.UpdateBy = _helper.GetCurrentUser();
-            oldToken.UpdateAt = now;
-            await _unitOfWork.RefreshTokens.Update(oldToken);
-            await _unitOfWork.CommitAsync();
-        }
 
         // Fetch user and account information
         var account = await _unitOfWork.Accounts.GetById(tokenData.AccountId);
@@ -180,7 +186,7 @@ public class AuthService : IAuthService
         {
             AccessToken = accessToken,
             RefreshToken = newRefreshPlain,
-            RefreshTokenExpiresAt = newRefreshEntity.ExpiresAt,
+            RefreshTokenExpiresAt = tokenData.ExpiresAt,
             User = _mapper.Map<UserViewModel>(user)
         };
     }
@@ -189,7 +195,7 @@ public class AuthService : IAuthService
     public async Task Logout(string refreshToken)
     {
         var hash = _hashing.HashRefreshToken(refreshToken);
-        var token = await _refreshTokenRepository.GetByHashToken(hash);
+        var token = await _refreshTokenRepository.GetByTokenHash(hash);
 
         if (token != null)
             await _unitOfWork.RefreshTokens.RevokeAllByAccountId(token.AccountId);

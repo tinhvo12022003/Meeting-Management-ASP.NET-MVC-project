@@ -10,7 +10,7 @@ public class AccountUpdateModel
     
     [Length(minimumLength: 5, maximumLength: 50, ErrorMessage = "Fix length required!")]
     [DataType(DataType.Password)]
-    public string HashPassword {get; set;} = string.Empty;
+    public string OldPassword {get; set;} = string.Empty;
 
 
     [EnumDataType(typeof(RowStatus), ErrorMessage = "Invalid status!")]

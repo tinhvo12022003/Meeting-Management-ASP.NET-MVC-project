@@ -1,50 +1,113 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MeetingManagement</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MeetingManagement.styles.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Sidebar Design - @ViewData["Title"]</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap-4.4.1-dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/fontawesome-free-7.2.0-web/css/all.min.css" />
+
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MeetingManagement</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+    <div class="d-flex" id="wrapper">
+
+        <aside class="sidebar d-flex flex-column" id="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">Dashboard</span>
+                <button class="toggle-btn" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
+            <ul class="menu flex-grow-1">
+                <li>
+                    <a href="#">
+                        <i class="fas fa-home menu-icon"></i>
+                        <span class="menu-text">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-user menu-icon"></i>
+                        <span class="menu-text">Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cog menu-icon"></i>
+                        <span class="menu-text">Settings</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-envelope menu-icon"></i>
+                        <span class="menu-text">Messages</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-chart-line menu-icon"></i>
+                        <span class="menu-text">Analytics</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="menu logout-menu mt-auto mb-3">
+                <li>
+                    <a href="#">
+                        <i class="fas fa-sign-out-alt menu-icon"></i>
+                        <span class="menu-text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Page Content -->
+        <main class="content" id="page-content">
+            @RenderBody() <!-- ← This line is REQUIRED to fix your error -->
+
+            @await RenderSectionAsync("Scripts", required: false)
         </main>
+
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - MeetingManagement - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <div id="sidebarBackdrop" class="sidebar-backdrop" style="display:none"></div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery-4.0.0.min.js"></script>
+    <script src="~/lib/bootstrap-4.4.1-dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            function closeSidebar() {
+                $('body').removeClass('sidebar-expanded');
+                $('#sidebarBackdrop').hide();
+            }
+
+            function openSidebar() {
+                $('body').addClass('sidebar-expanded');
+                $('#sidebarBackdrop').show();
+            }
+
+            $('#sidebarToggle').on('click', function () {
+                if ($('body').hasClass('sidebar-expanded')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+
+            $('#sidebarBackdrop').on('click', function () {
+                closeSidebar();
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("AfterBodyScripts", required: false)
 </body>
+
 </html>

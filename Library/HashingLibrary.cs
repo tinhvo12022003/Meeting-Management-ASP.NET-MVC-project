@@ -23,17 +23,16 @@ public class HashingLibrary
 
     public string HashRefreshToken(string refreshToken)
     {
-        return _hasher.HashPassword(new object(), refreshToken);
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var bytes = System.Text.Encoding.UTF8.GetBytes(refreshToken);
+        var hash = sha256.ComputeHash(bytes);
+        return Convert.ToBase64String(hash);
     }
 
     public bool VerifyRefreshToken(string inputToken, string storedHash)
     {
-        var result = _hasher.VerifyHashedPassword(
-            new object(),
-            storedHash,
-            inputToken);
-
-        return result == PasswordVerificationResult.Success;
+        var inputHash = HashRefreshToken(inputToken);
+        return inputHash == storedHash;
     }
 
 }

@@ -1,4 +1,3 @@
-using MeetingManagement.Attr.Permission;
 using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +21,7 @@ public class AuthController : Controller
     {
         if (User.Identity != null && User.Identity.IsAuthenticated)
             return RedirectToAction("Index", "Home");
-
+        
         return View();
     }
 
@@ -88,7 +87,26 @@ public class AuthController : Controller
         {
             await _authService.Logout(refreshToken);
         }
+        // Ensure cookies are removed by setting them expired with the same cookie options
+        var secure = Request.IsHttps;
 
+        Response.Cookies.Append("access_token", "", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = secure,
+            SameSite = SameSiteMode.Lax,
+            Expires = DateTimeOffset.UtcNow.AddDays(-1)
+        });
+
+        Response.Cookies.Append("refresh_token", "", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = secure,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTimeOffset.UtcNow.AddDays(-1)
+        });
+
+        // Also try Delete for good measure
         Response.Cookies.Delete("access_token");
         Response.Cookies.Delete("refresh_token");
 

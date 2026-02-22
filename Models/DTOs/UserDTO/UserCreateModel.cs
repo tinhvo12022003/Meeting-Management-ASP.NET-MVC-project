@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MeetingManagement.Enum;
 
@@ -25,6 +24,9 @@ public class UserCreateModel
     [EnumDataType(typeof(Gender), ErrorMessage = "Invalid gender!")]
     public Gender Gender;
 
-    [EnumDataType(typeof(RowStatus), ErrorMessage = "Invalid status!")]
-    public RowStatus RowStatus {get; set;}
+    
+    public string CompanyId {get; set;} = string.Empty;
+
+    public string DepartmentId {get; set;} = string.Empty;
+
 }

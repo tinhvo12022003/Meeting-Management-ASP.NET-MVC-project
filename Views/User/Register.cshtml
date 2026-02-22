@@ -1,0 +1,176 @@
+@using MeetingManagement.Models.DTOs
+@model UserCreateModel
+
+
+@{
+    ViewData["Title"] = "Register User";
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Tạo người dùng mới</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/wwwroot/lib/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/wwwroot/lib/fontawesome-free-7.2.0-web/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/wwwroot/css/style.css">
+    <link rel="stylesheet" href="/wwwroot/css/admin-form.css">
+
+    <!-- JS -->
+    <script src="/wwwroot/lib/jquery-4.0.0.min.js"></script>
+    <script src="/wwwroot/lib/bootstrap-4.4.1-dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+</head>
+
+<body>
+
+    <div class="d-flex" id="wrapper">
+
+        <!-- Page Content -->
+        <main class="content" id="page-content">
+            <div class="container-center">
+                <nav aria-label="breadcrumb" style="width: 100%; max-width: 800px;">
+                    <ol class="breadcrumb" style="background: transparent; padding: 0; margin-bottom: 2rem;">
+                        <li class="breadcrumb-item"><a href="#">Hệ thống</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thêm nhân viên mới</li>
+                    </ol>
+                </nav>
+
+                <div class="admin-form-container">
+                    <div class="admin-form-header">
+                        <div>
+                            <h2>Thêm tài khoản mới</h2>
+                            <p class="text-muted mb-0" style="font-size: 0.875rem;">Thiết lập thông tin cho nhân viên
+                                mới
+                                trong hệ thống.</p>
+                            </div>
+                        </div>
+
+                        <div class="admin-form-body">
+                            <!-- Ảnh đại diện -->
+                            <div class="admin-avatar-section">
+                                <div class="admin-avatar-preview" id="avatarPreview">
+                                    <ion-icon name="person"></ion-icon>
+                                </div>
+                                <div class="admin-avatar-info">
+                                    <input type="file" id="adminAvatarUpload" style="display: none;" accept="image/*">
+                                    <button class="btn btn-ghost mb-2"
+                                            onclick="document.getElementById('adminAvatarUpload').click()">
+                                        <i class="fas fa-upload mr-2"></i> Tải ảnh lên
+                                    </button>
+                                    <p>Định dạng JPG, PNG. Dung lượng tối đa 2MB.</p>
+                                </div>
+                            </div>
+
+                            <form id="createAccountForm">
+                                <!-- Section 1: Thông tin tài khoản -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <ion-icon name="key-outline"></ion-icon> Thông tin tài khoản
+                                    </div>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="adminUsername">Tên đăng nhập *</label>
+                                            <input type="text" id="adminUsername" placeholder="Ví dụ: anv_123" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="adminEmail">Email công việc *</label>
+                                            <input type="email" id="adminEmail" placeholder="an.nguyen@company.com"
+                                                   required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tempPassword">Mật khẩu tạm thời</label>
+                                            <input type="password" id="tempPassword" placeholder="••••••••">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="userRole">Phân quyền hệ thống</label>
+                                            <select id="userRole">
+                                                <option value="staff">Nhân viên (Staff)</option>
+                                                <option value="manager">Quản lý (Manager)</option>
+                                                <option value="admin">Quản trị viên (Admin)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Section 2: Thông tin cá nhân -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <ion-icon name="person-outline"></ion-icon> Thông tin cá nhân
+                                    </div>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="adminFullName">Họ và tên *</label>
+                                            <input type="text" id="adminFullName" placeholder="Nguyễn Văn An" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="adminPhone">Số điện thoại</label>
+                                            <input type="tel" id="adminPhone" placeholder="090 123 4567">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="department">Phòng ban</label>
+                                            <select id="department">
+                                                <option value="hr">Nhân sự (HR)</option>
+                                                <option value="tech">Kỹ thuật (Tech)</option>
+                                                <option value="sale">Kinh doanh (Sales)</option>
+                                                <option value="mkt">Marketing</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="startDate">Ngày gia nhập</label>
+                                            <input type="date" id="startDate">
+                                        </div>
+                                        <div class="form-group full-width">
+                                            <label for="adminNote">Ghi chú (Nội bộ)</label>
+                                            <textarea id="adminNote" rows="3"
+                                                      placeholder="Thông tin bổ sung về nhân viên..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="admin-form-footer">
+                            <button type="button" class="btn btn-ghost">Hủy bỏ</button>
+                            <button type="submit" form="createAccountForm" class="btn btn-primary">Xác nhận tạo tài
+                                khoản</button>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+
+                <script>
+                    $(document).ready(function () {
+                    // Sidebar toggle logic
+                    $('#sidebarToggle').on('click', function () {
+                    $('#sidebar').toggleClass('collapsed');
+                    });
+
+                    // Avatar preview logic
+                    $('#adminAvatarUpload').on('change', function () {
+                    const file = this.files[0];
+                    if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                    $('#avatarPreview').html(`<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`);
+                    }
+                    reader.readAsDataURL(file);
+                    }
+                    });
+
+                    // Form submit logic
+                    $('#createAccountForm').on('submit', function (e) {
+                    e.preventDefault();
+                    alert('Tài khoản đã được khởi tạo thành công!');
+                    // Reset form hoặc chuyển hướng
+                    });
+                    });
+                </script>
+            </body>
+
+        </html>

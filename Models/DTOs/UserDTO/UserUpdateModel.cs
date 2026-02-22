@@ -5,6 +5,9 @@ namespace MeetingManagement.Models.DTOs;
 
 public class UserUpdateModel
 {
+    
+    public string Id {get; set;} = string.Empty;
+
     [StringLength(maximumLength:100)]
     [Required]
     public string FullName { get; set; } = string.Empty;
@@ -23,6 +26,9 @@ public class UserUpdateModel
 
     [EnumDataType(typeof(Gender), ErrorMessage = "Invalid gender!")]
     public Gender Gender;
+
+    public string CompanyId {get; set;} = string.Empty;
+    public string DepartmentId {get; set;} = string.Empty;
 
     [EnumDataType(typeof(RowStatus), ErrorMessage = "Invalid status!")]
     public RowStatus RowStatus {get; set;}

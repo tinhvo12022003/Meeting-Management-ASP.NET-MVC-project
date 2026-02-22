@@ -12,4 +12,7 @@ public class MessageConstant
     public static string LOGIN_ERROR {get; set;} = "Username or Password is incorrect";
     public static string INVALID_PASSWORD {get; set;} = "Password is invalid";
     public static string ACCOUNT_DISABLE {get; set;} = "Account is disable";
+    public static string ACCOUNT_EXISTED {get; set;} = "Account is existed";
+    public static string NOT_EXISTED {get; set;} = "Data is not existed";
+    public static string INACTIVE {get; set;} = "Data is disable";
 }

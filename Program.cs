@@ -16,12 +16,17 @@ using MeetingManagement.Service.Jwt;
 using MeetingManagement.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new AuthorizeFilter());
+});
 builder.Services.AddAutoMapper(
     _ => { /* config action trống nếu không cần */ },
     typeof(AutoMapperConfig).Assembly
@@ -59,6 +64,12 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
+            // Nếu Header đã có Authorization (do TokenRefreshMiddleware gán sau khi refresh), thì dùng nó.
+            if (context.Request.Headers.ContainsKey("Authorization"))
+            {
+                return Task.CompletedTask;
+            }
+
             context.Token = context.Request.Cookies["access_token"];
             return Task.CompletedTask;
         }
@@ -67,7 +78,13 @@ builder.Services.AddAuthentication(options =>
 });
 
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Require authenticated user by default for all endpoints unless [AllowAnonymous] is present
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddHttpContextAccessor();
@@ -91,7 +108,7 @@ builder.Services.AddScoped<UserHelper>();
 builder.Services.AddScoped<HashingLibrary>();
 
 
-builder.Services.AddAuthorization();
+// Note: Authorization already configured with a fallback policy above.
 
 var app = builder.Build();
 
@@ -103,6 +120,21 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == 401 &&
+        context.Request.Headers["Accept"].ToString().Contains("text/html"))
+    {
+        context.Response.Redirect("/auth/login");
+    }
+});
+
+app.UseMiddleware<MeetingManagement.Middleware.TokenRefreshMiddleware>();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
