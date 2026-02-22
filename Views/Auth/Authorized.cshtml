@@ -1,0 +1,322 @@
+
+@{
+    ViewData["Title"] = "Phân quyền";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/admin-form.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/authorized.css" asp-append-version="true">
+}
+
+<div class="container-center">
+    <nav aria-label="breadcrumb" style="width: 100%; max-width: 800px;">
+        <ol class="breadcrumb" style="background: transparent; padding: 0; margin-bottom: 2rem;">
+            <li class="breadcrumb-item"><a href="#">Hệ thống</a></li>
+            <li class="breadcrumb-item"><a href="#">Người dùng</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Phân quyền</li>
+        </ol>
+    </nav>
+
+    <div class="admin-form-container">
+        <div class="admin-form-header">
+            <div>
+                <h2>Thiết lập quyền hạn</h2>
+                <p class="text-muted mb-0" style="font-size: 0.875rem;">Quản lý chi tiết các hành động người
+                    dùng có thể thực hiện.</p>
+            </div>
+        </div>
+
+        <div class="admin-form-body">
+            <!-- User Selection/Display Section -->
+            <div class="user-profile-header mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="user-avatar mr-3">
+                        <img src="https://ui-avatars.com/api/?name=Nguyen+Van+An&background=4f46e5&color=fff"
+                             alt="User Avatar" class="rounded-circle"
+                             style="width: 64px; height: 64px; border: 3px solid #e2e8f0;">
+                    </div>
+                    <div class="user-info">
+                        <h4 class="mb-1" style="font-weight: 700; color: var(--text-dark);">Nguyễn Văn An</h4>
+                        <div class="d-flex align-items-center text-muted" style="font-size: 0.875rem;">
+                            <span class="mr-3"><i class="far fa-envelope mr-1"></i> an.nguyen@company.com</span>
+                            <span><i class="fas fa-id-badge mr-1"></i> ID: #USR-1204</span>
+                        </div>
+                        <div class="mt-2 text-primary" id="btnChangeUser"
+                             style="font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-exchange-alt mr-1"></i> Thay đổi người dùng
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Search Section (Hidden by default) -->
+            <div id="userSearchSection" class="mb-4"
+                 style="display: none; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0" style="font-weight: 600;">Tìm kiếm người dùng</h6>
+                    <button type="button" id="closeSearch" class="btn p-0 text-muted"
+                            style="background:none; border:none;"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-white border-right-0"
+                              style="border-radius: 8px 0 0 8px;"><i class="fas fa-search text-muted"></i></span>
+                    </div>
+                    <input type="text" class="form-control border-left-0"
+                           style="border-radius: 0 8px 8px 0;" placeholder="Nhập tên, email..."
+                           id="userSearchInput">
+                </div>
+                <div class="search-results" style="max-height: 150px; overflow-y: auto;">
+                    <div class="p-2 border-bottom d-flex align-items-center result-item"
+                         style="cursor: pointer;">
+                        <div class="mr-2 rounded-circle"
+                             style="width: 24px; height: 24px; background: #4f46e5; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;">
+                            TB
+                        </div>
+                        <span style="font-size: 0.875rem;">Trần Thị Bích (bich.tt@company.com)</span>
+                    </div>
+                    <div class="p-2 border-bottom d-flex align-items-center result-item"
+                         style="cursor: pointer;">
+                        <div class="mr-2 rounded-circle"
+                             style="width: 24px; height: 24px; background: #10b981; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;">
+                            LC
+                        </div>
+                        <span style="font-size: 0.875rem;">Lê Văn Cường (cuong.lv@company.com)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Control Banner -->
+            <div class="full-control-card">
+                <div>
+                    <h3>Quyền tối cao (Full Control)</h3>
+                    <p>Cho phép người dùng thực hiện tất cả các hành động trong hệ thống.</p>
+                </div>
+                <div class="custom-control custom-switch full-control-switch">
+                    <input type="checkbox" class="custom-control-input" id="fullControl">
+                    <label class="custom-control-label" for="fullControl"></label>
+                </div>
+            </div>
+
+            <!-- Permission Sections -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-list-check"></i> Chi tiết quyền hạn
+                </div>
+
+                <table class="permission-table">
+                    <thead>
+                        <tr>
+                            <th>Chức năng</th>
+                            <th class="text-center">Xem</th>
+                            <th class="text-center">Thêm</th>
+                            <th class="text-center">Sửa</th>
+                            <th class="text-center">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="permission-item">
+                            <td>
+                                <div class="permission-group-title">
+                                    <i class="fas fa-users text-muted"></i> Quản lý người dùng
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="userView">
+                                    <label class="custom-control-label" for="userView"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="userCreate">
+                                    <label class="custom-control-label" for="userCreate"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="userEdit">
+                                    <label class="custom-control-label" for="userEdit"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="userDelete">
+                                    <label class="custom-control-label" for="userDelete"></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="permission-item">
+                            <td>
+                                <div class="permission-group-title">
+                                    <i class="fas fa-folder-open text-muted"></i> Quản lý dự án
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="projectView">
+                                    <label class="custom-control-label" for="projectView"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="projectCreate">
+                                    <label class="custom-control-label" for="projectCreate"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="projectEdit">
+                                    <label class="custom-control-label" for="projectEdit"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="projectDelete">
+                                    <label class="custom-control-label" for="projectDelete"></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="permission-item">
+                            <td>
+                                <div class="permission-group-title">
+                                    <i class="fas fa-file-invoice-dollar text-muted"></i> Quản lý tài chính
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="finView">
+                                    <label class="custom-control-label" for="finView"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="finCreate">
+                                    <label class="custom-control-label" for="finCreate"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="finEdit">
+                                    <label class="custom-control-label" for="finEdit"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="finDelete">
+                                    <label class="custom-control-label" for="finDelete"></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="permission-item">
+                            <td>
+                                <div class="permission-group-title">
+                                    <i class="fas fa-chart-line text-muted"></i> Báo cáo hệ thống
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="reportView">
+                                    <label class="custom-control-label" for="reportView"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input sub-permission"
+                                           id="reportExport">
+                                    <label class="custom-control-label" for="reportExport"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">-</td>
+                            <td class="text-center">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="admin-form-footer">
+            <button type="button" class="btn btn-ghost">Hủy bỏ</button>
+            <button type="submit" class="btn btn-primary" id="savePermissions">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Logic Phân quyền
+            const $fullControl = $('#fullControl');
+            const $subPermissions = $('.sub-permission');
+
+            // 1. Khi nhấn "Full Control"
+            $fullControl.on('change', function () {
+                const isChecked = $(this).prop('checked');
+                // Set tất cả các quyền con theo trạng thái của Full Control
+                $subPermissions.prop('checked', isChecked);
+            });
+
+            // 2. Khi nhấn từng quyền con
+            $subPermissions.on('change', function () {
+                // Nếu bỏ check bất kỳ quyền con nào -> bỏ check Full Control
+                if (!$(this).prop('checked')) {
+                    $fullControl.prop('checked', false);
+                }
+                // Nếu tất cả quyền con đều đã được check -> tự động check Full Control
+                else {
+                    const allChecked = $subPermissions.length === $subPermissions.filter(':checked').length;
+                    if (allChecked) {
+                        $fullControl.prop('checked', true);
+                    }
+                }
+            });
+
+            // Logic Thay đổi người dùng
+            $('#btnChangeUser').on('click', function () {
+                $('#userSearchSection').slideDown();
+            });
+
+            $('#closeSearch').on('click', function () {
+                $('#userSearchSection').slideUp();
+            });
+
+            $('.result-item').on('click', function () {
+                const nameAndEmail = $(this).find('span').text();
+                const name = nameAndEmail.split('(')[0].trim();
+                const email = nameAndEmail.split('(')[1].replace(')', '').trim();
+
+                // Cập nhật giao diện (Mô phỏng)
+                $('.user-info h4').text(name);
+                $('.user-info span:first').html(`<i class="far fa-envelope mr-1"></i> ${email}`);
+
+                // Ẩn search section
+                $('#userSearchSection').slideUp();
+            });
+
+            // Submit logic
+            $('#savePermissions').on('click', function () {
+                const permissions = {};
+                $subPermissions.each(function () {
+                    permissions[$(this).attr('id')] = $(this).prop('checked') ? 1 : 0;
+                });
+
+                console.log('Permissions to save:', permissions);
+                alert('Đã cập nhật quyền hạn thành công!');
+            });
+        });
+    </script>
+}

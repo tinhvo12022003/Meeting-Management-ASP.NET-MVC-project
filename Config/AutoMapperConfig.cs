@@ -8,7 +8,6 @@ public class AutoMapperConfig : Profile
 {
     public AutoMapperConfig()
     {
-        CreateMap<AccountModel, AccountViewModel>();
         CreateMap<CompanyModel, CompanyViewModel>();
         CreateMap<DepartmentModel, DepartmentViewModel>().ForMember(
             des => des.CompanyName, opt => opt.MapFrom(s => s.Company != null ? s.Company.Name : "")

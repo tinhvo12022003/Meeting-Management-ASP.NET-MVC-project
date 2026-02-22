@@ -27,6 +27,10 @@ public class UserUpdateModel
     [EnumDataType(typeof(Gender), ErrorMessage = "Invalid gender!")]
     public Gender Gender;
 
+    public string Username {get; set;} = string.Empty;
+    public string PlainPassword {get; set;} = string.Empty;
+    public string ConfirmPlainPassword {get; set;} = string.Empty;
+
     public string CompanyId {get; set;} = string.Empty;
     public string DepartmentId {get; set;} = string.Empty;
 

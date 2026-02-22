@@ -14,7 +14,8 @@ aside.sidebar {
     top: 0;
     left: 0;
     height: 100%;
-    width: 80px; /* default: narrow */
+    width: 80px;
+    /* default: narrow */
     background-color: #1a1a1a;
     color: #fff;
     transition: width 0.25s ease, transform 0.25s ease;
@@ -27,6 +28,36 @@ aside.sidebar {
 /* Expanded state overlays content without shifting it */
 body.sidebar-expanded aside.sidebar {
     width: 250px;
+}
+
+/* 
+   Main Content Area 
+   Sử dụng padding đối xứng (80px trái - 80px phải) để cân bằng với sidebar,
+   giúp nội dung luôn nằm chính xác ở trung tâm toàn bộ trang web (50vw).
+*/
+main.content {
+    width: 100%;
+    margin-left: 0;
+    padding: 2rem 80px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Không thay đổi padding khi sidebar expand để nội dung không bị rung lắc */
+body.sidebar-expanded main.content {
+    margin-left: 0;
+    padding: 2rem 80px;
+}
+
+.container-center {
+    width: 100%;
+    max-width: 1000px;
+    /* Giới hạn độ rộng tối đa để form không quá bè */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Sidebar Header / Logo Area */
@@ -151,10 +182,7 @@ body.sidebar-expanded aside.sidebar .menu-text {
 
 
 /* Main Content Area */
-main.content {
-    margin-left: 0; /* content stays full width and is not shifted */
-    padding: 20px;
-}
+/* Removed old main.content block to use the one at the top */
 
 /* Backdrop when sidebar overlays content */
 .sidebar-backdrop {
@@ -227,8 +255,13 @@ main.content {
         margin-right: 15px;
     }
 
-    /* Main Content stays full width */
+    /* Main Content stays shifted at 80px even on mobile for consistency */
     main.content {
-        margin-left: 0;
+        margin-left: 80px;
+        padding: 1.5rem 10px;
+    }
+
+    body.sidebar-expanded main.content {
+        margin-left: 80px;
     }
 }

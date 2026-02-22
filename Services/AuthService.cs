@@ -15,7 +15,6 @@ namespace MeetingManagement.Service;
 public class AuthService : IAuthService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IAccountRepository _accountRepository;
     private readonly IUserRepository _userRepository;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IConfiguration _configuration;
@@ -26,7 +25,6 @@ public class AuthService : IAuthService
     private readonly UserHelper _helper;
     public AuthService(
         IUnitOfWork unitOfWork,
-        IAccountRepository accountRepository,
         IRefreshTokenRepository refreshTokenRepository,
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
@@ -38,7 +36,6 @@ public class AuthService : IAuthService
         )
     {
         _unitOfWork = unitOfWork;
-        _accountRepository = accountRepository;
         _refreshTokenRepository = refreshTokenRepository;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
@@ -51,12 +48,13 @@ public class AuthService : IAuthService
 
     public async Task<AccountLoginResponse> Login(LoginDTO login)
     {
-        if (string.IsNullOrWhiteSpace(login.Username) || string.IsNullOrWhiteSpace(login.Password))
+        if (string.IsNullOrWhiteSpace(login.Username) || string.IsNullOrWhiteSpace(login.PlainPassword))
         {
             throw new ArgumentException(MessageConstant.EMPTY_STRING);
         }
 
-        var account = await _accountRepository.GetByUsername(login.Username);
+        var account = await _userRepository.GetByUsername(login.Username);
+
         if (account == null)
         {
             throw new UnauthorizedAccessException(MessageConstant.ACCOUNT_NOT_EXISTED);
@@ -65,22 +63,16 @@ public class AuthService : IAuthService
         {
             throw new Exception(MessageConstant.ACCOUNT_DISABLE);
         }
-        if (!_hashing.VerifyPassword(login.Password, account.HashPassword))
+        if (!_hashing.VerifyPassword(login.PlainPassword, account.HashPassword))
         {
             throw new UnauthorizedAccessException(MessageConstant.INVALID_PASSWORD);
         }
-        var user = await _userRepository.GetById(account.UserId);
-        if (user == null)
-        {
-            throw new InvalidOperationException("User not found for this account.");
-        }
-
-        var accessToken = await _jwtService.GenerateAccessToken(account.Id, account.Username, user.Id);
+        
+        var accessToken = await _jwtService.GenerateAccessToken(account.Id, account.Username);
         var refreshTokenValue = _jwtService.GenerateRefreshToken();
         var newRefreshTokenHash = _hashing.HashRefreshToken(refreshTokenValue);
         var expirationDays = _configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays");
 
-        // Kiểm tra xem browser có gửi kèm refresh token cũ không (Cookie)
         var currentRefreshTokenCookie = _httpContextAccessor.HttpContext?.Request.Cookies["refresh_token"];
         RefreshTokenModel? existingTokenEntity = null;
 
@@ -92,7 +84,7 @@ public class AuthService : IAuthService
         }
 
         // KỊCH BẢN 1: Tái sử dụng dòng cũ (Token Rotation) nếu token cũ thuộc về chính user này
-        if (existingTokenEntity != null && existingTokenEntity.AccountId == account.Id)
+        if (existingTokenEntity != null && existingTokenEntity.UserId == account.Id)
         {
             existingTokenEntity.TokenHash = newRefreshTokenHash;
             existingTokenEntity.ExpiresAt = DateTime.UtcNow.AddDays(expirationDays);
@@ -108,7 +100,7 @@ public class AuthService : IAuthService
             var refreshTokenEntity = new RefreshTokenModel
             {
                 TokenHash = newRefreshTokenHash,
-                AccountId = account.Id,
+                UserId = account.Id,
                 ExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
                 LoginAt = DateTime.UtcNow,
                 RevokedAt = null,
@@ -116,7 +108,7 @@ public class AuthService : IAuthService
             };
 
             // Giới hạn 5 thiết bị đăng nhập cùng lúc
-            var activeTokens = await _unitOfWork.RefreshTokens.GetActiveByAccountId(account.Id);
+            var activeTokens = await _unitOfWork.RefreshTokens.GetActiveByUserId(account.Id);
             if (activeTokens.Count() >= 5)
             {
                 var oldest = activeTokens.OrderBy(t => t.LoginAt).First();
@@ -134,7 +126,7 @@ public class AuthService : IAuthService
             AccessToken = accessToken,
             RefreshToken = refreshTokenValue,
             RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
-            User = _mapper.Map<UserViewModel>(user)
+            User = _mapper.Map<UserViewModel>(account)
         };
     }
 
@@ -152,7 +144,7 @@ public class AuthService : IAuthService
 
         if (tokenData.ReplacedByToken != null)
         {
-            await _unitOfWork.RefreshTokens.RevokeAllByAccountId(tokenData.AccountId);
+            await _unitOfWork.RefreshTokens.RevokeAllByUserId(tokenData.UserId);
             throw new SecurityException("Reuse detected");
         }
 
@@ -172,14 +164,13 @@ public class AuthService : IAuthService
         await _unitOfWork.CommitAsync();
 
         // Fetch user and account information
-        var account = await _unitOfWork.Accounts.GetById(tokenData.AccountId);
-        var user = await _userRepository.GetById(tokenData.Account.UserId)
+        var account = await _unitOfWork.Users.GetById(tokenData.UserId);
+        var user = await _userRepository.GetById(tokenData.User.Id)
             ?? throw new Exception("User not found");
 
         var accessToken = await _jwtService.GenerateAccessToken(
-            tokenData.AccountId,
-            tokenData.Account.Username,
-            tokenData.Account.UserId
+            tokenData.UserId,
+            tokenData.User.Username
         );
 
         return new AccountLoginResponse
@@ -198,11 +189,11 @@ public class AuthService : IAuthService
         var token = await _refreshTokenRepository.GetByTokenHash(hash);
 
         if (token != null)
-            await _unitOfWork.RefreshTokens.RevokeAllByAccountId(token.AccountId);
+            await _unitOfWork.RefreshTokens.RevokeAllByUserId(token.UserId);
     }
 
-    public async Task RevokeAllByAccountId(string accountId)
+    public async Task RevokeAllByAccountId(string UserId)
     {
-        await _unitOfWork.RefreshTokens.RevokeAllByAccountId(accountId);
+        await _unitOfWork.RefreshTokens.RevokeAllByUserId(UserId);
     }
 }

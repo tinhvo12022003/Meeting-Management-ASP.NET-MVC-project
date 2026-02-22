@@ -14,7 +14,6 @@ public class ApplicationDbContext : DbContext
 
     }
 
-    public DbSet<AccountModel> Account { get; set; }
     public DbSet<CompanyModel> Company { get; set; }
     public DbSet<DepartmentModel> Department { get; set; }
     public DbSet<MeetingModel> Meeting { get; set; }
@@ -68,16 +67,6 @@ public class ApplicationDbContext : DbContext
 
         }
 
-        modelBuilder.Entity<AccountModel>(entity =>
-        {
-            entity.ToTable(name: "Accounts");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).IsRequired().HasColumnName(name: "Id").HasColumnType(typeName: "NVARCHAR(100)").HasValueGenerator<PrefixStringIdGenerator>().ValueGeneratedOnAdd();
-            entity.Property(e => e.Username).IsRequired().HasColumnName(name: "Username").HasColumnType(typeName: "NVARCHAR(100)");
-            entity.Property(e => e.HashPassword).IsRequired().HasColumnName(name: "Password").HasMaxLength(150).HasColumnType(typeName: "NVARCHAR(150)");
-            entity.Property(e => e.UserId).HasColumnName(name: "UserId").HasColumnType(typeName: "NVARCHAR(100)");
-            entity.HasOne(a => a.User).WithOne(p => p.Account).HasForeignKey<AccountModel>(a => a.UserId).OnDelete(DeleteBehavior.NoAction).OnDelete(DeleteBehavior.NoAction);
-        });
 
 
         modelBuilder.Entity<CompanyModel>(entity =>
@@ -179,6 +168,8 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(a => a.Department).WithMany(p => p.Users).HasForeignKey(a => a.DepartmentId).OnDelete(DeleteBehavior.NoAction);
             entity.Property(e => e.CompanyId).HasColumnName(name: "CompanyId").HasColumnType(typeName: "NVARCHAR(100)");
             entity.HasOne(a => a.Company).WithMany(p => p.Users).HasForeignKey(a => a.CompanyId).OnDelete(DeleteBehavior.NoAction);
+            entity.Property(e => e.Username).HasColumnName(name: "Username").HasColumnType(typeName: "NVARCHAR(100)");
+            entity.Property(e => e.HashPassword).HasColumnName(name: "Password").HasColumnType(typeName: "NVARCHAR(100)");
         });
 
         modelBuilder.Entity<RefreshTokenModel>(entity =>
@@ -191,10 +182,9 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.LoginAt).HasColumnName(name: "LoginAt").HasColumnType(typeName: "DATETIME2");
             entity.Property(e => e.RevokedAt).HasColumnName(name: "RevokedAt").HasColumnType(typeName: "DATETIME2");
             entity.Property(e => e.ReplacedByToken).HasColumnName(name: "ReplacedByToken").HasColumnType(typeName: "NVARCHAR(1000)");
-            entity.Property(e => e.AccountId).IsRequired().HasColumnName(name: "AccountId").HasColumnType(typeName: "NVARCHAR(100)");
-            entity.HasOne(a => a.Account).WithMany(p => p.RefreshTokens).HasForeignKey(a => a.AccountId).OnDelete(DeleteBehavior.Cascade);
+            entity.Property(e => e.UserId).IsRequired().HasColumnName(name: "UserId").HasColumnType(typeName: "NVARCHAR(100)");
+            entity.HasOne(a => a.User).WithMany(p => p.RefreshTokens).HasForeignKey(a => a.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(x => x.TokenHash).IsUnique();
-            entity.HasIndex(x => x.AccountId);
         });
 
         base.OnModelCreating(modelBuilder);

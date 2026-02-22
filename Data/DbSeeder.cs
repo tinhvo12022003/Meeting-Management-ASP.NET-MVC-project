@@ -16,7 +16,7 @@ public static class DbSeeder
         await context.Database.MigrateAsync();
 
 
-        if (!await context.Account.AnyAsync())
+        if (!await context.User.AnyAsync())
         {
             
             var company = new CompanyModel
@@ -33,14 +33,6 @@ public static class DbSeeder
                 RowStatus = RowStatus.ACTIVE
             };
 
-            var account = new AccountModel
-            {
-                Id = "00001",
-                Username = "admin", 
-                HashPassword = hashing.HashPassword("12345678"),
-                RowStatus = RowStatus.ACTIVE
-            };
-
             var user = new UserModel
             {
                 FullName = "system", 
@@ -48,21 +40,22 @@ public static class DbSeeder
                 Email = "sys123@gmail.com",
                 Phone = "012345678",
                 Birthday = DateOnly.FromDateTime(DateTime.UtcNow),
-                Account = account,
                 Department = department, 
                 Company = company, 
                 Gender = Gender.MALE,
-                RowStatus = RowStatus.ACTIVE
+                RowStatus = RowStatus.ACTIVE, 
+                Username = "admin", 
+                HashPassword = "AQAAAAIAAYagAAAAECR3DscyOfXBdUWF3h6AZAFjF08kw2xrlysZTL5Y2Wx29h4qay07ZTohhhUXicYR/A=="
             };
 
             var permissions = new PermissionModel
             {
                 FullPermission = true,
+                User = user,
             };
 
             context.Company.Add(company);
             context.Department.Add(department);
-            context.Account.Add(account);
 
             context.User.Add(user);
             context.Permission.Add(permissions);

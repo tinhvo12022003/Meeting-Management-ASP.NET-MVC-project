@@ -22,64 +22,6 @@ namespace MeetingManagement.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("MeetingManagement.Models.AccountModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("Id");
-
-                    b.Property<DateTime>("CreateAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("DATETIME2")
-                        .HasColumnName("CreateAt")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("CreateBy")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("NVARCHAR(100)")
-                        .HasDefaultValue("SYSTEM");
-
-                    b.Property<string>("HashPassword")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("NVARCHAR(150)")
-                        .HasColumnName("Password");
-
-                    b.Property<int>("RowStatus")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdateAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("DATETIME2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("UpdateBy")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("NVARCHAR(100)")
-                        .HasDefaultValue("SYSTEM")
-                        .HasColumnName("UpdateBy");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("UserId");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("Username");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Accounts", (string)null);
-                });
-
             modelBuilder.Entity("MeetingManagement.Models.CompanyModel", b =>
                 {
                     b.Property<string>("Id")
@@ -389,11 +331,6 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("NVARCHAR(100)")
                         .HasColumnName("Id");
 
-                    b.Property<string>("AccountId")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("AccountId");
-
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("DATETIME2")
@@ -442,12 +379,17 @@ namespace MeetingManagement.Migrations
                         .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
 
-                    b.HasKey("Id");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnName("UserId");
 
-                    b.HasIndex("AccountId");
+                    b.HasKey("Id");
 
                     b.HasIndex("TokenHash")
                         .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("RefreshToken", (string)null);
                 });
@@ -458,10 +400,6 @@ namespace MeetingManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
                         .HasColumnName("Id");
-
-                    b.Property<string>("AccountId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Address")
                         .HasColumnType("NVARCHAR(255)")
@@ -505,6 +443,11 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("TINYINT")
                         .HasColumnName("Gender");
 
+                    b.Property<string>("HashPassword")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnName("Password");
+
                     b.Property<string>("Phone")
                         .HasColumnType("NVARCHAR(50)")
                         .HasColumnName("Phone");
@@ -523,6 +466,11 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("NVARCHAR(100)")
                         .HasDefaultValue("SYSTEM")
                         .HasColumnName("UpdateBy");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnName("Username");
 
                     b.HasKey("Id");
 
@@ -558,17 +506,6 @@ namespace MeetingManagement.Migrations
                     b.HasIndex("MeetingId");
 
                     b.ToTable("MeetingUsers", (string)null);
-                });
-
-            modelBuilder.Entity("MeetingManagement.Models.AccountModel", b =>
-                {
-                    b.HasOne("MeetingManagement.Models.UserModel", "User")
-                        .WithOne("Account")
-                        .HasForeignKey("MeetingManagement.Models.AccountModel", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MeetingManagement.Models.DepartmentModel", b =>
@@ -633,13 +570,13 @@ namespace MeetingManagement.Migrations
 
             modelBuilder.Entity("MeetingManagement.Models.RefreshTokenModel", b =>
                 {
-                    b.HasOne("MeetingManagement.Models.AccountModel", "Account")
+                    b.HasOne("MeetingManagement.Models.UserModel", "User")
                         .WithMany("RefreshTokens")
-                        .HasForeignKey("AccountId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Account");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MeetingManagement.Models.UserModel", b =>
@@ -680,11 +617,6 @@ namespace MeetingManagement.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MeetingManagement.Models.AccountModel", b =>
-                {
-                    b.Navigation("RefreshTokens");
-                });
-
             modelBuilder.Entity("MeetingManagement.Models.CompanyModel", b =>
                 {
                     b.Navigation("Departments");
@@ -715,12 +647,11 @@ namespace MeetingManagement.Migrations
 
             modelBuilder.Entity("MeetingManagement.Models.UserModel", b =>
                 {
-                    b.Navigation("Account")
-                        .IsRequired();
-
                     b.Navigation("MeetingUser");
 
                     b.Navigation("Permissions");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

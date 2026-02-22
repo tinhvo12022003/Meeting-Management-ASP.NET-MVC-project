@@ -26,33 +26,40 @@
             </div>
             <ul class="menu flex-grow-1">
                 <li>
-                    <a href="#">
+                    <a asp-controller="Home" asp-action="Index">
                         <i class="fas fa-home menu-icon"></i>
-                        <span class="menu-text">Home</span>
+                        <span class="menu-text">Trang chủ</span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
                         <i class="fas fa-user menu-icon"></i>
-                        <span class="menu-text">Profile</span>
+                        <span class="menu-text">Thông tin cá nhân</span>
+                    </a>
+                </li>
+                
+                @* <li>
+                    <a href="#">
+                        <i class="fas fa-envelope menu-icon"></i>
+                        <span class="menu-text">Messages</span>
+                    </a>
+                </li> *@
+                <li>
+                    <a href="calendar.html">
+                        <i class="fas fa-calendar-alt menu-icon"></i>
+                        <span class="menu-text">Lịch họp</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Auth" asp-action="Authorized">
+                        <i class="fas fa-shield-alt menu-icon"></i>
+                        <span class="menu-text">Phân quyền</span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
                         <i class="fas fa-cog menu-icon"></i>
-                        <span class="menu-text">Settings</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-envelope menu-icon"></i>
-                        <span class="menu-text">Messages</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-chart-line menu-icon"></i>
-                        <span class="menu-text">Analytics</span>
+                        <span class="menu-text">Cài đặt</span>
                     </a>
                 </li>
             </ul>
@@ -60,19 +67,17 @@
                 <li>
                     <a href="#">
                         <i class="fas fa-sign-out-alt menu-icon"></i>
-                        <span class="menu-text">Logout</span>
+                        <span class="menu-text">Đăng xuất</span>
                     </a>
                 </li>
+                
             </ul>
         </aside>
 
         <!-- Page Content -->
         <main class="content" id="page-content">
             @RenderBody() <!-- ← This line is REQUIRED to fix your error -->
-
-            @await RenderSectionAsync("Scripts", required: false)
         </main>
-
     </div>
 
     <div id="sidebarBackdrop" class="sidebar-backdrop" style="display:none"></div>
@@ -107,7 +112,7 @@
         });
     </script>
 
+    @await RenderSectionAsync("Scripts", required: false)
     @await RenderSectionAsync("AfterBodyScripts", required: false)
 </body>
-
 </html>

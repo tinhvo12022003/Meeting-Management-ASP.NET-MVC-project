@@ -4,7 +4,6 @@ namespace MeetingManagement.Interface.IUnitOfWork;
 
 public interface IUnitOfWork : IDisposable
 {
-    IAccountRepository Accounts { get; }
     ICompanyRepository Companies {get; }
     IDepartmentRepository Departments {get; }
     IMeetingRepository Meetings { get; }

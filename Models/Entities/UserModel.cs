@@ -17,12 +17,11 @@ public class UserModel : BaseModel
     public DateOnly? Birthday { get; set; }
 
     public Gender Gender;
+    public string Username = string.Empty;
+    public string HashPassword = string.Empty;
 
 
     // relationship
-    public string AccountId {get; set;} = string.Empty;
-    public AccountModel Account { get; set; } = null!;
-
     public string DepartmentId {get; set;} = string.Empty;
     public DepartmentModel? Department { get; set; }
 
@@ -32,5 +31,6 @@ public class UserModel : BaseModel
 
     public ICollection<MeetingUserModel> MeetingUser { get; set; } = new List<MeetingUserModel>();
     public ICollection<PermissionModel> Permissions { get; set; } = new List<PermissionModel>();
+    public ICollection<RefreshTokenModel> RefreshTokens {get; set;} = new List<RefreshTokenModel>();
 
 }

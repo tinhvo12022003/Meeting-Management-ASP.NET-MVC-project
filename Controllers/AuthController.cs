@@ -145,4 +145,10 @@ public class AuthController : Controller
         });
     }
 
+    [Authorize]
+    public IActionResult Authorized ()
+    {
+        return View();
+    }
+
 }

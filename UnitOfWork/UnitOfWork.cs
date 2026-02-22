@@ -6,7 +6,6 @@ namespace MeetingManagement.UnitOfWork;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
-    public IAccountRepository Accounts { get; }
     public ICompanyRepository Companies {get; }
     public IDepartmentRepository Departments {get; }
     public IMeetingRepository Meetings { get; }
@@ -17,7 +16,6 @@ public class UnitOfWork : IUnitOfWork
     public IUserRepository Users {get; }
 
     public UnitOfWork(ApplicationDbContext context,
-                      IAccountRepository accountRepo,
                       ICompanyRepository companyRepo,
                       IDepartmentRepository departmentRepo,
                       IMeetingRepository meetingRepo,
@@ -29,7 +27,6 @@ public class UnitOfWork : IUnitOfWork
                     )
     {
         _context = context;
-        Accounts = accountRepo;
         Companies = companyRepo;
         Departments = departmentRepo;
         Meetings = meetingRepo;

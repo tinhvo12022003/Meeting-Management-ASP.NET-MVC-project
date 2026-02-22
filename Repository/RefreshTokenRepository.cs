@@ -1,7 +1,5 @@
-using System.Security;
 using MeetingManagement.Data.Context;
 using MeetingManagement.Interface.IRepository;
-using MeetingManagement.Interface.IUnitOfWork;
 using MeetingManagement.Library;
 using MeetingManagement.Models;
 using Microsoft.EntityFrameworkCore;
@@ -18,38 +16,34 @@ public class RefreshTokenRepository : GenericRepository<RefreshTokenModel>, IRef
         _hash = hash;
     }
 
-    public async Task<IEnumerable<RefreshTokenModel>> FindAll(string accountId)
+    public async Task<IEnumerable<RefreshTokenModel>> FindAll(string UserId)
     {
         return await _context.RefreshToken
-            .Where(x => x.AccountId == accountId)
+            .Where(x => x.UserId == UserId)
             .ToListAsync();
     }
 
-    public async Task<RefreshTokenModel?> GetByAccountId (string accountId)
-    {
-        return await _context.RefreshToken.FirstOrDefaultAsync(x => x.AccountId == accountId);
-    }
 
-    public async Task<IEnumerable<RefreshTokenModel>> GetActiveByAccountId(string accountId)
+    public async Task<IEnumerable<RefreshTokenModel>> GetActiveByUserId(string UserId)
     {
         return await _context.RefreshToken
-            .Where(x => x.AccountId == accountId && x.RevokedAt == null)
+            .Where(x => x.UserId == UserId && x.RevokedAt == null)
             .ToListAsync();
     }
 
     public async Task<RefreshTokenModel?> GetByTokenHash(string tokenHash)
     {
         return await _context.RefreshToken
-            .Include(x => x.Account)
+            .Include(x => x.User)
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.TokenHash == tokenHash);
     }
 
-    public async Task RevokeAllByAccountId(string accountId)
+    public async Task RevokeAllByUserId(string UserId)
     {
         var now = DateTime.UtcNow;
         await _context.RefreshToken
-            .Where(t => t.AccountId == accountId && t.RevokedAt == null)
+            .Where(t => t.UserId == UserId && t.RevokedAt == null)
             .ExecuteUpdateAsync(x => x.SetProperty(t => t.RevokedAt, now));
     }
 }

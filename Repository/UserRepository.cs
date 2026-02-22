@@ -22,4 +22,9 @@ public class UserRepository : GenericRepository<UserModel>, IUserRepository
     {
         return await _context.User.AnyAsync(x => x.Email == Email);
     }
+
+    public async Task<UserModel?> GetByUsername(string Username)
+    {
+        return await _context.User.FirstOrDefaultAsync(x => x.Username == Username);
+    }
 }

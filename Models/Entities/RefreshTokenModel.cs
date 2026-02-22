@@ -12,7 +12,6 @@ public class RefreshTokenModel : BaseModel
     public DateTime LoginAt { get; set; }
     public DateTime? RevokedAt { get; set; }
     public string? ReplacedByToken { get; set; }
-
-    public string AccountId { get; set; } = string.Empty;
-    public AccountModel Account { get; set; } = null!;
+    public string UserId {get; set;} = null!;
+    public UserModel User {get; set;} = null!;
 }
