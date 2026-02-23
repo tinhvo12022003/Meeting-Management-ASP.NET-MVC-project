@@ -9,6 +9,8 @@ public class MeetingRoomUpdateModel
     [StringLength(maximumLength: 255)]
     public string Name {get; set;} = string.Empty;
 
+    public int Capacity {get; set;}
+
     [Required]
     public string CompanyId {get; set;} = string.Empty;
 

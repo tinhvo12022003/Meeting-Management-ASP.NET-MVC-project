@@ -12,6 +12,7 @@ public class UserViewModel
     public string? Phone { get; set; } = string.Empty;
     public DateOnly? Birthday { get; set; }
     public Gender Gender;
+    public UserType userType;
 
     public string Username {get; set;} = string.Empty;
 

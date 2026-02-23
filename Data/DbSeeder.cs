@@ -23,6 +23,9 @@ public static class DbSeeder
             {
                 Name = "IDI seafood", 
                 Address = "Lap Vo, Dong Thap, VietNam", 
+                Phone = "0779859057",
+                Email = "example123@gmail.com",
+                TaxCode = "023815451",  
                 RowStatus = RowStatus.ACTIVE
             };
 
@@ -43,6 +46,7 @@ public static class DbSeeder
                 Department = department, 
                 Company = company, 
                 Gender = Gender.MALE,
+                userType = UserType.HEAD,
                 RowStatus = RowStatus.ACTIVE, 
                 Username = "admin", 
                 HashPassword = "AQAAAAIAAYagAAAAECR3DscyOfXBdUWF3h6AZAFjF08kw2xrlysZTL5Y2Wx29h4qay07ZTohhhUXicYR/A=="

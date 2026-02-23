@@ -16,7 +16,9 @@ public class UserModel : BaseModel
     public string? Phone { get; set; } = string.Empty;
     public DateOnly? Birthday { get; set; }
 
-    public Gender Gender;
+    public Gender Gender {get; set;}
+    public UserType userType {get; set;}
+    
     public string Username = string.Empty;
     public string HashPassword = string.Empty;
 

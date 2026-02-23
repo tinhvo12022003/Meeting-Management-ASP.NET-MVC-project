@@ -10,6 +10,7 @@ public interface IGenericRepository<T> where T : class
 
     public Task<T> Add(T entity);
     public Task<T> Update(T entity);
+    public Task<List<T>> GetAll();
 
     public Task<PaginatedResponse<T>> GetPaginated(
         PaginatedRequest request,

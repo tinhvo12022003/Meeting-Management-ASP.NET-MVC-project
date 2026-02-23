@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MeetingManagement.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260222131638_CreateInit")]
+    [Migration("20260223145803_CreateInit")]
     partial class CreateInit
     {
         /// <inheritdoc />
@@ -49,13 +49,32 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("NVARCHAR(100)")
                         .HasDefaultValue("SYSTEM");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnName("Email");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(255)")
                         .HasColumnName("Name");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnName("Phone");
+
                     b.Property<int>("RowStatus")
                         .HasColumnType("int");
+
+                    b.Property<string>("TaxCode")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnName("TaxCode");
+
+                    b.Property<byte>("TotalDepartment")
+                        .HasColumnType("TINYINT")
+                        .HasColumnName("TotalDepartment");
 
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -105,6 +124,10 @@ namespace MeetingManagement.Migrations
 
                     b.Property<int>("RowStatus")
                         .HasColumnType("int");
+
+                    b.Property<int>("TotalStaff")
+                        .HasColumnType("INT")
+                        .HasColumnName("TotalStaff");
 
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -223,6 +246,10 @@ namespace MeetingManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
                         .HasColumnName("Id");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("INT")
+                        .HasColumnName("Capacity");
 
                     b.Property<string>("CompanyId")
                         .IsRequired()
@@ -474,6 +501,10 @@ namespace MeetingManagement.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(100)")
                         .HasColumnName("Username");
+
+                    b.Property<byte>("userType")
+                        .HasColumnType("TINYINT")
+                        .HasColumnName("Type");
 
                     b.HasKey("Id");
 

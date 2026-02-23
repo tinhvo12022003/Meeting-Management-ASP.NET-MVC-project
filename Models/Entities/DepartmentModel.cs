@@ -9,6 +9,7 @@ public class DepartmentModel : BaseModel
 {
     public string Id {get; set;} = null!;
     public string Name {get; set;} = string.Empty;
+    public int TotalStaff {get; set;}
 
     // relationship
     public string CompanyId {get; set;} = string.Empty;

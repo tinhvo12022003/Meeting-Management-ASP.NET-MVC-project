@@ -24,6 +24,9 @@ public class UserCreateModel
     [EnumDataType(typeof(Gender), ErrorMessage = "Invalid gender!")]
     public Gender Gender;
 
+    [EnumDataType(typeof(UserType), ErrorMessage = "Invalid type user!")]
+    public UserType userType;
+
     public string Username {get; set;} = string.Empty;
     public string PlainPassword {get; set;} = string.Empty;
     public string ConfirmPlainPassword {get; set;} = string.Empty;

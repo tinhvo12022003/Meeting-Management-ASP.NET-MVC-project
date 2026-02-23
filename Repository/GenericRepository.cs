@@ -16,21 +16,26 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _context = context;
         _dbSet = _context.Set<T>();
     }
-    public async Task<T?> GetById(string Id)
+    public virtual async Task<T?> GetById(string Id)
     {
         return await _dbSet.FindAsync(Id);
     }
 
-    public async Task<T> Add(T entity)
+    public virtual async Task<T> Add(T entity)
     {
         await _dbSet.AddAsync(entity);
         return entity;
     }
 
-    public async Task<T> Update(T entity)
+    public virtual async Task<T> Update(T entity)
     {
         _dbSet.Update(entity);
         return entity;
+    }
+
+    public virtual async Task<List<T>> GetAll()
+    {
+        return await _dbSet.ToListAsync();
     }
 
 
@@ -42,7 +47,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     /// <param name="searchFields">Các trường muốn áp dụng SearchTerm (ví dụ: "Title,Description")</param>
     /// <param name="filterExpressionBuilder">Xây dựng Expression cho ColumnFilters (tùy entity)</param>
 
-    public async Task<PaginatedResponse<T>> GetPaginated(
+    public virtual async Task<PaginatedResponse<T>> GetPaginated(
         PaginatedRequest request,
         Expression<Func<T, bool>>? baseFilter = null,
         string? searchFields = null,

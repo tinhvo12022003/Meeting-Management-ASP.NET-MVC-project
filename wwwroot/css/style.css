@@ -1,11 +1,29 @@
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --bg-color: #f8fafc;
+    --sidebar-bg: #1e293b;
+    --sidebar-hover: #2d3a4f;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Basic resets */
 body,
 html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
 }
 
 /* Sidebar Styling */
@@ -15,253 +33,180 @@ aside.sidebar {
     left: 0;
     height: 100%;
     width: 80px;
-    /* default: narrow */
-    background-color: #1a1a1a;
+    background-color: var(--sidebar-bg);
     color: #fff;
-    transition: width 0.25s ease, transform 0.25s ease;
+    transition: width var(--transition);
     overflow-x: hidden;
     white-space: nowrap;
     z-index: 1000;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Expanded state overlays content without shifting it */
-body.sidebar-expanded aside.sidebar {
-    width: 250px;
-}
-
-/* 
-   Main Content Area 
-   Sử dụng padding đối xứng (80px trái - 80px phải) để cân bằng với sidebar,
-   giúp nội dung luôn nằm chính xác ở trung tâm toàn bộ trang web (50vw).
-*/
-main.content {
-    width: 100%;
-    margin-left: 0;
-    padding: 2rem 80px;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-/* Không thay đổi padding khi sidebar expand để nội dung không bị rung lắc */
-body.sidebar-expanded main.content {
-    margin-left: 0;
-    padding: 2rem 80px;
-}
-
-.container-center {
-    width: 100%;
-    max-width: 1000px;
-    /* Giới hạn độ rộng tối đa để form không quá bè */
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 
-/* Sidebar Header / Logo Area */
+body.sidebar-expanded aside.sidebar {
+    width: 260px;
+}
+
+/* Sidebar Header */
 .sidebar-header {
-    height: 60px;
+    height: 72px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 20px;
-    border-bottom: 1px solid #333;
-    transition: padding 0.3s ease, justify-content 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.sidebar-expanded .sidebar-header {
+    justify-content: space-between;
 }
 
 .logo-text {
-    font-size: 1.2rem;
-    font-weight: bold;
-    opacity: 1;
-    max-width: 150px;
-    transition: opacity 0.2s ease, max-width 0.3s ease;
-    white-space: nowrap;
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0;
+    max-width: 0;
+    transition: var(--transition);
     overflow: hidden;
 }
 
-/* Hide text when collapsed (default) on desktop */
-aside.sidebar .logo-text {
-    opacity: 0;
-    max-width: 0;
-    pointer-events: none;
-    margin: 0;
+body.sidebar-expanded .logo-text {
+    opacity: 1;
+    max-width: 180px;
 }
 
-/* Toggle Button */
 .toggle-btn {
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1.2rem;
-    padding: 5px;
-    outline: none;
-    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
 }
 
-.toggle-btn:focus {
-    outline: none;
+.toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
 }
 
 /* Menu Items */
 .menu {
     list-style: none;
-    padding: 0;
-    margin: 20px 0;
+    padding: 12px;
+    margin: 0;
+    flex-grow: 1;
 }
 
 .menu li {
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .menu a {
     display: flex;
     align-items: center;
-    padding: 15px 25px;
+    padding: 12px;
     text-decoration: none;
-    color: #b0b0b0;
-    transition: background 0.2s, color 0.2s, padding 0.3s ease, justify-content 0.3s ease;
-    border-left: 3px solid transparent;
+    color: #94a3b8;
+    border-radius: 10px;
+    transition: var(--transition);
+    position: relative;
 }
 
 .menu a:hover {
-    background-color: #2c2c2c;
+    background: var(--sidebar-hover);
     color: #fff;
-    border-left-color: #3498db;
+}
+
+.menu a.active {
+    background: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .menu-icon {
-    font-size: 1.2rem;
-    min-width: 30px;
-    /* fixed width for icon alignment */
+    font-size: 1.25rem;
+    min-width: 32px;
     text-align: center;
-    margin-right: 15px;
-    transition: margin-right 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .menu-text {
-    opacity: 1;
-    max-width: 150px;
-    transition: opacity 0.2s ease, max-width 0.3s ease;
-    white-space: nowrap;
+    margin-left: 12px;
+    font-weight: 500;
+    opacity: 0;
+    max-width: 0;
+    transition: var(--transition);
     overflow: hidden;
 }
 
-/* Hide menu text when collapsed (default) on desktop */
-aside.sidebar .menu-text {
-    opacity: 0;
-    max-width: 0;
-    pointer-events: none;
-}
-
-/* Adjustments for collapsed state on desktop */
-/* When expanded, show text and restore paddings */
-body.sidebar-expanded aside.sidebar .sidebar-header {
-    justify-content: space-between;
-    padding: 0 20px;
-}
-
-body.sidebar-expanded aside.sidebar .menu a {
-    justify-content: flex-start;
-    padding: 15px 25px;
-}
-
-body.sidebar-expanded aside.sidebar .menu-icon {
-    margin-right: 15px;
-}
-
-/* When expanded, reveal text */
-body.sidebar-expanded aside.sidebar .logo-text,
-body.sidebar-expanded aside.sidebar .menu-text {
+body.sidebar-expanded .menu-text {
     opacity: 1;
-    max-width: 150px;
-    pointer-events: auto;
+    max-width: 180px;
 }
-
 
 /* Main Content Area */
-/* Removed old main.content block to use the one at the top */
+main.content {
+    margin-left: 80px;
+    width: calc(100% - 80px);
+    min-height: 100vh;
+    transition: var(--transition);
+    padding: 2rem;
+}
 
-/* Backdrop when sidebar overlays content */
+body.sidebar-expanded main.content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    aside.sidebar {
+        width: 0;
+        box-shadow: none;
+    }
+
+    body.sidebar-expanded aside.sidebar {
+        width: 260px;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+    }
+
+    main.content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+    }
+
+    body.sidebar-expanded main.content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* Backdrop for Mobile */
 .sidebar-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
     z-index: 900;
+    display: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-
-    /* Mobile Default: Collapsed (80px) */
-    aside.sidebar {
-        width: 80px;
-    }
-
-    /* Mobile Expanded: show full sidebar */
-    body.sidebar-expanded aside.sidebar {
-        width: 250px;
-    }
-
-    /* Text hidden by default on mobile */
-    .logo-text,
-    .menu-text {
-        opacity: 0;
-        max-width: 0;
-        pointer-events: none;
-    }
-
-    /* Text visible when expanded on mobile */
-    body.sidebar-expanded aside.sidebar .logo-text,
-    body.sidebar-expanded aside.sidebar .menu-text {
-        opacity: 1;
-        max-width: 150px;
-        pointer-events: auto;
-    }
-
-    /* Center icons by default on mobile */
-    .sidebar-header {
-        justify-content: center;
-        padding: 0;
-    }
-
-    .menu a {
-        justify-content: center;
-        padding: 15px 0;
-    }
-
-    .menu-icon {
-        margin-right: 0;
-    }
-
-    /* Align items left when toggled (expanded) on mobile */
-    aside.sidebar.toggled .sidebar-header {
-        justify-content: space-between;
-        padding: 0 20px;
-    }
-
-    aside.sidebar.toggled .menu a {
-        justify-content: flex-start;
-        /* Or initial flex flow */
-        padding: 15px 25px;
-    }
-
-    aside.sidebar.toggled .menu-icon {
-        margin-right: 15px;
-    }
-
-    /* Main Content stays shifted at 80px even on mobile for consistency */
-    main.content {
-        margin-left: 80px;
-        padding: 1.5rem 10px;
-    }
-
-    body.sidebar-expanded main.content {
-        margin-left: 80px;
-    }
+body.sidebar-expanded .sidebar-backdrop {
+    display: block;
 }

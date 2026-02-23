@@ -9,6 +9,10 @@ public class CompanyModel : BaseModel
     public string Id { get; set; } = null!;
     public string Address { get; set; } = string.Empty;
     public string? Name { get; set; } = string.Empty;
+    public string Phone {get; set;} = string.Empty;
+    public string Email {get; set;} = string.Empty;
+    public string TaxCode {get; set;} = string.Empty;
+    public int TotalDepartment {get; set;}
 
     // relationship 
     public ICollection<DepartmentModel> Departments { get; set; } = new List<DepartmentModel>();

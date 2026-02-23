@@ -18,4 +18,6 @@ public class DepartmentCreateModel
     [Required]
     [EnumDataType(typeof(RowStatus), ErrorMessage = "Invalid status!")]
     public RowStatus RowStatus {get; set;}
+
+    
 }

@@ -15,4 +15,5 @@ public class MessageConstant
     public static string ACCOUNT_EXISTED {get; set;} = "Account is existed";
     public static string NOT_EXISTED {get; set;} = "Data is not existed";
     public static string INACTIVE {get; set;} = "Data is disable";
+    public static string EXISTED {get; set;} = "Data existed";
 }

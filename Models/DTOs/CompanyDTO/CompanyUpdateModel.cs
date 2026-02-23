@@ -6,6 +6,8 @@ namespace MeetingManagement.Models.DTOs;
 
 public class CompanyUpdateModel
 {
+    public string Id {get; set;} = string.Empty;
+
     [Required]
     [NotNull]
     public string Address {get; set;} = string.Empty;
@@ -17,4 +19,8 @@ public class CompanyUpdateModel
     [Required]
     [EnumDataType(typeof(RowStatus), ErrorMessage = "Invalid status!")]
     public RowStatus RowStatus {get; set;}
+
+    public string Phone {get; set;} = string.Empty;
+    public string Email {get; set;} = string.Empty;
+    public string TaxCode {get; set;} = string.Empty;
 }
