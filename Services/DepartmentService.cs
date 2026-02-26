@@ -97,14 +97,14 @@ public class DepartmentService : IDepartmentService
         var paginatedResult = await _unitOfWork.Departments.GetPaginated(
             request,
             baseFilter: x => x.RowStatus == RowStatus.ACTIVE && (string.IsNullOrEmpty(companyId) || x.CompanyId == companyId),
-            searchFields: "Name"
+            searchFields: "Name,Location,TotalStaff", 
+            includes: new [] {"Company,Users"}
         );
         var viewModels = paginatedResult.Items.Select(x => new DepartmentViewModel
         {
             Id = x.Id,
             Name = x.Name,
-            CompanyId = x.CompanyId,
-            CompanyName = x.Company?.Name ?? "N/A",
+            CompanyName = x.Company?.Name ?? string.Empty,
             TotalStaff = x.Users?.Count ?? 0,
             ManagerName = x.Users?.FirstOrDefault(u => u.userType == UserType.HEAD || u.userType == UserType.MANAGER)?.FullName ?? "Chưa cập nhật"
 
@@ -117,14 +117,5 @@ public class DepartmentService : IDepartmentService
             PageNumber = paginatedResult.PageNumber,
             PageSize = paginatedResult.PageSize
         };
-    }
-    public async Task<List<CompanyViewModel>> GetCompanies()
-    {
-        var companies = await _unitOfWork.Companies.GetAll();
-        return companies.Select(x => new CompanyViewModel
-        {
-            Id = x.Id,
-            Name = x.Name
-        }).ToList();
     }
 }

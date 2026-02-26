@@ -4,8 +4,7 @@ namespace MeetingManagement.Models.DTOs;
 
 public class PermissionCreateModel
 {
-    [Required]
-    public string GroupId {get; set;} = string.Empty;
+    public string UserId {get; set;} = string.Empty;
 
     [Required]
     public string Controller { get; set; } = string.Empty;

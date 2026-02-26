@@ -53,9 +53,18 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         string? searchFields = null,
         Func<Dictionary<string, string>?,
         Expression<Func<T, bool>>>? filterExpressionBuilder = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        params string[]? includes)
     {
         IQueryable<T> query = _dbSet.AsQueryable();
+
+        if (includes != null)
+        {
+            foreach (var property in includes)
+            {
+                query = query.Include(property);
+            }
+        }
 
         if (baseFilter != null)
         {
@@ -113,5 +122,11 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             PageSize = request.PageSize
         };
     }
+
+    public virtual async Task<int> AddRange(IEnumerable<T> entities)
+{
+    await _dbSet.AddRangeAsync(entities);
+    return entities.Count(); 
+}
 
 }

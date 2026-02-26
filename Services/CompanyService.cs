@@ -104,7 +104,11 @@ public class CompanyService : ICompanyService
         {
             Id = x.Id,
             Name = x.Name,
-            Address = x.Address
+            Address = x.Address,
+            Phone = x.Phone,
+            Email = x.Email,
+            TaxCode = x.TaxCode,
+            rowStatus = x.RowStatus
         }).ToList();
         return new PaginatedResponse<CompanyViewModel>
         {

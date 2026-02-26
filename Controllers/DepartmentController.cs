@@ -29,10 +29,7 @@ public class DepartmentController : Controller
         };
 
         var result = await _departmentService.Find(request, companyId);
-        
-        var companies = await _departmentService.GetCompanies();
-        ViewBag.Companies = companies;
-        ViewBag.SelectedCompanyId = companyId;
+
 
         return View(result);
     }
@@ -40,8 +37,7 @@ public class DepartmentController : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var companies = await _departmentService.GetCompanies();
-        ViewBag.Companies = companies;
+
         return View();
     }
 

@@ -2,8 +2,7 @@ namespace MeetingManagement.Models.DTOs;
 
 public class PermissionViewModel
 {
-    
-    public string GroupName {get; set;} = string.Empty;
+    public string Username {get; set;} = string.Empty; 
     public string? Controller { get; set; } = string.Empty;
     public string? Action { get; set; } = string.Empty;
 

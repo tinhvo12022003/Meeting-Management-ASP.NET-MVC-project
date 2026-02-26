@@ -18,6 +18,9 @@ public interface IGenericRepository<T> where T : class
         string? searchFields = null,
         Func<Dictionary<string, string>?,
         Expression<Func<T, bool>>>? filterExpressionBuilder = null,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        params string[]? includes
     );
+
+    public Task<int> AddRange(IEnumerable<T> entities);
 }

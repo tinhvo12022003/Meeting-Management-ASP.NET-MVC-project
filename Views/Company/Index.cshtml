@@ -1,4 +1,5 @@
 @using MeetingManagement.Common
+@using MeetingManagement.Enum
 @using MeetingManagement.Models.DTOs
 @model PaginatedResponse<CompanyViewModel>
 
@@ -306,8 +307,10 @@
             <table class="custom-table">
                 <thead>
                     <tr>
-                        <th style="width: 40%">Tên Công Ty</th>
-                        <th style="width: 35%">Địa Chỉ</th>
+                        <th style="width: 15%">Tên Công Ty</th>
+                        <th style="width: 30%">Địa Chỉ</th>
+                        <th style="width: 15%">Điện thoại</th>
+                        <th style="width: 15%">Email</th>
                         <th style="width: 15%">Trạng Thái</th>
                         <th style="width: 10%" class="text-right">Thao Tác</th>
                     </tr>
@@ -336,10 +339,34 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="badge-status status-active">
-                                        <div class="status-dot"></div>
-                                        Hoạt động
+                                    <div class="d-flex align-items-center text-muted">
+                                        <i class="fas fa-phone mr-2 small"></i>
+                                        @item.Phone
                                     </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center text-muted">
+                                        <i class="fas fa-envelope mr-2 small"></i>
+                                        @item.Email
+                                    </div>
+                                </td>
+
+
+                                <td>
+                                    @if (item.rowStatus == RowStatus.ACTIVE)
+                                    {
+                                        <div class="badge-status status-active">
+                                            <div class="status-dot"></div>
+                                            Hoạt động
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="badge-status status-inactive">
+                                            <div class="status-dot"></div>
+                                            Ngừng hoạt động
+                                        </div>
+                                    }
                                 </td>
                                 <td>
                                     <div class="action-btns justify-content-end">

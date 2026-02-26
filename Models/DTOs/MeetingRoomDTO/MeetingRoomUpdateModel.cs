@@ -5,6 +5,8 @@ namespace MeetingManagement.Models.DTOs;
 
 public class MeetingRoomUpdateModel
 {
+    public string Id {get; set;} = string.Empty;
+
     [Required]
     [StringLength(maximumLength: 255)]
     public string Name {get; set;} = string.Empty;

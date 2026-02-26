@@ -1,3 +1,4 @@
+using MeetingManagement.Common;
 using MeetingManagement.Constant;
 using MeetingManagement.Enum;
 using MeetingManagement.Helper;
@@ -106,5 +107,39 @@ public class UserService : IUserService
         
         await _unitOfWork.Users.Update(user);
         await _unitOfWork.CommitAsync();
+    }
+
+
+    public async Task<PaginatedResponse<UserViewModel>> Find (PaginatedRequest request)
+    {
+        var paginatedResult = await _unitOfWork.Users.GetPaginated(
+            request,
+            baseFilter: x => x.RowStatus == RowStatus.ACTIVE,
+            searchFields: "FullName,Email,Phone,Birthday,Username",
+            includes: new[] { "Company,Department" }
+        );
+
+        var viewModels = paginatedResult.Items.Select(x => new UserViewModel
+        {
+            Id = x.Id,
+            FullName = x.FullName,
+            Address = x.Address,
+            Email = x.Email,
+            Phone = x.Phone,
+            Birthday = x.Birthday,
+            userType = x.userType,
+            Gender = x.Gender,
+            Username = x.Username,
+            CompanyName = x.Company?.Name ?? string.Empty,
+            DepartmentName = x.Department?.Name ?? string.Empty
+        }).ToList();
+
+        return new PaginatedResponse<UserViewModel>
+        {
+            Items = viewModels,
+            TotalRecords = paginatedResult.TotalRecords,
+            PageNumber = paginatedResult.PageNumber,
+            PageSize = paginatedResult.PageSize
+        };
     }
 }

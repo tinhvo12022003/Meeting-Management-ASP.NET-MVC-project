@@ -1,3 +1,5 @@
+using MeetingManagement.Enum;
+
 namespace MeetingManagement.Models.DTOs;
 
 public class CompanyViewModel
@@ -8,4 +10,5 @@ public class CompanyViewModel
     public string Phone {get; set;} = string.Empty;
     public string Email {get; set;} = string.Empty;
     public string TaxCode {get; set;} = string.Empty;
+    public RowStatus rowStatus {get; set;}
 }
