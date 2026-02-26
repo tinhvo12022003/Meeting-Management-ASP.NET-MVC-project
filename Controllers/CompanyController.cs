@@ -16,7 +16,7 @@ public class CompanyController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index (int pageNumber = 1, int pageSize = 10, string? searchTerm = null)
+    public async Task<IActionResult> Index (int pageNumber = 1, int pageSize = 10, string? searchTerm = null, string? status = null)
     {
         var request = new PaginatedRequest
         {
@@ -24,6 +24,14 @@ public class CompanyController : Controller
             PageSize = pageSize,
             SearchTerm = searchTerm
         };
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            request.ColumnFilters = new Dictionary<string, string>
+            {
+                { "status", status }
+            };
+        }
 
         var result = await _companyService.Find(request);
         return View(result);
@@ -35,14 +43,54 @@ public class CompanyController : Controller
         return View();
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create (CompanyCreateModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        await _companyService.Create(model);
+        return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Update(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return RedirectToAction("Index");
+
+        var model = await _companyService.GetById(id);
+        if (model == null)
+            return NotFound();
+
         return View(model);
     }
 
-    public async Task<IActionResult> Update()
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Update(CompanyUpdateModel model)
     {
-        return View();
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        await _companyService.Update(model);
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return RedirectToAction("Index");
+
+        await _companyService.Delete(id);
+        return RedirectToAction("Index");
     }
 
 }

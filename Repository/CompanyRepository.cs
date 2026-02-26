@@ -1,4 +1,5 @@
 using MeetingManagement.Data.Context;
+using MeetingManagement.Enum;
 using MeetingManagement.Interface.IRepository;
 using MeetingManagement.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +16,11 @@ public class CompanyRepository : GenericRepository<CompanyModel>, ICompanyReposi
 
     public async Task<CompanyModel?> GetByName(string Name)
     {
-        return await _context.Company.FirstOrDefaultAsync(x => x.Name == Name);
+        return await _context.Company.FirstOrDefaultAsync(x => x.Name == Name && x.RowStatus == RowStatus.ACTIVE);
     }
 
     public async Task<bool> Existed (string Name)
     {
-        return await _context.Company.AnyAsync(x => x.Name == Name);
+        return await _context.Company.AnyAsync(x => x.Name == Name && x.RowStatus == RowStatus.ACTIVE);
     }
 }

@@ -5900,7 +5900,6 @@ C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\D
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\mwn6usig0w-{0}-9vrjyuzamu-9vrjyuzamu.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\xqa335kiae-{0}-ouflz0h7k2-ouflz0h7k2.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\r8lg0hprcv-{0}-3ncp0i4837-3ncp0i4837.gz
-C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\vhwsyj68wz-{0}-69quyxc7au-69quyxc7au.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\u6tz8ccpgw-{0}-1y6lbaq0ul-1y6lbaq0ul.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\7pedk70x56-{0}-osbef0e72c-osbef0e72c.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\mtwzush05o-{0}-wl5i0qexan-wl5i0qexan.gz
@@ -5958,3 +5957,6 @@ C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\D
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\elpqmntru2-{0}-a69f0uvk62-a69f0uvk62.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\o1clcofz7q-{0}-urgt7mke0p-urgt7mke0p.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\24sfsr86c1-{0}-7s2n0ol71w-7s2n0ol71w.gz
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\f3w186nre6-{0}-5ipweew5fc-5ipweew5fc.gz
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\compressed\vhwsyj68wz-{0}-69quyxc7au-69quyxc7au.gz
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\MeetingManagement\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

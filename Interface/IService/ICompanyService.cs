@@ -9,4 +9,5 @@ public interface ICompanyService
     public Task Update (CompanyUpdateModel model);
     public Task Delete (string CompanyId);
     public Task<PaginatedResponse<CompanyViewModel>> Find(PaginatedRequest request);
+    public Task<CompanyUpdateModel?> GetById(string id);
 }
