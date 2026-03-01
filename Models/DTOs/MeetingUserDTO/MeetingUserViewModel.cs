@@ -7,6 +7,7 @@ public class MeetingUserViewModel
 {
     public string MeetingId {get; set;} = string.Empty;
     public string UserId {get; set;} = string.Empty;
+    public string FullName { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public DateTime StartAt { get; set; }
     public DateTime EndAt { get; set; }

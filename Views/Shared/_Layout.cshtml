@@ -67,9 +67,17 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="">
+                    <a asp-controller="Meeting" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Meeting" ? "active" : "")">
                         <i class="fas fa-calendar-alt menu-icon"></i>
                         <span class="menu-text">Lịch họp</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="MeetingRoom" asp-action="Index"
+                           class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "MeetingRoom" ? "active" : "")">
+                        <i class="fas fa-door-open menu-icon"></i>
+                        <span class="menu-text">Phòng họp</span>
                     </a>
                 </li>
                 <li>

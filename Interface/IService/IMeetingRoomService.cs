@@ -9,4 +9,5 @@ public interface IMeetingRoomService
     public Task Update (MeetingRoomUpdateModel model);
     public Task Delete (string Id);
     public Task<PaginatedResponse<MeetingRoomViewModel>> Find (PaginatedRequest request);
+    public Task<List<MeetingRoomViewModel>> GetAll();
 }

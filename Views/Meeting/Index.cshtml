@@ -1,0 +1,896 @@
+@using MeetingManagement.Common
+@using MeetingManagement.Models.DTOs
+@using MeetingManagement.Enum
+@model PaginatedResponse<MeetingViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý Lịch họp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 p-0 bg-transparent">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-muted small text-decoration-none">Quản trị</a></li>
+                    <li class="breadcrumb-item active small" aria-current="page">Lịch họp</li>
+                </ol>
+            </nav>
+            <h3 class="font-weight-bold mb-0">Quản lý Lịch họp</h3>
+            <p class="text-muted small mb-0">Theo dõi, sắp xếp và điều phối các cuộc họp trong hệ thống.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary mr-2" style="border-radius: 8px;" id="toggleViewBtn">
+                <i class="fas fa-list mr-1"></i> <span id="toggleText">Chế độ Danh sách</span>
+            </button>
+            <a asp-action="Create" class="btn btn-primary px-4"
+               style="border-radius: 8px; background: #4f46e5; border: none;">
+                <i class="fas fa-plus mr-1"></i> Tạo cuộc họp
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #eef2ff; color: #4f46e5;">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <span class="label">Tổng cuộc họp</span>
+                <span class="value">@Model.TotalRecords</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #f0fdf4; color: #16a34a;">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <span class="label">Sắp diễn ra</span>
+                <span class="value">@Model.Items.Count(x => x.StartAt > DateTime.Now)</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fff7ed; color: #ea580c;">
+                <i class="fas fa-door-open"></i>
+            </div>
+            <div class="stat-content">
+                <span class="label">Phòng bận hôm nay</span>
+                <span class="value">3</span> <!-- Placeholder for today's active rooms -->
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fdf2f8; color: #db2777;">
+                <i class="fas fa-video"></i>
+            </div>
+            <div class="stat-content">
+                <span class="label">Họp trực tuyến</span>
+                <span class="value">@Model.Items.Count(x => !string.IsNullOrEmpty(x.Url))</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-container">
+        <!-- Calendar View -->
+        <div id="calendarView" class="view-section">
+            <div class="row">
+                <!-- Sidebar: Draggable Events & Quick Create -->
+                <div class="col-lg-3">
+                    <div class="sticky-top mb-3" style="top: 20px; z-index: 10;">
+                        <!-- Draggable Events Card -->
+                        <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+                            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                                <h5 class="font-weight-bold mb-0">Sự kiện chờ</h5>
+                                <p class="text-muted small">Kéo sự kiện vào lịch để lưu</p>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <div id="external-events">
+                                    <!-- Events will be loaded from local storage here -->
+                                    <div class="text-center py-3 text-muted small" id="no-events-msg">
+                                        Không có sự kiện chờ.
+                                    </div>
+                                </div>
+                                <div class="custom-control custom-checkbox mt-3">
+                                    <input type="checkbox" class="custom-control-input" id="drop-remove" checked>
+                                    <label class="custom-control-label text-muted small" for="drop-remove">Xóa sau khi kéo</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Create Event Card -->
+                        <div class="card shadow-sm border-0" style="border-radius: 16px;">
+                            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                                <h5 class="font-weight-bold mb-0">Tạo mới</h5>
+                                <button class="btn btn-sm btn-light text-primary" id="add-to-draft" title="Lưu vào danh sách chờ">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </div>
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <div class="form-group mb-3">
+                                    <label class="small text-muted">Tiêu đề</label>
+                                    <input id="q-title" type="text" class="form-control" placeholder="Nhập tên sự kiện...">
+                                </div>
+                                
+                                <div class="row no-gutters mb-3">
+                                    <div class="col-6 pr-1">
+                                        <label class="small text-muted">Bắt đầu</label>
+                                        <input id="q-start" type="time" class="form-control">
+                                    </div>
+                                    <div class="col-6 pl-1">
+                                        <label class="small text-muted">Kết thúc</label>
+                                        <input id="q-end" type="time" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="small text-muted">Phòng họp</label>
+                                    <select id="q-room" class="form-control">
+                                        <option value="">-- Chọn phòng họp --</option>
+                                        @foreach (var room in ViewBag.Rooms) {
+                                            <option value="@room.Id">@room.Name</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="small text-muted">Công ty</label>
+                                    <select id="q-company" class="form-control">
+                                        <option value="">-- Chọn công ty --</option>
+                                        @foreach (var c in ViewBag.Companies) {
+                                            <option value="@c.Id">@c.Name</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label class="small text-muted">Phòng ban</label>
+                                    <select id="q-dept" class="form-control">
+                                        <option value="">-- Chọn phòng ban --</option>
+                                        @foreach (var d in ViewBag.Departments) {
+                                            <option value="@d.Id">@d.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                
+                                <label class="small text-muted mb-1">Màu sắc</label>
+                                <div class="d-flex gap-2 mb-4" id="color-chooser">
+                                    <button class="color-dot bg-primary active" data-color="#4f46e5"></button>
+                                    <button class="color-dot bg-success" data-color="#10b981"></button>
+                                    <button class="color-dot bg-warning" data-color="#f59e0b"></button>
+                                    <button class="color-dot bg-danger" data-color="#ef4444"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Card -->
+                <div class="col-lg-9">
+                    <div class="card shadow-sm border-0" style="border-radius: 16px; overflow: hidden;">
+                        <div class="card-body p-4">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View (Hidden by default) -->
+        <div id="tableView" class="view-section d-none">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="search-box">
+                        <form method="get" id="filterForm" class="d-flex w-100 gap-3">
+                            <div class="position-relative flex-grow-1">
+                                <i class="fas fa-search"></i>
+                                <input type="text" name="searchTerm" id="meetingSearch"
+                                       placeholder="Tìm tên cuộc họp..."
+                                       value="@ViewContext.HttpContext.Request.Query["searchTerm"]">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="custom-table-wrapper">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Cuộc họp</th>
+                                <th>Thời gian</th>
+                                <th>Địa điểm / Link</th>
+                                <th>Trạng thái</th>
+                                <th class="text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Items != null && Model.Items.Any())
+                            {
+                                foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="icon-box" style="background: #eef2ff; color: #4f46e5; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-handshake"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="font-weight-600 text-main">@item.Title</div>
+                                                    <div class="small text-muted">@item.DepartmentName - @item.CompanyName</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="small">
+                                                <i class="far fa-calendar-alt mr-1"></i> @item.StartAt.ToString("dd/MM/yyyy")<br />
+                                                <i class="far fa-clock mr-1"></i> @item.StartAt.ToString("HH:mm") - @item.EndAt.ToString("HH:mm")
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.Url))
+                                            {
+                                                <a href="@item.Url" target="_blank" class="badge badge-info p-2" style="border-radius: 6px;">
+                                                    <i class="fas fa-video mr-1"></i> Tham gia online
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted"><i class="fas fa-map-marker-alt mr-1"></i> @item.RoomName</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                var statusClass = item.Status switch
+                                                {
+                                                    MeetingStatus.APPROVED => "status-active",
+                                                    MeetingStatus.ACTIVE => "status-active",
+                                                    MeetingStatus.PENDING => "badge-warning",
+                                                    MeetingStatus.REJECTED => "badge-danger",
+                                                    _ => "badge-secondary"
+                                                };
+                                            }
+                                            <span class="badge-status @statusClass">
+                                                <span class="dot"></span> @item.Status
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-btns justify-content-end">
+                                                <a asp-action="Update" asp-route-id="@item.Id" class="btn-icon btn-edit" title="Chỉnh sửa">
+                                                    <i class="fas fa-pen"></i>
+                                                </a>
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Xóa cuộc họp này?')">
+                                                    <button type="submit" class="btn-icon btn-delete" title="Xóa">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="text-muted">Không tìm thấy cuộc họp nào.</div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <div class="pagination-info">
+                        Hiển thị <b>@Model.Items.Count</b> trên tổng số <b>@Model.TotalRecords</b> cuộc họp
+                    </div>
+                    <div class="pagination-btns">
+                        <!-- Pagination logic same as Department -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Event Detail Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title font-weight-bold" id="eventTitleModal">Chi tiết cuộc họp</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-4 d-flex align-items-center gap-3">
+                    <div id="modalIcon" class="icon-box" style="background: #eef2ff; color: #4f46e5; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div>
+                        <h4 id="displayEventTitle" class="font-weight-bold mb-0 text-main"></h4>
+                        <span id="displayEventStatus" class="badge badge-pill badge-success mt-1">Đã duyệt</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="small text-muted mb-1">Bắt đầu</label>
+                        <div id="displayEventStart" class="font-weight-600 text-main"></div>
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted mb-1">Kết thúc</label>
+                        <div id="displayEventEnd" class="font-weight-600 text-main"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-muted mb-1">Phòng họp / Liên kết</label>
+                    <div id="displayEventLocation" class="text-main"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-muted mb-1">Tổ chức</label>
+                    <div id="displayEventOrg" class="text-main"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light px-4" data-dismiss="modal" style="border-radius: 10px;">Đóng</button>
+                <a id="editEventBtn" href="#" class="btn btn-primary px-4" style="border-radius: 10px; background: #4f46e5; border: none;">Chỉnh sửa</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-light: #eef2ff;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-content .label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-content .value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 2px;
+        }
+
+        /* Draggable Events */
+        .external-event {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: grab;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .external-event:active {
+            cursor: grabbing;
+        }
+
+        .external-event:hover {
+            transform: translateX(4px);
+            filter: brightness(1.1);
+        }
+
+        .external-event .remove-draft {
+            width: 20px;
+            height: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #fff;
+            opacity: 0;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .external-event:hover .remove-draft {
+            opacity: 1;
+        }
+
+        .external-event .remove-draft:hover {
+            background: rgba(0,0,0,0.4);
+            transform: scale(1.1);
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: var(--primary-light) !important;
+            border: 2px dashed var(--primary-color) !important;
+        }
+
+        /* Color Dot Selector */
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.2s;
+        }
+
+        .color-dot.active {
+            border-color: #fff;
+            box-shadow: 0 0 0 2px var(--primary-color);
+            transform: scale(1.2);
+        }
+
+        /* Form Control overrides */
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1rem;
+            font-size: 0.875rem;
+            height: auto;
+            background-color: #fdfdfd;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            border-color: var(--primary-color);
+            background-color: #fff;
+            outline: none;
+        }
+
+        /* Modern Select styling */
+        select.form-control {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 12px;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        /* Label adjustments */
+        label.small {
+            font-weight: 600;
+            color: #475569 !important;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+
+        /* Calendar Customization */
+        #calendar {
+            color: var(--text-main);
+            font-family: inherit;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+        }
+
+        .fc-button-primary {
+            background-color: white !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-main) !important;
+            border-radius: 8px !important;
+            text-transform: capitalize !important;
+            font-weight: 500 !important;
+            padding: 8px 16px !important;
+        }
+
+        .fc-button-primary:hover {
+            background-color: #f8fafc !important;
+        }
+
+        .fc-button-active {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .fc-event {
+            border-radius: 6px !important;
+            border: none !important;
+            padding: 2px 4px !important;
+            font-size: 0.85rem !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Table styles from Department */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .custom-table th {
+            background: #f9fafb;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .custom-table td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .badge-status {
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-active { background: #dcfce7; color: #15803d; }
+        .status-active .dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; }
+
+        .btn-icon {
+            width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; border: 1px solid var(--border-color);
+            background: white; color: var(--text-muted); transition: all 0.2s;
+            text-decoration: none; margin-left: 4px;
+        }
+
+        .btn-icon:hover { color: var(--primary-color); border-color: var(--primary-color); background: #f5f3ff; }
+        .btn-delete:hover { color: #ef4444; border-color: #ef4444; background: #fef2f2; }
+
+        .search-box input {
+            padding: 0.75rem 1rem 0.75rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            outline: none;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+    </style>
+}
+
+@section Scripts {
+    <!-- FullCalendar JS & Draggable -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js'></script>
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var Calendar = FullCalendar.Calendar;
+            var Draggable = FullCalendar.Draggable;
+
+            var containerEl = document.getElementById('external-events');
+            var calendarEl = document.getElementById('calendar');
+            var checkbox = document.getElementById('drop-remove');
+
+            // --- LOCAL STORAGE LOGIC ---
+            function loadDraftEvents() {
+                const drafts = JSON.parse(localStorage.getItem('meetingDrafts') || '[]');
+                const container = $('#external-events');
+                container.find('.external-event').remove();
+                
+                if (drafts.length === 0) {
+                    $('#no-events-msg').show();
+                } else {
+                    $('#no-events-msg').hide();
+                    drafts.forEach((ev, index) => {
+                        const eventEl = $('<div />')
+                            .attr('data-id', index)
+                            .attr('data-event', JSON.stringify({
+                                title: ev.title,
+                                backgroundColor: ev.color,
+                                borderColor: ev.color,
+                                extendedProps: ev
+                            }))
+                            .addClass('external-event')
+                            .css({
+                                'background-color': ev.color,
+                                'border-color': ev.color,
+                                'color': '#fff'
+                            })
+                            .html(`
+                                <span>${ev.title}</span>
+                                <button class="remove-draft" data-index="${index}" title="Xóa khỏi hàng đợi">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `);
+                        container.append(eventEl);
+                    });
+                }
+            }
+
+            function saveDraftEvent(eventData) {
+                const drafts = JSON.parse(localStorage.getItem('meetingDrafts') || '[]');
+                drafts.push(eventData);
+                localStorage.setItem('meetingDrafts', JSON.stringify(drafts));
+                loadDraftEvents();
+            }
+
+            function removeDraftEvent(index) {
+                const drafts = JSON.parse(localStorage.getItem('meetingDrafts') || '[]');
+                drafts.splice(index, 1);
+                localStorage.setItem('meetingDrafts', JSON.stringify(drafts));
+                loadDraftEvents();
+            }
+
+            function resortDrafts() {
+                const newDrafts = [];
+                $('#external-events .external-event').each(function() {
+                    const eventData = JSON.parse($(this).attr('data-event')).extendedProps;
+                    newDrafts.push(eventData);
+                });
+                localStorage.setItem('meetingDrafts', JSON.stringify(newDrafts));
+            }
+
+            // Delete draft handler
+            $(document).on('click', '.remove-draft', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent drag start
+                const index = $(this).data('index');
+                Swal.fire({
+                    title: 'Xóa sự kiện chờ?',
+                    text: "Sự kiện này sẽ bị gỡ khỏi hàng đợi.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        removeDraftEvent(index);
+                    }
+                });
+            });
+
+            // Initialize Sortable
+            new Sortable(containerEl, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: function() {
+                    resortDrafts();
+                    loadDraftEvents(); // Reload to refresh data-index
+                }
+            });
+
+            // Initialize Draggable
+            new Draggable(containerEl, {
+                itemSelector: '.external-event',
+                eventData: function (eventEl) {
+                    return JSON.parse(eventEl.getAttribute('data-event'));
+                }
+            });
+
+            // Color Chooser
+            var currColor = '#4f46e5';
+            $('#color-chooser > button').click(function () {
+                currColor = $(this).data('color');
+                $('#color-chooser > button').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            // Add to Draft Button
+            $('#add-to-draft').click(function () {
+                const title = $('#q-title').val();
+                if (!title) {
+                    Swal.fire('Lỗi', 'Vui lòng nhập tiêu đề', 'error');
+                    return;
+                }
+
+                const eventData = {
+                    title: title,
+                    startTime: $('#q-start').val(),
+                    endTime: $('#q-end').val(),
+                    roomId: $('#q-room').val(),
+                    companyId: $('#q-company').val(),
+                    departmentId: $('#q-dept').val(),
+                    color: currColor
+                };
+
+                saveDraftEvent(eventData);
+                $('#q-title').val('');
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Đã lưu vào danh sách chờ',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            });
+
+            // --- CALENDAR LOGIC ---
+            var calendar = new Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'vi',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                editable: true,
+                droppable: true,
+                events: '/Meeting/GetCalendarEvents',
+                
+                // When an external event is dropped
+                drop: function (info) {
+                    const eventData = JSON.parse(info.draggedEl.getAttribute('data-event')).extendedProps;
+                    const dropDate = moment(info.date);
+                    
+                    // Construct start/end times based on drop date and pre-set times
+                    let startAt = dropDate.clone();
+                    if (eventData.startTime) {
+                        const [h, m] = eventData.startTime.split(':');
+                        startAt.hour(h).minute(m);
+                    }
+                    
+                    let endAt = startAt.clone().add(1, 'hours');
+                    if (eventData.endTime) {
+                        const [h, m] = eventData.endTime.split(':');
+                        endAt.hour(h).minute(m);
+                    }
+
+                    // Prepare Model for Creating in DB
+                    const model = {
+                        Title: eventData.title,
+                        StartAt: startAt.format('YYYY-MM-DDTHH:mm:ss'),
+                        EndAt: endAt.format('YYYY-MM-DDTHH:mm:ss'),
+                        RoomId: eventData.roomId,
+                        CompanyId: eventData.companyId,
+                        DepartmentId: eventData.departmentId,
+                        Type: 0, // OFFLINE default
+                        Status: 1, // PENDING default
+                        RowStatus: 5 // ACTIVE
+                    };
+
+                    // Sync to Database
+                    $.ajax({
+                        url: '/Meeting/Create',
+                        method: 'POST',
+                        data: model,
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: response.message,
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+                                calendar.refetchEvents();
+                                
+                                if (checkbox.checked) {
+                                    const index = $(info.draggedEl).data('id');
+                                    removeDraftEvent(index);
+                                }
+                            } else {
+                                Swal.fire('Thất bại', response.message, 'error');
+                            }
+                        },
+                        error: function (xhr) {
+                            var errMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Không thể lưu cuộc họp';
+                            Swal.fire('Lỗi hệ thống', errMsg, 'error');
+                        }
+                    });
+                },
+
+                eventClick: function(info) {
+                    const event = info.event;
+                    const props = event.extendedProps;
+                    document.getElementById('displayEventTitle').textContent = event.title;
+                    document.getElementById('displayEventStart').textContent = moment(event.start).format('DD/MM/YYYY, HH:mm');
+                    document.getElementById('displayEventEnd').textContent = event.end ? moment(event.end).format('DD/MM/YYYY, HH:mm') : 'N/A';
+                    document.getElementById('displayEventLocation').innerHTML = event.url ? `<a href="${event.url}" target="_blank">${event.url}</a>` : (props.room || 'N/A');
+                    document.getElementById('displayEventOrg').textContent = props.department ? `${props.department} - ${props.company}` : 'N/A';
+                    document.getElementById('displayEventStatus').textContent = props.status;
+                    document.getElementById('editEventBtn').href = `/Meeting/Update/${event.id}`;
+                    $('#eventModal').modal('show');
+                }
+            });
+
+            calendar.render();
+            loadDraftEvents();
+
+            // View Toggle Logic
+            $('#toggleViewBtn').click(function() {
+                if ($('#calendarView').hasClass('d-none')) {
+                    $('#calendarView').removeClass('d-none');
+                    $('#tableView').addClass('d-none');
+                    $('#toggleText').text('Chế độ Danh sách');
+                    $(this).find('i').attr('class', 'fas fa-list mr-1');
+                    calendar.render();
+                } else {
+                    $('#calendarView').addClass('d-none');
+                    $('#tableView').removeClass('d-none');
+                    $('#toggleText').text('Chế độ Lịch biểu');
+                    $(this).find('i').attr('class', 'fas fa-calendar-alt mr-1');
+                }
+            });
+        });
+    </script>
+}

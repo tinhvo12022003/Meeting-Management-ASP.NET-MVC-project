@@ -64,7 +64,6 @@ public class MeetingRoomService : IMeetingRoomService
         room.Name = model.Name;
         room.Capacity = model.Capacity;
         room.CompanyId = model.CompanyId;
-        room.RowStatus = model.RowStatus;
         room.UpdateAt = DateTime.UtcNow;
         room.UpdateBy = _helper.GetCurrentUser();
 
@@ -100,7 +99,7 @@ public class MeetingRoomService : IMeetingRoomService
         var paginatedResult = await _unitOfWork.MeetingRooms.GetPaginated(
             request,
             baseFilter: x => x.RowStatus == RowStatus.ACTIVE,
-            searchFields: "Title,StartAt,EndAt",
+            searchFields: "Name",
             includes: new[] { "Company" }
         );
 
@@ -119,5 +118,16 @@ public class MeetingRoomService : IMeetingRoomService
             PageNumber = paginatedResult.PageNumber,
             PageSize = paginatedResult.PageSize
         };
+    }
+
+    public async Task<List<MeetingRoomViewModel>> GetAll()
+    {
+        var rooms = await _unitOfWork.MeetingRooms.GetAll();
+        return rooms.Select(x => new MeetingRoomViewModel
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Capacity = x.Capacity
+        }).ToList();
     }
 }

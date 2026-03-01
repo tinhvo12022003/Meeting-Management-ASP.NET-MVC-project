@@ -107,6 +107,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
+builder.Services.AddScoped<IMeetingService, MeetingService>();
+builder.Services.AddScoped<IMeetingUserService, MeetingUserService>();
 
 
 builder.Services.AddScoped<UserHelper>();

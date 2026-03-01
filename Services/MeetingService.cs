@@ -127,8 +127,8 @@ public class MeetingService : IMeetingService
         var paginatedResult = await _unitOfWork.Meetings.GetPaginated(
             request,
             baseFilter: x => x.RowStatus == RowStatus.ACTIVE,
-            searchFields: "Title,StartAt,EndAt",
-            includes: new[] { "MeetingRoom,Company,Department" }
+            searchFields: "Title",
+            includes: new[] { "MeetingRoom", "Company", "Department" }
         );
 
         var viewModels = paginatedResult.Items.Select(x => new MeetingViewModel
