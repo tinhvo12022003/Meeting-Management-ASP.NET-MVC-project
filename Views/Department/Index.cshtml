@@ -151,9 +151,13 @@
                                         <a asp-action="Update" asp-route-id="@item.Id" class="btn-icon btn-edit" title="Chỉnh sửa">
                                             <i class="fas fa-pen"></i>
                                         </a>
-                                        <button class="btn-icon btn-delete" title="Xóa" onclick="confirmDelete('@item.Id', '@item.Name')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        <form asp-action="Delete" asp-controller="Department" method="post" id="deleteForm-@item.Id" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="button" class="btn-icon-link btn-delete" title="Xóa" onclick="confirmDelete('@item.Id', '@item.Name')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -360,13 +364,15 @@
         .status-active .dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; }
 
         .action-btns { display: flex; gap: 0.5rem; }
-        .btn-icon {
+        .btn-icon, .btn-icon-link {
             width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
             border-radius: 8px; border: 1px solid var(--border-color);
             background: white; color: var(--text-muted); transition: var(--transition);
+            text-decoration: none;
         }
-        .btn-icon:hover { color: var(--primary-color); border-color: var(--primary-color); background: #f5f3ff; }
-        .btn-delete:hover { color: var(--danger); border-color: var(--danger); background: #fef2f2; }
+        .btn-icon:hover, .btn-icon-link:hover { color: var(--primary-color); border-color: var(--primary-color); background: #f5f3ff; }
+        .btn-delete { color: var(--danger); border-color: var(--danger); }
+        .btn-delete:hover { background: #fef2f2; }
 
         .table-footer {
             display: flex; justify-content: space-between; align-items: center;
@@ -423,6 +429,35 @@
 
 @section Scripts {
     <script>
+        $(document).ready(function() {
+            var successMsg = '@TempData["Success"]';
+            var errorMsg = '@TempData["Error"]';
+            
+            if (successMsg) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: successMsg,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+            
+            if (errorMsg) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        });
+
         function confirmDelete(id, name) {
             Swal.fire({
                 title: 'Xác nhận xóa?',
@@ -435,7 +470,10 @@
                 cancelButtonText: 'Hủy bỏ'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Redirect to Delete action or call API
+                    var form = document.getElementById('deleteForm-' + id);
+                    if (form) {
+                        form.submit();
+                    }
                 }
             });
         }

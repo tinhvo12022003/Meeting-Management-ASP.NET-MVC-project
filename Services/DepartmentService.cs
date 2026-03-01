@@ -118,4 +118,18 @@ public class DepartmentService : IDepartmentService
             PageSize = paginatedResult.PageSize
         };
     }
+
+    public async Task<DepartmentUpdateModel?> GetById(string id)
+    {
+        var dept = await _unitOfWork.Departments.GetById(id);
+        if (dept == null) return null;
+
+        return new DepartmentUpdateModel
+        {
+            Id = dept.Id,
+            Name = dept.Name ?? string.Empty,
+            CompanyId = dept.CompanyId,
+            RowStatus = dept.RowStatus
+        };
+    }
 }

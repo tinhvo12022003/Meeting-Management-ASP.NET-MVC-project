@@ -72,8 +72,57 @@ public class DepartmentController : Controller
     }
 
     [HttpGet]
-    public IActionResult Update()
+    public async Task<IActionResult> Update(string id)
     {
-        return View();
+        if (string.IsNullOrWhiteSpace(id))
+            return BadRequest();
+
+        var model = await _departmentService.GetById(id);
+        if (model == null)
+            return NotFound();
+
+        var companies = await _companyService.GetAllActive();
+        ViewBag.Companies = companies;
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Update(DepartmentUpdateModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var companies = await _companyService.GetAllActive();
+            ViewBag.Companies = companies;
+            return View(model);
+        }
+
+        try
+        {
+            await _departmentService.Update(model);
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+            var companies = await _companyService.GetAllActive();
+            ViewBag.Companies = companies;
+            return View(model);
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(string id)
+    {
+        try
+        {
+            await _departmentService.Delete(id);
+            TempData["Success"] = "Xóa phòng ban thành công!";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = "Lỗi khi xóa: " + ex.Message;
+        }
+        return RedirectToAction(nameof(Index));
     }
 }

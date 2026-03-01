@@ -69,7 +69,6 @@ public class CompanyService : ICompanyService
         company.Phone = model.Phone;
         company.Email = model.Email;
         company.TaxCode = model.TaxCode;
-        company.RowStatus = model.RowStatus;
         company.UpdateAt = DateTime.UtcNow;
         company.UpdateBy = _helper.GetCurrentUser();
 
