@@ -10,10 +10,12 @@ namespace MeetingManagement.Controllers;
 public class DepartmentController : Controller
 {
     private readonly IDepartmentService _departmentService;
+    private readonly ICompanyService _companyService;
 
-    public DepartmentController(IDepartmentService departmentService)
+    public DepartmentController(IDepartmentService departmentService, ICompanyService companyService)
     {
         _departmentService = departmentService;
+        _companyService = companyService;
     }
 
     [HttpGet]
@@ -29,7 +31,11 @@ public class DepartmentController : Controller
         };
 
         var result = await _departmentService.Find(request, companyId);
-
+        
+        // Lấy danh sách công ty để hiển thị trong dropdown filter
+        var companies = await _companyService.GetAllActive();
+        ViewBag.Companies = companies;
+        ViewBag.SelectedCompanyId = companyId;
 
         return View(result);
     }
@@ -37,14 +43,20 @@ public class DepartmentController : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-
+        var companies = await _companyService.GetAllActive();
+        ViewBag.Companies = companies;
         return View();
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(DepartmentCreateModel model)
     {
-        if (!ModelState.IsValid) return View(model);
+        if (!ModelState.IsValid)
+        {
+            var companies = await _companyService.GetAllActive();
+            ViewBag.Companies = companies;
+            return View(model);
+        }
         try
         {
             await _departmentService.Create(model);
@@ -53,6 +65,8 @@ public class DepartmentController : Controller
         catch (Exception ex)
         {
             ModelState.AddModelError("", ex.Message);
+            var companies = await _companyService.GetAllActive();
+            ViewBag.Companies = companies;
             return View(model);
         }
     }

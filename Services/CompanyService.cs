@@ -156,4 +156,20 @@ public class CompanyService : ICompanyService
             RowStatus = company.RowStatus
         };
     }
+
+    public async Task<List<CompanyViewModel>> GetAllActive()
+    {
+        var allCompanies = await _unitOfWork.Companies.GetAll();
+        var activeCompanies = allCompanies.Where(x => x.RowStatus == RowStatus.ACTIVE).ToList();
+        return activeCompanies.Select(x => new CompanyViewModel
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Address = x.Address,
+            Phone = x.Phone,
+            Email = x.Email,
+            TaxCode = x.TaxCode,
+            rowStatus = x.RowStatus
+        }).ToList();
+    }
 }

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MeetingManagement")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ac97db2cc0312ba57c302e81e34b21797eab9d5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+58d8162107f7f1ab5d9fadaa4c60a538a34920bc")]
 [assembly: System.Reflection.AssemblyProductAttribute("MeetingManagement")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MeetingManagement")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

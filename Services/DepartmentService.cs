@@ -34,7 +34,7 @@ public class DepartmentService : IDepartmentService
         {
             Name = model.Name,
             CompanyId = model.CompanyId,
-            RowStatus = model.RowStatus,
+            RowStatus = RowStatus.ACTIVE,
             CreateAt = DateTime.UtcNow,
             CreateBy = _helper.GetCurrentUser()
         };
@@ -98,7 +98,7 @@ public class DepartmentService : IDepartmentService
             request,
             baseFilter: x => x.RowStatus == RowStatus.ACTIVE && (string.IsNullOrEmpty(companyId) || x.CompanyId == companyId),
             searchFields: "Name,Location,TotalStaff", 
-            includes: new [] {"Company,Users"}
+            includes: new [] {"Company", "Users"}
         );
         var viewModels = paginatedResult.Items.Select(x => new DepartmentViewModel
         {
