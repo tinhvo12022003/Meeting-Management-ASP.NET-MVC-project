@@ -7,7 +7,7 @@ namespace MeetingManagement.Models.DTOs;
 public class MeetingCreateModel
 {
     [Required]
-    [Length(minimumLength: 5, maximumLength: 255, ErrorMessage = "Fix length required")]
+    [StringLength(255, MinimumLength = 5, ErrorMessage = "Tiêu đề phải từ 5 đến 255 ký tự")]
     public string Title { get; set; } = string.Empty;
 
     [Required]
@@ -20,13 +20,7 @@ public class MeetingCreateModel
     [DataType(DataType.DateTime)]
     public DateTime EndAt { get; set; }
 
-    [Required]
-    [EnumDataType(typeof(MeetingType), ErrorMessage = "Invalid meeting type!")]
     public MeetingType Type { get; set; } = MeetingType.OFFLINE;
-
-    [Required]
-    [EnumDataType(typeof(MeetingStatus), ErrorMessage = "Invalid status!")]
-    public MeetingStatus Status { get; set; }
 
     [StringLength(maximumLength: 255)]
     public string? Description { get; set; } = string.Empty;

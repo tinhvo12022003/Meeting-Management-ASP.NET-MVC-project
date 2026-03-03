@@ -1,0 +1,165 @@
+@using MeetingManagement.Models.DTOs
+@using MeetingManagement.Enum
+@model MeetingRoomCreateModel
+
+@{
+    ViewData["Title"] = "Thêm phòng họp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var companies = ViewBag.Companies as List<CompanyViewModel> ?? new List<CompanyViewModel>();
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 p-0 bg-transparent">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-muted small">Quản lý Phòng họp</a></li>
+                    <li class="breadcrumb-item active small" aria-current="page">Thêm mới</li>
+                </ol>
+            </nav>
+
+            <div class="d-flex align-items-center mb-4">
+                <a asp-action="Index" class="btn btn-light btn-sm rounded-circle mr-3 shadow-sm" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-arrow-left text-muted"></i>
+                </a>
+                <h3 class="font-weight-bold mb-0">Tạo phòng họp mới</h3>
+            </div>
+
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Create" method="post" id="createRoomForm">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4" style="border-radius: 8px;"></div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <label asp-for="Name" class="form-label font-weight-bold text-dark small text-uppercase mb-2">Tên phòng họp <span class="text-danger">*</span></label>
+                                <div class="input-group input-group-merge">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light border-right-0"><i class="fas fa-door-open text-muted"></i></span>
+                                    </div>
+                                    <input asp-for="Name" class="form-control bg-light border-left-0" style="border-radius: 0 8px 8px 0;" placeholder="Ví dụ: Meeting Room A101" required>
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger small mt-1"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Capacity" class="form-label font-weight-bold text-dark small text-uppercase mb-2">Sức chứa (Người) <span class="text-danger">*</span></label>
+                                <div class="input-group input-group-merge">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light border-right-0"><i class="fas fa-users text-muted"></i></span>
+                                    </div>
+                                    <input asp-for="Capacity" type="number" class="form-control bg-light border-left-0" style="border-radius: 0 8px 8px 0;" placeholder="Số lượng tối đa..." required>
+                                </div>
+                                <span asp-validation-for="Capacity" class="text-danger small mt-1"></span>
+                            </div>
+
+                            @* <div class="col-md-6 mb-4">
+                                <label asp-for="RowStatus" class="form-label font-weight-bold text-dark small text-uppercase mb-2">Trạng thái <span class="text-danger">*</span></label>
+                                <select asp-for="RowStatus" class="form-control custom-select bg-light" style="border-radius: 8px;">
+                                    <option value="1">Hoạt động</option>
+                                    <option value="0">Tạm khóa</option>
+                                </select>
+                                <span asp-validation-for="RowStatus" class="text-danger small mt-1"></span>
+                            </div> *@
+
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="CompanyId" class="form-label font-weight-bold text-dark small text-uppercase mb-2">Công ty trực thuộc <span class="text-danger">*</span></label>
+                                <div class="input-group input-group-merge">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light border-right-0"><i class="fas fa-building text-muted"></i></span>
+                                    </div>
+                                    <select asp-for="CompanyId" class="form-control bg-light border-left-0" style="border-radius: 0 8px 8px 0;" required>
+                                        <option value="">-- Chọn công ty --</option>
+                                        @foreach (var c in companies)
+                                        {
+                                            <option value="@c.Id">@c.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span asp-validation-for="CompanyId" class="text-danger small mt-1"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 border-light">
+
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a asp-action="Index" class="btn-cancel mr-4">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 font-weight-bold shadow-sm btn-save" style="border-radius: 10px; background: #4f46e5; border: none;">
+                                <i class="fas fa-save mr-2"></i> Lưu phòng họp
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .form-control:focus, .custom-select:focus {
+            background-color: #fff !important;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-save {
+            background: linear-gradient(to right, #6366f1, #4f46e5);
+            padding: 0.9rem 2.2rem;
+            font-size: 1.05rem;
+            letter-spacing: 0.4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35) !important;
+            background: linear-gradient(to right, #4f46e5, #4338ca);
+        }
+
+        .btn-save:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25) !important;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #4b5563;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-cancel:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+            color: #374151;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-cancel:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        .input-group-merge .form-control {
+            border-left: 0;
+        }
+
+        .input-group-merge .input-group-text {
+            border-right: 0;
+            border-radius: 8px 0 0 8px;
+        }
+    </style>
+}

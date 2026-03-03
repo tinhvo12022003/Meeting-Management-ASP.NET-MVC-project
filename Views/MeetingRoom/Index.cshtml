@@ -1,0 +1,204 @@
+@using MeetingManagement.Models.DTOs
+@using MeetingManagement.Enum
+@model MeetingManagement.Common.PaginatedResponse<MeetingRoomViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý Phòng họp";
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="font-weight-bold text-dark mb-1">Hệ thống Phòng họp</h2>
+            <p class="text-muted small mb-0">Quản lý không gian họp nội bộ tối giản & hiệu quả</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary px-4 py-2 shadow-sm" style="border-radius: 12px; font-weight: 600;">
+            <i class="fas fa-plus mr-2"></i> Thêm phòng
+        </a>
+    </div>
+
+    <!-- Minimal Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card glass-card p-3 d-flex align-items-center">
+                <div class="stat-icon bg-soft-primary mr-3">
+                    <i class="fas fa-building text-primary"></i>
+                </div>
+                <div>
+                    <span class="text-muted small font-weight-bold d-block text-uppercase">Tổng số phòng</span>
+                    <h4 class="font-weight-bold mb-0">@Model.TotalRecords</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card glass-card p-3 d-flex align-items-center">
+                <div class="stat-icon bg-soft-success mr-3">
+                    <i class="fas fa-check-circle text-success"></i>
+                </div>
+                <div>
+                    <span class="text-muted small font-weight-bold d-block text-uppercase">Đang hoạt động</span>
+                    <h4 class="font-weight-bold mb-0">@Model.Items.Count()</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card border-0 shadow-sm glass-card" style="border-radius: 20px;">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="font-weight-bold mb-0">Danh sách phòng họp</h5>
+                </div>
+                <div class="col-md-4">
+                    <form asp-action="Index" method="get">
+                        <div class="input-group bg-light border-0 shadow-none" style="border-radius: 12px; overflow: hidden;">
+                            <div class="input-group-prepend px-3 d-flex align-items-center">
+                                <i class="fas fa-search text-muted small"></i>
+                            </div>
+                            <input type="text" name="SearchTerm" class="form-control bg-light border-0 pl-0 small" 
+                                   placeholder="Tìm tên phòng..." value="@Context.Request.Query["SearchTerm"]">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body px-0 pb-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-items-center mb-0">
+                    <thead class="bg-light-faded">
+                        <tr>
+                            <th class="px-4 text-muted small text-uppercase font-weight-bold">Tên phòng</th>
+                            <th class="text-center text-muted small text-uppercase font-weight-bold">Sức chứa</th>
+                            <th class="text-muted small text-uppercase font-weight-bold">Công ty</th>
+                            <th class="px-4 text-right text-muted small text-uppercase font-weight-bold">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Items.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted small italic">Chưa có dữ liệu phòng họp.</td>
+                            </tr>
+                        }
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="px-4">
+                                    <span class="font-weight-600 text-dark">@item.Name</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge badge-soft-indigo px-3 py-2" style="border-radius: 8px;">
+                                        <i class="fas fa-users mr-1"></i> @item.Capacity
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-muted small font-weight-500">@item.CompanyName</span>
+                                </td>
+                                <td class="px-4 text-right">
+                                    <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-link text-primary p-0 mr-3 hover-scale" title="Sửa">
+                                        <i class="fas fa-pen-nib"></i>
+                                    </a>
+                                    <button class="btn btn-link text-danger p-0 hover-scale" onclick="deleteRoom('@item.Id')" title="Xóa">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        @if (Model.TotalPages > 1)
+        {
+            <div class="card-footer bg-transparent border-0 py-4 px-4">
+                <nav class="d-flex justify-content-center">
+                    <ul class="pagination pagination-rounded mb-0 gap-2">
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                <a class="page-link border-0 shadow-sm" href="?PageNumber=@i&SearchTerm=@Context.Request.Query["SearchTerm"]" 
+                                   style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+    .stat-card { border-radius: 18px; border: 1px solid #f1f5f9; transition: all 0.2s; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+    }
+    .bg-soft-primary { background: #eef2ff; }
+    .bg-soft-success { background: #f0fdf4; }
+    .badge-soft-indigo { color: #4f46e5; background: #eef2ff; }
+    
+    .form-control {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        background: #fdfdfd;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    .form-control:focus {
+        background: #fff;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+    }
+    .hover-scale:hover { transform: scale(1.15); transition: 0.2s; }
+    .italic { font-style: italic; }
+    .font-weight-600 { font-weight: 600; }
+    .font-weight-500 { font-weight: 500; }
+    .bg-light-faded { background-color: #fbfcfd; }
+</style>
+
+@section Scripts {
+    <script>
+        function deleteRoom(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: "Phòng họp sẽ tạm dừng hoạt động và ẩn khỏi danh sách.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Bỏ qua'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/MeetingRoom/Delete/${id}`, function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', response.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

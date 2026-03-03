@@ -1,12 +1,54 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\tvo22\\OneDrive\\M\u00E1y t\u00EDnh\\Projects\\Main-Meeting\\Meeting-Management-ASP.NET-MVC-project\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{BD5A3088-2AC9-6016-4D6D-99373BCE7111}|MeetingManagement.csproj|c:\\users\\tvo22\\onedrive\\m\u00E1y t\u00EDnh\\projects\\main-meeting\\meeting-management-asp.net-mvc-project\\views\\meetingroom\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BD5A3088-2AC9-6016-4D6D-99373BCE7111}|MeetingManagement.csproj|solutionrelative:views\\meetingroom\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BD5A3088-2AC9-6016-4D6D-99373BCE7111}|MeetingManagement.csproj|c:\\users\\tvo22\\onedrive\\m\u00E1y t\u00EDnh\\projects\\main-meeting\\meeting-management-asp.net-mvc-project\\views\\meetingroom\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BD5A3088-2AC9-6016-4D6D-99373BCE7111}|MeetingManagement.csproj|solutionrelative:views\\meetingroom\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\tvo22\\OneDrive\\M\u00E1y t\u00EDnh\\Projects\\Main-Meeting\\Meeting-Management-ASP.NET-MVC-project\\Views\\MeetingRoom\\Create.cshtml",
+              "RelativeDocumentMoniker": "Views\\MeetingRoom\\Create.cshtml",
+              "ToolTip": "C:\\Users\\tvo22\\OneDrive\\M\u00E1y t\u00EDnh\\Projects\\Main-Meeting\\Meeting-Management-ASP.NET-MVC-project\\Views\\MeetingRoom\\Create.cshtml",
+              "RelativeToolTip": "Views\\MeetingRoom\\Create.cshtml",
+              "ViewState": "AgIAAIQAAAAAAAAAAAAewJYAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-01T13:40:18.522Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\tvo22\\OneDrive\\M\u00E1y t\u00EDnh\\Projects\\Main-Meeting\\Meeting-Management-ASP.NET-MVC-project\\Views\\MeetingRoom\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\MeetingRoom\\Index.cshtml",
+              "ToolTip": "C:\\Users\\tvo22\\OneDrive\\M\u00E1y t\u00EDnh\\Projects\\Main-Meeting\\Meeting-Management-ASP.NET-MVC-project\\Views\\MeetingRoom\\Index.cshtml",
+              "RelativeToolTip": "Views\\MeetingRoom\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAABHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-01T12:51:32.59Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

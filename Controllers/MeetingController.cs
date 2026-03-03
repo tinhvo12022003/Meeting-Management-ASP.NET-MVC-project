@@ -39,7 +39,9 @@ public class MeetingController : Controller
 
     public IActionResult Create()
     {
-        return View();
+        // The 'Create' page is currently handled by AJAX/JavaScript on the index view.
+        // To avoid the missing view error when the link is clicked, redirect to Index.
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
@@ -48,7 +50,11 @@ public class MeetingController : Controller
         if (!ModelState.IsValid)
         {
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                var errorMessages = string.Join("; ", errors.Select(e => e.ErrorMessage));
+                return Json(new { success = false, message = errorMessages ?? "Dữ liệu không hợp lệ." });
+            }
             return View(model);
         }
 
@@ -73,8 +79,55 @@ public class MeetingController : Controller
 
     public async Task<IActionResult> Update(string id)
     {
-        // This is a placeholder, usually we'd get the meeting by id and map to UpdateModel
+        // retrieve existing meeting and send to view (not used currently)
+        var meeting = await _meetingService.Find(new PaginatedRequest { PageSize = 1 });
+        // we'll keep placeholder; actual update handled via POST below
         return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Update(MeetingUpdateModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                var errorMessages = string.Join("; ", errors.Select(e => e.ErrorMessage));
+                return Json(new { success = false, message = errorMessages });
+            }
+            return View(model);
+        }
+
+        try
+        {
+            await _meetingService.Update(model);
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return Json(new { success = true, message = "Cuộc họp đã được cập nhật!" });
+            TempData["Success"] = "Cuộc họp đã được cập nhật!";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return Json(new { success = false, message = ex.Message });
+            TempData["Error"] = ex.Message;
+            return View(model);
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Reschedule([FromBody] MeetingRescheduleModel model)
+    {
+        try
+        {
+            await _meetingService.Reschedule(model.Id, model.StartAt, model.EndAt);
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
     }
 
     [HttpPost]
@@ -95,21 +148,34 @@ public class MeetingController : Controller
     [HttpGet]
     public async Task<IActionResult> GetCalendarEvents()
     {
-        // Fetch events for FullCalendar
-        var result = await _meetingService.Find(new PaginatedRequest { PageSize = 1000 });
-        var events = result.Items.Select(m => new {
-            id = m.Id,
-            title = m.Title,
-            start = m.StartAt,
-            end = m.EndAt,
-            url = m.Url,
-            extendedProps = new {
-                room = m.RoomName,
-                company = m.CompanyName,
-                department = m.DepartmentName,
-                status = m.Status.ToString()
-            }
-        });
-        return Json(events);
+        try
+        {
+            // Fetch all active meetings for the calendar
+            var result = await _meetingService.Find(new PaginatedRequest { PageSize = 1000 });
+            
+            var events = result.Items
+                .Where(m => m.StartAt != default && m.EndAt != default) // Filter out invalid dates
+                .Select(m => new {
+                    id = m.Id,
+                    title = m.Title,
+                    start = m.StartAt.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    end = m.EndAt.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    url = m.Url,
+                    extendedProps = new {
+                        room = m.RoomName ?? "N/A",
+                        company = m.CompanyName ?? "N/A",
+                        department = m.DepartmentName ?? "N/A",
+                        description = m.Description ?? "",
+                        endAt = m.EndAt.ToString("yyyy-MM-ddTHH:mm:ss")
+                    }
+                })
+                .ToList();
+            
+            return Json(events);
+        }
+        catch (Exception ex)
+        {
+            return Json(new { error = ex.Message }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        }
     }
 }

@@ -41,14 +41,13 @@ public class MeetingService : IMeetingService
             StartAt = model.StartAt,
             EndAt = model.EndAt,
             Type = model.Type,
-            MeetingStatus = model.Status,
             Description = model.Description,
             Organization = model.Organization,
             Url = model.Url,
             CompanyId = model.CompanyId,
             DepartmentId = model.DepartmentId,
             RoomId = model.RoomId,
-            RowStatus = model.RowStatus,
+            RowStatus = RowStatus.ACTIVE,
             CreateAt = DateTime.Now,
             CreateBy = _helper.GetCurrentUser()
         };
@@ -82,7 +81,6 @@ public class MeetingService : IMeetingService
         meeting.StartAt = model.StartAt;
         meeting.EndAt = model.EndAt;
         meeting.Type = model.Type;
-        meeting.MeetingStatus = model.Status;
         meeting.Description = model.Description;
         meeting.Organization = model.Organization;
         meeting.Url = model.Url;
@@ -90,6 +88,32 @@ public class MeetingService : IMeetingService
         meeting.DepartmentId = model.DepartmentId;
         meeting.RoomId = model.RoomId;
         meeting.RowStatus = model.RowStatus;
+        meeting.UpdateAt = DateTime.UtcNow;
+        meeting.UpdateBy = _helper.GetCurrentUser();
+
+        await _unitOfWork.Meetings.Update(meeting);
+        await _unitOfWork.CommitAsync();
+    }
+
+    public async Task Reschedule(string id, DateTime startAt, DateTime endAt)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            throw new Exception(MessageConstant.EMPTY_STRING);
+
+        var meeting = await _unitOfWork.Meetings.GetById(id);
+        if (meeting == null)
+            throw new Exception(MessageConstant.NOT_EXISTED);
+
+        if (meeting.RowStatus == RowStatus.INACTIVE)
+            throw new Exception(MessageConstant.INACTIVE);
+
+        // collision check (exclude self)
+        var overlap = await _unitOfWork.Meetings.IsMeetingOverlap(startAt, endAt, meeting.RoomId);
+        if (overlap && (meeting.StartAt != startAt || meeting.EndAt != endAt))
+            throw new Exception(MessageConstant.EXISTED);
+
+        meeting.StartAt = startAt;
+        meeting.EndAt = endAt;
         meeting.UpdateAt = DateTime.UtcNow;
         meeting.UpdateBy = _helper.GetCurrentUser();
 
@@ -138,7 +162,6 @@ public class MeetingService : IMeetingService
             StartAt = x.StartAt,
             EndAt = x.EndAt,
             Type = x.Type,
-            Status = x.MeetingStatus,
             Description = x.Description,
             Organization = x.Organization,
             Url = x.Url,
@@ -146,7 +169,6 @@ public class MeetingService : IMeetingService
             CompanyName = x.Company?.Name ?? string.Empty,
             DepartmentName = x.Department?.Name ?? string.Empty
         }).ToList();
-
         return new PaginatedResponse<MeetingViewModel>
         {
             Items = viewModels,

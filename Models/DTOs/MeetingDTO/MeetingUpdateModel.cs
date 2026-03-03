@@ -18,13 +18,7 @@ public class MeetingUpdateModel
     [DataType(DataType.DateTime)]
     public DateTime EndAt { get; set; }
 
-    [Required]
-    [EnumDataType(typeof(MeetingType), ErrorMessage = "Invalid meeting type!")]
     public MeetingType Type { get; set; } = MeetingType.OFFLINE;
-
-    [Required]
-    [EnumDataType(typeof(MeetingStatus), ErrorMessage = "Invalid status!")]
-    public MeetingStatus Status { get; set; }
 
     [StringLength(maximumLength: 255)]
     public string? Description { get; set; } = string.Empty;

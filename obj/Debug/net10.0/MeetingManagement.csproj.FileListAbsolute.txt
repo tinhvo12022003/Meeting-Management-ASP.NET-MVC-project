@@ -11921,7 +11921,6 @@ C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\MeetingManagement.pdb
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\MeetingManagement.genruntimeconfig.cache
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\ref\MeetingManagement.dll
-C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\wg7untscgb-{0}-d76phpsg5j-d76phpsg5j.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\yt3wgrs64i-{0}-apeiq82xqi-apeiq82xqi.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\cqyle9m2yq-{0}-32enyiajfk-32enyiajfk.gz

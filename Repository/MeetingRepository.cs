@@ -1,4 +1,5 @@
 using MeetingManagement.Data.Context;
+using MeetingManagement.Enum;
 using MeetingManagement.Interface.IRepository;
 using MeetingManagement.Models;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,13 @@ public class MeetingRepository : GenericRepository<MeetingModel>, IMeetingReposi
         _context = context;
     }
 
-    public async Task<bool> IsMeetingOverlap (DateTime StartAt, DateTime EndAt, string RoomId)
+    public async Task<bool> IsMeetingOverlap(DateTime start, DateTime end, string roomId)
     {
-        var query = await _context.Meeting.AnyAsync(x => x.StartAt == StartAt && x.EndAt == EndAt && x.RoomId == RoomId);
-        return query;
+        return await _context.Meeting.AnyAsync(x => 
+            x.RoomId == roomId && 
+            x.StartAt < end && 
+            x.EndAt > start &&
+            x.RowStatus == RowStatus.ACTIVE);
     }
 
     public async Task<MeetingModel?> GetMeeting (DateTime StartAt, DateTime EndAt, string RoomId)

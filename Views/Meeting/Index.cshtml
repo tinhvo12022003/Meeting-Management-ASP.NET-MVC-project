@@ -25,6 +25,9 @@
             <button class="btn btn-outline-secondary mr-2" style="border-radius: 8px;" id="toggleViewBtn">
                 <i class="fas fa-list mr-1"></i> <span id="toggleText">Chế độ Danh sách</span>
             </button>
+            <button class="btn btn-outline-primary mr-2" style="border-radius: 8px;" id="refreshCalendarBtn" title="Làm mới lịch từ server">
+                <i class="fas fa-sync-alt mr-1"></i> Làm mới
+            </button>
             <a asp-action="Create" class="btn btn-primary px-4"
                style="border-radius: 8px; background: #4f46e5; border: none;">
                 <i class="fas fa-plus mr-1"></i> Tạo cuộc họp
@@ -201,7 +204,6 @@
                                 <th>Cuộc họp</th>
                                 <th>Thời gian</th>
                                 <th>Địa điểm / Link</th>
-                                <th>Trạng thái</th>
                                 <th class="text-right">Thao tác</th>
                             </tr>
                         </thead>
@@ -240,22 +242,7 @@
                                                 <span class="text-muted"><i class="fas fa-map-marker-alt mr-1"></i> @item.RoomName</span>
                                             }
                                         </td>
-                                        <td>
-                                            @{
-                                                var statusClass = item.Status switch
-                                                {
-                                                    MeetingStatus.APPROVED => "status-active",
-                                                    MeetingStatus.ACTIVE => "status-active",
-                                                    MeetingStatus.PENDING => "badge-warning",
-                                                    MeetingStatus.REJECTED => "badge-danger",
-                                                    _ => "badge-secondary"
-                                                };
-                                            }
-                                            <span class="badge-status @statusClass">
-                                                <span class="dot"></span> @item.Status
-                                            </span>
-                                        </td>
-                                        <td>
+                                        <td class="text-right">
                                             <div class="action-btns justify-content-end">
                                                 <a asp-action="Update" asp-route-id="@item.Id" class="btn-icon btn-edit" title="Chỉnh sửa">
                                                     <i class="fas fa-pen"></i>
@@ -312,7 +299,6 @@
                     </div>
                     <div>
                         <h4 id="displayEventTitle" class="font-weight-bold mb-0 text-main"></h4>
-                        <span id="displayEventStatus" class="badge badge-pill badge-success mt-1">Đã duyệt</span>
                     </div>
                 </div>
 
@@ -628,6 +614,16 @@
             transform: translateY(-50%);
             color: var(--text-muted);
         }
+
+        /* Spinner animation for refresh button */
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fa-spin {
+            animation: spin 1s linear infinite;
+        }
     </style>
 }
 
@@ -706,6 +702,14 @@
                 localStorage.setItem('meetingDrafts', JSON.stringify(newDrafts));
             }
 
+            // Reload calendar events from server
+            function refreshCalendarEvents() {
+                if (typeof calendar !== 'undefined' && calendar) {
+                    console.log('Refreshing calendar events from server...');
+                    calendar.refetchEvents();
+                }
+            }
+
             // Delete draft handler
             $(document).on('click', '.remove-draft', function(e) {
                 e.preventDefault();
@@ -756,23 +760,42 @@
             // Add to Draft Button
             $('#add-to-draft').click(function () {
                 const title = $('#q-title').val();
-                if (!title) {
-                    Swal.fire('Lỗi', 'Vui lòng nhập tiêu đề', 'error');
+                const startTime = $('#q-start').val();
+                const endTime = $('#q-end').val();
+                const roomId = $('#q-room').val();
+                const companyId = $('#q-company').val();
+                const departmentId = $('#q-dept').val();
+
+                if (!title || !roomId || !companyId || !departmentId) {
+                    Swal.fire('Chú ý', 'Vui lòng nhập tiêu đề và chọn đầy đủ thông tin (Phòng, Công ty, Phòng ban)', 'warning');
+                    return;
+                }
+
+                if (title.length < 5) {
+                    Swal.fire('Chú ý', 'Tiêu đề cuộc họp phải từ 5 ký tự trở lên', 'warning');
                     return;
                 }
 
                 const eventData = {
                     title: title,
-                    startTime: $('#q-start').val(),
-                    endTime: $('#q-end').val(),
-                    roomId: $('#q-room').val(),
-                    companyId: $('#q-company').val(),
-                    departmentId: $('#q-dept').val(),
+                    startTime: startTime,
+                    endTime: endTime,
+                    roomId: roomId,
+                    companyId: companyId,
+                    departmentId: departmentId,
                     color: currColor
                 };
 
                 saveDraftEvent(eventData);
+                
+                // Reset form
                 $('#q-title').val('');
+                $('#q-start').val('');
+                $('#q-end').val('');
+                $('#q-room').val('');
+                $('#q-company').val('');
+                $('#q-dept').val('');
+
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
@@ -795,6 +818,95 @@
                 editable: true,
                 droppable: true,
                 events: '/Meeting/GetCalendarEvents',
+                eventDidMount: function(info) {
+                    // Add tooltip and custom styling to events
+                    const props = info.event.extendedProps;
+                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}`;
+                    
+                    $(info.el).css('cursor', 'pointer');
+                    
+                    // Initialize bootstrap tooltip
+                    $(info.el).tooltip({
+                        title: tooltipContent,
+                        html: true,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                },
+                eventWillUnmount: function(info) {
+                    $(info.el).tooltip('dispose');
+                },
+
+                // When an existing event is dropped (rescheduled)
+                eventDrop: function(info) {
+                    const evt = info.event;
+                    $.ajax({
+                        url: '/Meeting/Reschedule',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            id: evt.id,
+                            startAt: moment(evt.start).format('YYYY-MM-DDTHH:mm:ss'),
+                            endAt: moment(evt.end).format('YYYY-MM-DDTHH:mm:ss')
+                        }),
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'Cuộc họp đã được di chuyển',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                refreshCalendarEvents();
+                            } else {
+                                Swal.fire('Lỗi', res.message, 'error');
+                                info.revert();
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Lỗi', 'Không thể cập nhật lịch', 'error');
+                            info.revert();
+                        }
+                    });
+                },
+                
+                // When an existing event is resized (duration changed)
+                eventResize: function(info) {
+                    const evt = info.event;
+                    $.ajax({
+                        url: '/Meeting/Reschedule',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            id: evt.id,
+                            startAt: moment(evt.start).format('YYYY-MM-DDTHH:mm:ss'),
+                            endAt: moment(evt.end).format('YYYY-MM-DDTHH:mm:ss')
+                        }),
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'Đã thay đổi thời lượng cuộc họp',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                refreshCalendarEvents();
+                            } else {
+                                Swal.fire('Lỗi', res.message, 'error');
+                                info.revert();
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Lỗi', 'Không thể cập nhật thời lượng', 'error');
+                            info.revert();
+                        }
+                    });
+                },
                 
                 // When an external event is dropped
                 drop: function (info) {
@@ -822,9 +934,8 @@
                         RoomId: eventData.roomId,
                         CompanyId: eventData.companyId,
                         DepartmentId: eventData.departmentId,
-                        Type: 0, // OFFLINE default
-                        Status: 1, // PENDING default
-                        RowStatus: 5 // ACTIVE
+                        Type: 1, // OFFLINE (MeetingType.OFFLINE = 1)
+                        RowStatus: 1 // ACTIVE (RowStatus.ACTIVE = 1)
                     };
 
                     // Sync to Database
@@ -842,7 +953,11 @@
                                     showConfirmButton: false,
                                     timer: 3000
                                 });
-                                calendar.refetchEvents();
+                                
+                                // Refetch events with a small delay to ensure DB is updated
+                                setTimeout(() => {
+                                    calendar.refetchEvents();
+                                }, 500);
                                 
                                 if (checkbox.checked) {
                                     const index = $(info.draggedEl).data('id');
@@ -850,11 +965,26 @@
                                 }
                             } else {
                                 Swal.fire('Thất bại', response.message, 'error');
+                                // Remove the event if it was added locally but rejected by server
+                                const event = calendar.getEventById(info.draggedEl.getAttribute('data-id'));
+                                if (event) event.remove();
                             }
                         },
                         error: function (xhr) {
-                            var errMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Không thể lưu cuộc họp';
+                            let errMsg = 'Không thể lưu cuộc họp';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errMsg = xhr.responseJSON.message;
+                            } else if (xhr.status === 0) {
+                                errMsg = 'Mất kết nối mạng. Vui lòng kiểm tra và thử lại.';
+                            }
+                            
                             Swal.fire('Lỗi hệ thống', errMsg, 'error');
+                            
+                            // Remove the event from calendar if request failed
+                            const event = calendar.getEventById(info.draggedEl.getAttribute('data-id'));
+                            if (event) event.remove();
+                            
+                            console.error('Meeting Create Error:', xhr);
                         }
                     });
                 },
@@ -862,12 +992,21 @@
                 eventClick: function(info) {
                     const event = info.event;
                     const props = event.extendedProps;
+                    
+                    // Format dates for display
+                    const startStr = moment(event.start).format('DD/MM/YYYY, HH:mm');
+                    let endStr = 'N/A';
+                    if (event.end) {
+                        endStr = moment(event.end).format('DD/MM/YYYY, HH:mm');
+                    } else if (props.endAt) {
+                        endStr = moment(props.endAt).format('DD/MM/YYYY, HH:mm');
+                    }
+
                     document.getElementById('displayEventTitle').textContent = event.title;
-                    document.getElementById('displayEventStart').textContent = moment(event.start).format('DD/MM/YYYY, HH:mm');
-                    document.getElementById('displayEventEnd').textContent = event.end ? moment(event.end).format('DD/MM/YYYY, HH:mm') : 'N/A';
+                    document.getElementById('displayEventStart').textContent = startStr;
+                    document.getElementById('displayEventEnd').textContent = endStr;
                     document.getElementById('displayEventLocation').innerHTML = event.url ? `<a href="${event.url}" target="_blank">${event.url}</a>` : (props.room || 'N/A');
                     document.getElementById('displayEventOrg').textContent = props.department ? `${props.department} - ${props.company}` : 'N/A';
-                    document.getElementById('displayEventStatus').textContent = props.status;
                     document.getElementById('editEventBtn').href = `/Meeting/Update/${event.id}`;
                     $('#eventModal').modal('show');
                 }
@@ -875,6 +1014,31 @@
 
             calendar.render();
             loadDraftEvents();
+
+            // Refresh Calendar Button Handler
+            $('#refreshCalendarBtn').click(function() {
+                const btn = $(this);
+                const icon = btn.find('i');
+                
+                btn.prop('disabled', true);
+                icon.addClass('fa-spin');
+                
+                console.log('Manual refresh triggered');
+                refreshCalendarEvents();
+                
+                setTimeout(() => {
+                    btn.prop('disabled', false);
+                    icon.removeClass('fa-spin');
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Đã làm mới lịch',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }, 1000);
+            });
 
             // View Toggle Logic
             $('#toggleViewBtn').click(function() {

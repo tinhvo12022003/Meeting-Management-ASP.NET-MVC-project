@@ -26,13 +26,14 @@ public class MeetingRoomService : IMeetingRoomService
         }
 
         var isExisted = await _unitOfWork.MeetingRooms.GetByName(model.Name);
-        if (isExisted == null)
+        if (isExisted != null)
         {
-            throw new Exception(MessageConstant.NOT_EXISTED);
+            throw new Exception(MessageConstant.EXISTED);
         }
         var room = new MeetingRoomModel
         {
             Name = model.Name,
+            Capacity = model.Capacity,
             CompanyId = model.CompanyId,
             RowStatus = RowStatus.ACTIVE,
             CreateAt = DateTime.UtcNow,
@@ -108,7 +109,8 @@ public class MeetingRoomService : IMeetingRoomService
             Id = x.Id,
             Name = x.Name,
             Capacity = x.Capacity,
-            CompanyName = x.Company?.Name ?? string.Empty
+            CompanyName = x.Company?.Name ?? string.Empty,
+            CompanyId = x.CompanyId
         }).ToList();
 
         return new PaginatedResponse<MeetingRoomViewModel>
@@ -129,5 +131,19 @@ public class MeetingRoomService : IMeetingRoomService
             Name = x.Name,
             Capacity = x.Capacity
         }).ToList();
+    }
+
+    public async Task<MeetingRoomViewModel> GetById(string id)
+    {
+        var x = await _unitOfWork.MeetingRooms.GetById(id);
+        if (x == null) return null;
+        return new MeetingRoomViewModel
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Capacity = x.Capacity,
+            CompanyName = x.Company?.Name ?? string.Empty,
+            CompanyId = x.CompanyId
+        };
     }
 }

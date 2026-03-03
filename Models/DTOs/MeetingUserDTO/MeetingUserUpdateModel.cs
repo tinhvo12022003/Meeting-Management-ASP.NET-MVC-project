@@ -11,11 +11,6 @@ public class MeetingUserUpdateModel
     [Required]
     public string MeetingId {get; set;} = string.Empty;
 
-    [Required]
     [EnumDataType(typeof(RoleMeeting), ErrorMessage = "Invalid role!")]
     public RoleMeeting Role {get; set;}
-
-    [Required]
-    [EnumDataType(typeof(MeetingStatus), ErrorMessage = "Invalid status!")]
-    public MeetingStatus Status {get ; set;}
 }

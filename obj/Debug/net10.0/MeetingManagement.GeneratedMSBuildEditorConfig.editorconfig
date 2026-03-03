@@ -70,8 +70,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/tvo22/OneDrive/Máy tính/Projects/Main-Meeting/Meeting-Management-ASP.NET-MVC-project/Views/MeetingRoom/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVldGluZ1Jvb21cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/tvo22/OneDrive/Máy tính/Projects/Main-Meeting/Meeting-Management-ASP.NET-MVC-project/Views/MeetingRoom/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVldGluZ1Jvb21cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tvo22/OneDrive/Máy tính/Projects/Main-Meeting/Meeting-Management-ASP.NET-MVC-project/Views/MeetingRoom/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVldGluZ1Jvb21cVXBkYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/tvo22/OneDrive/Máy tính/Projects/Main-Meeting/Meeting-Management-ASP.NET-MVC-project/Views/Meeting/Index.cshtml]
