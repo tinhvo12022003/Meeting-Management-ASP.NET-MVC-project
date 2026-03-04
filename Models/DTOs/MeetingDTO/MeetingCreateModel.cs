@@ -31,6 +31,8 @@ public class MeetingCreateModel
     [DataType(DataType.Url)]
     public string? Url {get; set;} = string.Empty;
 
+    public string? Color {get; set;} = "#4f46e5";
+
     [Required]
     [NotNull]
     public string CompanyId { get; set; } = string.Empty;

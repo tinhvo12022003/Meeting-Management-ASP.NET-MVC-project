@@ -104,6 +104,7 @@ public class DepartmentService : IDepartmentService
         {
             Id = x.Id,
             Name = x.Name,
+            CompanyId = x.CompanyId,
             CompanyName = x.Company?.Name ?? string.Empty,
             TotalStaff = x.Users?.Count ?? 0,
             ManagerName = x.Users?.FirstOrDefault(u => u.userType == UserType.HEAD || u.userType == UserType.MANAGER)?.FullName ?? "Chưa cập nhật"

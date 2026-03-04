@@ -15,6 +15,7 @@ public class MeetingModel : BaseModel
     public string? Description {get; set;} = string.Empty;
     public string? Organization {get; set;} = string.Empty;
     public string? Url {get; set;} = string.Empty;
+    public string? Color {get; set;} = "#4f46e5";
 
 
     // relationship

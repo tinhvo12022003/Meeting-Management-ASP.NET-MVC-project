@@ -161,11 +161,15 @@ public class MeetingController : Controller
                     start = m.StartAt.ToString("yyyy-MM-ddTHH:mm:ss"),
                     end = m.EndAt.ToString("yyyy-MM-ddTHH:mm:ss"),
                     url = m.Url,
+                    backgroundColor = m.Color ?? "#4f46e5",
+                    borderColor = m.Color ?? "#4f46e5",
                     extendedProps = new {
                         room = m.RoomName ?? "N/A",
                         company = m.CompanyName ?? "N/A",
                         department = m.DepartmentName ?? "N/A",
                         description = m.Description ?? "",
+                        color = m.Color ?? "#4f46e5",
+                        createdBy = m.CreatedBy ?? "Hệ thống",
                         endAt = m.EndAt.ToString("yyyy-MM-ddTHH:mm:ss")
                     }
                 })

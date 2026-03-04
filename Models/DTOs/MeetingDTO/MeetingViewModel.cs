@@ -12,6 +12,8 @@ public class MeetingViewModel
     public string? Description {get; set;} = string.Empty;
     public string? Organization {get; set;} = string.Empty;
     public string? Url {get; set;} = string.Empty;
+    public string? Color {get; set;} = "#4f46e5";
+    public string CreatedBy {get; set;} = string.Empty;
 
     
     public string RoomName {get; set;} = string.Empty;

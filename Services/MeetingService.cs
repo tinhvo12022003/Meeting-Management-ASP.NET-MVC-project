@@ -52,6 +52,7 @@ public class MeetingService : IMeetingService
             CompanyId = model.CompanyId,
             DepartmentId = model.DepartmentId,
             RoomId = model.RoomId,
+            Color = model.Color,
             RowStatus = RowStatus.ACTIVE,
             CreateAt = DateTime.Now,
             CreateBy = _helper.GetCurrentUser()
@@ -104,6 +105,7 @@ public class MeetingService : IMeetingService
         meeting.CompanyId = model.CompanyId;
         meeting.DepartmentId = model.DepartmentId;
         meeting.RoomId = model.RoomId;
+        meeting.Color = model.Color;
         meeting.RowStatus = model.RowStatus;
         meeting.UpdateAt = DateTime.Now;
         meeting.UpdateBy = _helper.GetCurrentUser();
@@ -187,6 +189,8 @@ public class MeetingService : IMeetingService
             Description = x.Description,
             Organization = x.Organization,
             Url = x.Url,
+            Color = x.Color,
+            CreatedBy = x.CreateBy,
             RoomName = x.MeetingRoom?.Name ?? string.Empty,
             CompanyName = x.Company?.Name ?? string.Empty,
             DepartmentName = x.Department?.Name ?? string.Empty

@@ -104,33 +104,43 @@
                         </div>
 
                         <!-- Quick Create Event Card -->
-                        <div class="card shadow-sm border-0" style="border-radius: 16px;">
+                        <div class="card shadow-sm border-0 quick-create-card" style="border-radius: 16px; transition: border-color 0.3s ease;">
                             <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
-                                <h5 class="font-weight-bold mb-0">Tạo mới</h5>
-                                <button class="btn btn-sm btn-light text-primary" id="add-to-draft" title="Lưu vào danh sách chờ">
-                                    <i class="fas fa-save"></i>
-                                </button>
+                                <h5 class="font-weight-bold mb-0">Lên lịch nhanh</h5>
+                                <div class="badge badge-soft-primary" id="auto-save-status" style="display: none;">
+                                    <i class="fas fa-sync fa-spin mr-1"></i> Đang lưu...
+                                </div>
                             </div>
                             <div class="card-body px-4 pb-4 pt-2">
                                 <div class="form-group mb-3">
-                                    <label class="small text-muted">Tiêu đề</label>
-                                    <input id="q-title" type="text" class="form-control" placeholder="Nhập tên sự kiện...">
+                                    <label class="small text-muted">Tiêu đề cuộc họp</label>
+                                    <input id="q-title" type="text" class="form-control" placeholder="Tên cuộc họp (tối thiểu 5 ký tự)...">
                                 </div>
                                 
-                                <div class="row no-gutters mb-3">
-                                    <div class="col-6 pr-1">
-                                        <label class="small text-muted">Bắt đầu</label>
-                                        <input id="q-start" type="time" class="form-control">
+                                <div class="row mb-3">
+                                    <div class="col-12 mb-3">
+                                        <label class="small text-muted">Thời gian bắt đầu <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-light border-right-0"><i class="far fa-calendar-alt"></i></span>
+                                            </div>
+                                            <input id="q-start" type="datetime-local" class="form-control border-left-0 q-input">
+                                        </div>
                                     </div>
-                                    <div class="col-6 pl-1">
-                                        <label class="small text-muted">Kết thúc</label>
-                                        <input id="q-end" type="time" class="form-control">
+                                    <div class="col-12">
+                                        <label class="small text-muted">Thời gian kết thúc <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-light border-right-0"><i class="far fa-clock"></i></span>
+                                            </div>
+                                            <input id="q-end" type="datetime-local" class="form-control border-left-0 q-input">
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label class="small text-muted">Phòng họp</label>
-                                    <select id="q-room" class="form-control">
+                                    <label class="small text-muted">Phòng họp <span class="text-danger">*</span></label>
+                                    <select id="q-room" class="form-control q-input">
                                         <option value="">-- Chọn phòng họp --</option>
                                         @foreach (var room in ViewBag.Rooms) {
                                             <option value="@room.Id">@room.Name</option>
@@ -138,32 +148,53 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label class="small text-muted">Công ty</label>
-                                    <select id="q-company" class="form-control">
-                                        <option value="">-- Chọn công ty --</option>
-                                        @foreach (var c in ViewBag.Companies) {
-                                            <option value="@c.Id">@c.Name</option>
-                                        }
-                                    </select>
-                                </div>
-
-                                <div class="form-group mb-4">
-                                    <label class="small text-muted">Phòng ban</label>
-                                    <select id="q-dept" class="form-control">
-                                        <option value="">-- Chọn phòng ban --</option>
-                                        @foreach (var d in ViewBag.Departments) {
-                                            <option value="@d.Id">@d.Name</option>
-                                        }
-                                    </select>
+                                <div class="row">
+                                    <div class="col-6 pr-2">
+                                        <div class="form-group mb-3">
+                                            <label class="small text-muted">Công ty <span class="text-danger">*</span></label>
+                                            <select id="q-company" class="form-control q-input">
+                                                <option value="">-- Chọn --</option>
+                                                @foreach (var c in ViewBag.Companies) {
+                                                    <option value="@c.Id">@c.Name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 pl-2">
+                                        <div class="form-group mb-3">
+                                            <label class="small text-muted">Phòng ban <span class="text-danger">*</span></label>
+                                            <select id="q-dept" class="form-control q-input">
+                                                <option value="">-- Chọn --</option>
+                                                @foreach (var d in ViewBag.Departments) {
+                                                    <option value="@d.Id" data-company-id="@d.CompanyId">@d.Name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <label class="small text-muted mb-1">Màu sắc</label>
-                                <div class="d-flex gap-2 mb-4" id="color-chooser">
-                                    <button class="color-dot bg-primary active" data-color="#4f46e5"></button>
-                                    <button class="color-dot bg-success" data-color="#10b981"></button>
-                                    <button class="color-dot bg-warning" data-color="#f59e0b"></button>
-                                    <button class="color-dot bg-danger" data-color="#ef4444"></button>
+                                <div class="form-group mb-3">
+                                    <label class="small text-muted mb-1">Màu sắc đánh dấu</label>
+                                    <div class="d-flex gap-2" id="color-chooser">
+                                        <button class="color-dot bg-primary active" data-color="#4f46e5"></button>
+                                        <button class="color-dot bg-success" data-color="#10b981"></button>
+                                        <button class="color-dot bg-warning" data-color="#f59e0b"></button>
+                                        <button class="color-dot bg-danger" data-color="#ef4444"></button>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                    <button class="btn btn-light btn-sm text-muted" id="clear-q-form" title="Xóa form" style="border-radius: 8px;">
+                                        <i class="fas fa-eraser"></i>
+                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-primary btn-sm px-3" id="add-to-draft" style="border-radius: 8px;" title="Lưu vào danh sách kéo thả">
+                                            <i class="fas fa-layer-group mr-1"></i> Chờ
+                                        </button>
+                                        <button class="btn btn-primary btn-sm px-3" id="submit-q-form" style="border-radius: 8px; background: #4f46e5;">
+                                            <i class="fas fa-check mr-1"></i> Lưu ngay
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -279,12 +310,62 @@
                 </div>
 
                 <div class="table-footer">
-                    <div class="pagination-info">
-                        Hiển thị <b>@Model.Items.Count</b> trên tổng số <b>@Model.TotalRecords</b> cuộc họp
-                    </div>
-                    <div class="pagination-btns">
-                        <!-- Pagination logic same as Department -->
-                    </div>
+                    @if (Model != null && Model.TotalRecords > 0)
+                    {
+                        var totalPages = (int)Math.Ceiling((double)Model.TotalRecords / Model.PageSize);
+                        <div class="pagination-info">
+                            Hiển thị <b>@Model.Items!.Count</b> trên tổng số <b>@Model.TotalRecords</b> cuộc họp
+                        </div>
+                        <div class="pagination-btns">
+                            <a class="btn-page @(Model.PageNumber <= 1 ? "disabled" : "")" 
+                               href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })"
+                               title="Trang trước">
+                               <i class="fas fa-chevron-left"></i>
+                            </a>
+                            
+                            @{
+                                int startPage = Math.Max(1, Model.PageNumber - 2);
+                                int endPage = Math.Min(totalPages, startPage + 4);
+                                if (endPage - startPage < 4) startPage = Math.Max(1, endPage - 4);
+                            }
+
+                            @if (startPage > 1)
+                            {
+                                <a class="btn-page" href="@Url.Action("Index", new { pageNumber = 1, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">1</a>
+                                if (startPage > 2)
+                                {
+                                    <span class="btn-page disabled" style="border:none">...</span>
+                                }
+                            }
+
+                            @for (int i = startPage; i <= endPage; i++)
+                            {
+                                <a class="btn-page @(i == Model.PageNumber ? "active" : "")" 
+                                   href="@Url.Action("Index", new { pageNumber = i, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">@i</a>
+                            }
+
+                            @if (endPage < totalPages)
+                            {
+                                if (endPage < totalPages - 1)
+                                {
+                                    <span class="btn-page disabled" style="border:none">...</span>
+                                }
+                                <a class="btn-page" href="@Url.Action("Index", new { pageNumber = totalPages, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">@totalPages</a>
+                            }
+                            
+                            <a class="btn-page @(Model.PageNumber >= totalPages ? "disabled" : "")" 
+                               href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })"
+                               title="Trang sau">
+                               <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    }
+                    else if (Model?.TotalRecords == 0)
+                    {
+                        <div class="pagination-info text-center w-100">
+                            Không có dữ liệu để hiển thị
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -330,6 +411,11 @@
                 <div class="mb-3">
                     <label class="small text-muted mb-1">Tổ chức</label>
                     <div id="displayEventOrg" class="text-main"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-muted mb-1">Người tạo</label>
+                    <div id="displayEventCreator" class="text-main font-weight-600"></div>
                 </div>
             </div>
             <div class="modal-footer border-0">
@@ -606,6 +692,32 @@
 
         .btn-icon:hover { color: var(--primary-color); border-color: var(--primary-color); background: #f5f3ff; }
         .btn-delete:hover { color: #ef4444; border-color: #ef4444; background: #fef2f2; }
+        .pagination-btns { display: flex; gap: 0.375rem; }
+        .btn-page {
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border-color); background: white; border-radius: 8px;
+            font-size: 0.875rem; cursor: pointer; text-decoration: none !important; color: var(--text-main);
+        }
+        .btn-page.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .btn-page.disabled { pointer-events: none; opacity: 0.5; }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .pagination-info b {
+            color: var(--text-main);
+        }
 
         .search-box input {
             padding: 0.75rem 1rem 0.75rem 2.75rem;
@@ -625,13 +737,45 @@
         }
 
         /* Spinner animation for refresh button */
-        @@keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .fa-spin {
             animation: spin 1s linear infinite;
+        }
+
+        @@keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .badge-soft-primary {
+            background-color: #eef2ff;
+            color: #4f46e5;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        .quick-create-card {
+            border-top: 6px solid var(--primary-color);
+        }
+
+        .color-dot.active {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--active-color, #4f46e5) !important;
+            transform: scale(1.1);
+        }
+
+        @@media (max-width: 767px) {
+            .table-footer { 
+                flex-direction: column; 
+                gap: 1.25rem; 
+                text-align: center;
+                padding-bottom: 1rem;
+            }
+            .pagination-btns { 
+                justify-content: center; 
+                width: 100%; 
+            }
         }
     </style>
 }
@@ -792,61 +936,183 @@
                 }
             });
 
-            // Color Chooser
-            var currColor = '#4f46e5';
-            $('#color-chooser > button').click(function () {
-                currColor = $(this).data('color');
+            // Color Chooser Logic
+            var currColor = localStorage.getItem('meetingPreferredColor') || '#4f46e5';
+            
+            function applyQuickColor(color) {
+                currColor = color;
+                localStorage.setItem('meetingPreferredColor', color);
                 $('#color-chooser > button').removeClass('active');
-                $(this).addClass('active');
+                const $activeBtn = $(`#color-chooser > button[data-color="${color}"]`);
+                if ($activeBtn.length) {
+                    $activeBtn.addClass('active');
+                } else {
+                    $('#color-chooser > button.bg-primary').addClass('active');
+                }
+                
+                // Visual feedback
+                $('.quick-create-card').css('border-top-color', color);
+                $('#submit-q-form').css('background-color', color).css('border-color', color);
+                document.documentElement.style.setProperty('--active-color', color);
+            }
+
+            // Sync UI on load
+            applyQuickColor(currColor);
+
+            $('#color-chooser > button').click(function () {
+                applyQuickColor($(this).data('color'));
+            });
+
+            // --- DEPARTMENT FILTERING ---
+            const $deptSelect = $('#q-dept');
+            const $deptOptions = $deptSelect.find('option').clone();
+
+            $('#q-company').change(function() {
+                const companyId = $(this).val();
+                const currentDept = $deptSelect.val();
+                
+                $deptSelect.empty();
+                // Always keep the placeholder
+                $deptSelect.append($deptOptions.filter('[value=""]'));
+                
+                if (companyId) {
+                    $deptOptions.filter(function() {
+                        return $(this).data('company-id') == companyId;
+                    }).appendTo($deptSelect);
+                } else {
+                    // If no company selected, show all departments
+                    $deptOptions.filter('[value!=""]').appendTo($deptSelect);
+                }
+                
+                // Restore selection if possible
+                if (currentDept && $deptSelect.find(`option[value="${currentDept}"]`).length > 0) {
+                    $deptSelect.val(currentDept);
+                }
+            });
+
+            // --- QUICK CREATE LOGIC ---
+            let isCreating = false;
+
+            function submitQuickMeeting(silent = false) {
+                if (isCreating) return;
+
+                const title = $('#q-title').val();
+                const startAt = $('#q-start').val();
+                const endAt = $('#q-end').val();
+                const roomId = $('#q-room').val();
+                const companyId = $('#q-company').val();
+                const departmentId = $('#q-dept').val();
+
+                // Validation for auto-save (must be silent and have all data)
+                if (silent && (!title || title.length < 5 || !startAt || !endAt || !roomId || !companyId || !departmentId)) {
+                    return; 
+                }
+
+                // Explicit validation for manual save
+                if (!silent && (!title || title.length < 5 || !startAt || !endAt || !roomId || !companyId || !departmentId)) {
+                    Swal.fire({
+                        title: 'Thông tin chưa đủ',
+                        text: 'Vui lòng nhập tiêu đề (>= 5 ký tự) và chọn đầy đủ các trường bắt đầu, kết thúc, phòng, công ty, phòng ban.',
+                        icon: 'warning',
+                        confirmButtonColor: '#4f46e5'
+                    });
+                    return;
+                }
+
+                // Check time sequence
+                if (moment(endAt).isBefore(moment(startAt))) {
+                    if (!silent) Swal.fire('Lỗi thời gian', 'Thời gian kết thúc phải sau thời gian bắt đầu.', 'error');
+                    return;
+                }
+
+                isCreating = true;
+                if (silent) $('#auto-save-status').fadeIn();
+
+                const model = {
+                    Title: title,
+                    StartAt: moment(startAt).format('YYYY-MM-DDTHH:mm:ss'),
+                    EndAt: moment(endAt).format('YYYY-MM-DDTHH:mm:ss'),
+                    RoomId: roomId,
+                    CompanyId: companyId,
+                    DepartmentId: departmentId,
+                    Color: currColor,
+                    Type: 1, // OFFLINE
+                    RowStatus: 1 // ACTIVE
+                };
+
+                $.ajax({
+                    url: '/Meeting/Create',
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    data: model,
+                    success: function (response) {
+                        if (response.success) {
+                            Toast.fire({
+                                icon: 'success',
+                                title: silent ? 'Đã tự động lên lịch' : 'Đã tạo cuộc họp thành công'
+                            });
+                            
+                            clearQuickForm();
+                            refreshAllData();
+                        } else {
+                            if (!silent) Swal.fire('Không thể lưu', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        if (!silent) Swal.fire('Lỗi kết nối', 'Không thể kết nối đến máy chủ. Vui lòng thử lại.', 'error');
+                    },
+                    complete: function() {
+                        isCreating = false;
+                        $('#auto-save-status').fadeOut();
+                    }
+                });
+            }
+
+            function clearQuickForm() {
+                $('.q-input, #q-input, #q-title').val('');
+                applyQuickColor(localStorage.getItem('meetingPreferredColor') || '#4f46e5');
+            }
+
+            // Bind events for auto-save and manual triggers
+            $('.q-input, #q-title').on('change input', function() {
+                clearTimeout(window.autoSaveTimer);
+                window.autoSaveTimer = setTimeout(() => {
+                    submitQuickMeeting(true); 
+                }, 2000); // 2 second delay for auto-save
+            });
+
+            $('#submit-q-form').click(() => submitQuickMeeting(false));
+            $('#clear-q-form').click(clearQuickForm);
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
             });
 
             // Add to Draft Button
             $('#add-to-draft').click(function () {
                 const title = $('#q-title').val();
-                const startTime = $('#q-start').val();
-                const endTime = $('#q-end').val();
-                const roomId = $('#q-room').val();
-                const companyId = $('#q-company').val();
-                const departmentId = $('#q-dept').val();
-
-                if (!title || !roomId || !companyId || !departmentId) {
-                    Swal.fire('Chú ý', 'Vui lòng nhập tiêu đề và chọn đầy đủ thông tin (Phòng, Công ty, Phòng ban)', 'warning');
-                    return;
-                }
-
-                if (title.length < 5) {
-                    Swal.fire('Chú ý', 'Tiêu đề cuộc họp phải từ 5 ký tự trở lên', 'warning');
+                if (!title || title.length < 5) {
+                    Swal.fire('Chú ý', 'Vui lòng nhập tiêu đề ít nhất 5 ký tự', 'warning');
                     return;
                 }
 
                 const eventData = {
                     title: title,
-                    startTime: startTime,
-                    endTime: endTime,
-                    roomId: roomId,
-                    companyId: companyId,
-                    departmentId: departmentId,
+                    startTime: $('#q-start').val() ? moment($('#q-start').val()).format('HH:mm') : '',
+                    endTime: $('#q-end').val() ? moment($('#q-end').val()).format('HH:mm') : '',
+                    roomId: $('#q-room').val(),
+                    companyId: $('#q-company').val(),
+                    departmentId: $('#q-dept').val(),
                     color: currColor
                 };
 
                 saveDraftEvent(eventData);
-                
-                // Reset form
-                $('#q-title').val('');
-                $('#q-start').val('');
-                $('#q-end').val('');
-                $('#q-room').val('');
-                $('#q-company').val('');
-                $('#q-dept').val('');
-
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Đã lưu vào danh sách chờ',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
+                clearQuickForm();
+                Toast.fire({ icon: 'success', title: 'Đã lưu vào danh sách chờ' });
             });
 
             // --- CALENDAR LOGIC ---
@@ -864,9 +1130,16 @@
                 eventDidMount: function(info) {
                     // Add tooltip and custom styling to events
                     const props = info.event.extendedProps;
-                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}`;
+                    const creator = props.createdBy ? `<br/>Người tạo: ${props.createdBy}` : '';
+                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}${creator}`;
                     
                     $(info.el).css('cursor', 'pointer');
+                    
+                    // Force the color again if needed (FullCalendar handles it but just in case)
+                    if (props.color) {
+                        $(info.el).css('background-color', props.color);
+                        $(info.el).css('border-color', props.color);
+                    }
                     
                     // Initialize bootstrap tooltip
                     $(info.el).tooltip({
@@ -977,6 +1250,7 @@
                         RoomId: eventData.roomId,
                         CompanyId: eventData.companyId,
                         DepartmentId: eventData.departmentId,
+                        Color: eventData.color || currColor, // Use the color from draft or current active color
                         Type: 1, // OFFLINE (MeetingType.OFFLINE = 1)
                         RowStatus: 1 // ACTIVE (RowStatus.ACTIVE = 1)
                     };
@@ -1050,6 +1324,13 @@
                     document.getElementById('displayEventEnd').textContent = endStr;
                     document.getElementById('displayEventLocation').innerHTML = event.url ? `<a href="${event.url}" target="_blank">${event.url}</a>` : (props.room || 'N/A');
                     document.getElementById('displayEventOrg').textContent = props.department ? `${props.department} - ${props.company}` : 'N/A';
+                    
+                    // Show creator if available
+                    const creatorEl = document.getElementById('displayEventCreator');
+                    if (creatorEl) {
+                        creatorEl.textContent = props.createdBy || 'N/A';
+                    }
+
                     document.getElementById('editEventBtn').href = `/Meeting/Update/${event.id}`;
                     $('#eventModal').modal('show');
                 }

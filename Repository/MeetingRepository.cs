@@ -24,6 +24,11 @@ public class MeetingRepository : GenericRepository<MeetingModel>, IMeetingReposi
             (excludeId == null || x.Id != excludeId));
     }
 
+    public async Task<bool> HasActiveMeetings(string roomId)
+    {
+        return await _context.Meeting.AnyAsync(x => x.RoomId == roomId && x.RowStatus == RowStatus.ACTIVE);
+    }
+
     public async Task<MeetingModel?> GetMeeting (DateTime StartAt, DateTime EndAt, string RoomId)
     {
         var query = await _context.Meeting.FirstOrDefaultAsync(x => x.StartAt == StartAt && x.EndAt == EndAt && x.RoomId == RoomId);

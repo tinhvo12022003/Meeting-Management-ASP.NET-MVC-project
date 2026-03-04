@@ -36,7 +36,7 @@ public class MeetingRoomService : IMeetingRoomService
             Capacity = model.Capacity,
             CompanyId = model.CompanyId,
             RowStatus = RowStatus.ACTIVE,
-            CreateAt = DateTime.UtcNow,
+            CreateAt = DateTime.Now,
             CreateBy = _helper.GetCurrentUser()
         };
 
@@ -65,7 +65,7 @@ public class MeetingRoomService : IMeetingRoomService
         room.Name = model.Name;
         room.Capacity = model.Capacity;
         room.CompanyId = model.CompanyId;
-        room.UpdateAt = DateTime.UtcNow;
+        room.UpdateAt = DateTime.Now;
         room.UpdateBy = _helper.GetCurrentUser();
 
         await _unitOfWork.MeetingRooms.Update(room);
@@ -88,8 +88,15 @@ public class MeetingRoomService : IMeetingRoomService
             throw new Exception(MessageConstant.INACTIVE);
         }
 
+        // --- FIX: Check for active meetings before deleting ---
+        var hasActiveMeetings = await _unitOfWork.Meetings.HasActiveMeetings(RoomId);
+        if (hasActiveMeetings)
+        {
+            throw new Exception("Không thể xóa phòng họp này vì hiện đang có các cuộc họp được lên lịch. Vui lòng chuyển hoặc hủy các cuộc họp này trước khi xóa phòng.");
+        }
+
         room.RowStatus = RowStatus.INACTIVE;
-        room.UpdateAt = DateTime.UtcNow;
+        room.UpdateAt = DateTime.Now;
         room.UpdateBy = _helper.GetCurrentUser();
 
         await _unitOfWork.MeetingRooms.Update(room);
