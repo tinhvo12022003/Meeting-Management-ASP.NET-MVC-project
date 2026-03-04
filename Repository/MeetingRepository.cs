@@ -14,13 +14,14 @@ public class MeetingRepository : GenericRepository<MeetingModel>, IMeetingReposi
         _context = context;
     }
 
-    public async Task<bool> IsMeetingOverlap(DateTime start, DateTime end, string roomId)
+    public async Task<bool> IsMeetingOverlap(DateTime start, DateTime end, string roomId, string? excludeId = null)
     {
         return await _context.Meeting.AnyAsync(x => 
             x.RoomId == roomId && 
             x.StartAt < end && 
             x.EndAt > start &&
-            x.RowStatus == RowStatus.ACTIVE);
+            x.RowStatus == RowStatus.ACTIVE &&
+            (excludeId == null || x.Id != excludeId));
     }
 
     public async Task<MeetingModel?> GetMeeting (DateTime StartAt, DateTime EndAt, string RoomId)

@@ -7,6 +7,9 @@ namespace MeetingManagement.Models.DTOs;
 public class MeetingUpdateModel
 {
     [Required]
+    public string Id { get; set; } = string.Empty;
+
+    [Required]
     [Length(minimumLength: 5, maximumLength: 255, ErrorMessage = "Fix length required")]
     public string Title { get; set; } = string.Empty;
 

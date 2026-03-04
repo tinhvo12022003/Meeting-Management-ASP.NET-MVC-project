@@ -30,10 +30,15 @@ public class MeetingService : IMeetingService
             throw new Exception(MessageConstant.EMPTY_STRING);
         }
 
-        var isExisted = await _unitOfWork.Meetings.IsMeetingOverlap(model.StartAt, model.EndAt, model.RoomId);
-        if (isExisted == true)
+        if (model.StartAt >= model.EndAt)
         {
-            throw new Exception(MessageConstant.EXISTED);
+            throw new Exception("Thời gian kết thúc phải sau thời gian bắt đầu.");
+        }
+
+        var isExisted = await _unitOfWork.Meetings.IsMeetingOverlap(model.StartAt, model.EndAt, model.RoomId);
+        if (isExisted)
+        {
+            throw new Exception("Phòng họp đã có lịch trong khoảng thời gian này. Vui lòng chọn thời gian hoặc phòng khác.");
         }
         var meeting = new MeetingModel
         {
@@ -66,7 +71,12 @@ public class MeetingService : IMeetingService
             throw new Exception(MessageConstant.EMPTY_STRING);
         }
 
-        var meeting = await _unitOfWork.Meetings.GetMeeting(model.StartAt, model.EndAt, model.RoomId);
+        if (model.StartAt >= model.EndAt)
+        {
+            throw new Exception("Thời gian kết thúc phải sau thời gian bắt đầu.");
+        }
+
+        var meeting = await _unitOfWork.Meetings.GetById(model.Id);
         if (meeting == null)
         {
             throw new Exception(MessageConstant.NOT_EXISTED);
@@ -75,6 +85,13 @@ public class MeetingService : IMeetingService
         if (meeting.RowStatus == RowStatus.INACTIVE)
         {
             throw new Exception(MessageConstant.INACTIVE);
+        }
+
+        // Check for overlap with other meetings
+        var overlap = await _unitOfWork.Meetings.IsMeetingOverlap(model.StartAt, model.EndAt, model.RoomId, model.Id);
+        if (overlap)
+        {
+            throw new Exception("Phòng họp đã có lịch trong khoảng thời gian này. Vui lòng chọn thời gian hoặc phòng khác.");
         }
 
         meeting.Title = model.Title;
@@ -88,7 +105,7 @@ public class MeetingService : IMeetingService
         meeting.DepartmentId = model.DepartmentId;
         meeting.RoomId = model.RoomId;
         meeting.RowStatus = model.RowStatus;
-        meeting.UpdateAt = DateTime.UtcNow;
+        meeting.UpdateAt = DateTime.Now;
         meeting.UpdateBy = _helper.GetCurrentUser();
 
         await _unitOfWork.Meetings.Update(meeting);
@@ -107,14 +124,19 @@ public class MeetingService : IMeetingService
         if (meeting.RowStatus == RowStatus.INACTIVE)
             throw new Exception(MessageConstant.INACTIVE);
 
+        if (startAt >= endAt)
+        {
+            throw new Exception("Thời gian kết thúc phải sau thời gian bắt đầu.");
+        }
+
         // collision check (exclude self)
-        var overlap = await _unitOfWork.Meetings.IsMeetingOverlap(startAt, endAt, meeting.RoomId);
-        if (overlap && (meeting.StartAt != startAt || meeting.EndAt != endAt))
-            throw new Exception(MessageConstant.EXISTED);
+        var overlap = await _unitOfWork.Meetings.IsMeetingOverlap(startAt, endAt, meeting.RoomId, id);
+        if (overlap)
+            throw new Exception("Phòng họp đã có lịch trong khoảng thời gian này.");
 
         meeting.StartAt = startAt;
         meeting.EndAt = endAt;
-        meeting.UpdateAt = DateTime.UtcNow;
+        meeting.UpdateAt = DateTime.Now;
         meeting.UpdateBy = _helper.GetCurrentUser();
 
         await _unitOfWork.Meetings.Update(meeting);
@@ -139,7 +161,7 @@ public class MeetingService : IMeetingService
         }
 
         meeting.RowStatus = RowStatus.INACTIVE;
-        meeting.UpdateAt = DateTime.UtcNow;
+        meeting.UpdateAt = DateTime.Now;
         meeting.UpdateBy = _helper.GetCurrentUser();
 
         await _unitOfWork.Meetings.Update(meeting);

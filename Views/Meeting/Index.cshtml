@@ -243,12 +243,21 @@
                                             }
                                         </td>
                                         <td class="text-right">
-                                            <div class="action-btns justify-content-end">
-                                                <a asp-action="Update" asp-route-id="@item.Id" class="btn-icon btn-edit" title="Chỉnh sửa">
+                                            <div class="action-btns d-flex align-items-center justify-content-end gap-2">
+                                                <!-- Nút Edit -->
+                                                <a asp-action="Update" asp-route-id="@item.Id" 
+                                                class="btn-icon btn-edit" 
+                                                title="Chỉnh sửa">
                                                     <i class="fas fa-pen"></i>
                                                 </a>
-                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Xóa cuộc họp này?')">
-                                                    <button type="submit" class="btn-icon btn-delete" title="Xóa">
+
+                                                <!-- Nút Delete (giữ form để POST) -->
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" 
+                                                    style="margin: 0; display: inline;" 
+                                                    onsubmit="return confirm('Bạn có chắc muốn xóa cuộc họp này?');">
+                                                    <button type="submit" 
+                                                            class="btn-icon btn-delete" 
+                                                            title="Xóa">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </form>
@@ -702,12 +711,46 @@
                 localStorage.setItem('meetingDrafts', JSON.stringify(newDrafts));
             }
 
-            // Reload calendar events from server
-            function refreshCalendarEvents() {
+            // Reload all data views (Calendar, List Table, and Stats)
+            function refreshAllData() {
+                // 1. Refresh Calendar Events
                 if (typeof calendar !== 'undefined' && calendar) {
-                    console.log('Refreshing calendar events from server...');
+                    console.log('Refreshing calendar events...');
                     calendar.refetchEvents();
                 }
+
+                // 2. Refresh List View and Stats via AJAX
+                const currentUrl = window.location.href;
+                $.ajax({
+                    url: currentUrl,
+                    type: 'GET',
+                    success: function (html) {
+                        const $newHtml = $(html);
+
+                        // Update table body
+                        const newTbody = $newHtml.find('.custom-table tbody').html();
+                        if (newTbody) {
+                            $('.custom-table tbody').html(newTbody);
+                        }
+
+                        // Update stats grid (counters)
+                        const newStats = $newHtml.find('.stats-grid').html();
+                        if (newStats) {
+                            $('.stats-grid').html(newStats);
+                        }
+
+                        // Update footer (pagination info)
+                        const newFooter = $newHtml.find('.table-footer').html();
+                        if (newFooter) {
+                            $('.table-footer').html(newFooter);
+                        }
+
+                        console.log('Synchronized List View and Stats');
+                    },
+                    error: function (xhr) {
+                        console.error('Failed to synchronize views:', xhr);
+                    }
+                });
             }
 
             // Delete draft handler
@@ -860,7 +903,7 @@
                                     showConfirmButton: false,
                                     timer: 2000
                                 });
-                                refreshCalendarEvents();
+                                refreshAllData();
                             } else {
                                 Swal.fire('Lỗi', res.message, 'error');
                                 info.revert();
@@ -895,7 +938,7 @@
                                     showConfirmButton: false,
                                     timer: 2000
                                 });
-                                refreshCalendarEvents();
+                                refreshAllData();
                             } else {
                                 Swal.fire('Lỗi', res.message, 'error');
                                 info.revert();
@@ -956,7 +999,7 @@
                                 
                                 // Refetch events with a small delay to ensure DB is updated
                                 setTimeout(() => {
-                                    calendar.refetchEvents();
+                                    refreshAllData();
                                 }, 500);
                                 
                                 if (checkbox.checked) {
@@ -1024,7 +1067,7 @@
                 icon.addClass('fa-spin');
                 
                 console.log('Manual refresh triggered');
-                refreshCalendarEvents();
+                refreshAllData();
                 
                 setTimeout(() => {
                     btn.prop('disabled', false);
@@ -1041,20 +1084,31 @@
             });
 
             // View Toggle Logic
-            $('#toggleViewBtn').click(function() {
+            $('#toggleViewBtn').click(function () {
                 if ($('#calendarView').hasClass('d-none')) {
                     $('#calendarView').removeClass('d-none');
                     $('#tableView').addClass('d-none');
                     $('#toggleText').text('Chế độ Danh sách');
                     $(this).find('i').attr('class', 'fas fa-list mr-1');
+                    localStorage.setItem('meetingViewMode', 'calendar');
                     calendar.render();
                 } else {
                     $('#calendarView').addClass('d-none');
                     $('#tableView').removeClass('d-none');
                     $('#toggleText').text('Chế độ Lịch biểu');
                     $(this).find('i').attr('class', 'fas fa-calendar-alt mr-1');
+                    localStorage.setItem('meetingViewMode', 'list');
                 }
             });
+
+            // Restore saved view mode on load
+            const savedView = localStorage.getItem('meetingViewMode');
+            if (savedView === 'list') {
+                $('#calendarView').addClass('d-none');
+                $('#tableView').removeClass('d-none');
+                $('#toggleText').text('Chế độ Lịch biểu');
+                $('#toggleViewBtn').find('i').attr('class', 'fas fa-calendar-alt mr-1');
+            }
         });
     </script>
 }
