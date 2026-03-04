@@ -13,7 +13,8 @@
             <h2 class="font-weight-bold text-dark mb-1">Hệ thống Phòng họp</h2>
             <p class="text-muted small mb-0">Quản lý không gian họp nội bộ tối giản & hiệu quả</p>
         </div>
-        <a asp-action="Create" class="btn btn-primary px-4 py-2 shadow-sm" style="border-radius: 12px; font-weight: 600;">
+        <a asp-action="Create" class="btn btn-primary px-4 py-2 shadow-sm"
+               style="border-radius: 12px; font-weight: 600;">
             <i class="fas fa-plus mr-2"></i> Thêm phòng
         </a>
     </div>
@@ -53,11 +54,12 @@
                 </div>
                 <div class="col-md-4">
                     <form asp-action="Index" method="get">
-                        <div class="input-group bg-light border-0 shadow-none" style="border-radius: 12px; overflow: hidden;">
+                        <div class="input-group bg-light border-0 shadow-none"
+                             style="border-radius: 12px; overflow: hidden;">
                             <div class="input-group-prepend px-3 d-flex align-items-center">
                                 <i class="fas fa-search text-muted small"></i>
                             </div>
-                            <input type="text" name="SearchTerm" class="form-control bg-light border-0 pl-0 small" 
+                            <input type="text" name="SearchTerm" class="form-control bg-light border-0 pl-0 small"
                                    placeholder="Tìm tên phòng..." value="@Context.Request.Query["SearchTerm"]">
                         </div>
                     </form>
@@ -79,7 +81,8 @@
                         @if (!Model.Items.Any())
                         {
                             <tr>
-                                <td colspan="4" class="text-center py-5 text-muted small italic">Chưa có dữ liệu phòng họp.</td>
+                                <td colspan="4" class="text-center py-5 text-muted small italic">Chưa có dữ liệu phòng họp.
+                                </td>
                             </tr>
                         }
                         @foreach (var item in Model.Items)
@@ -97,12 +100,15 @@
                                     <span class="text-muted small font-weight-500">@item.CompanyName</span>
                                 </td>
                                 <td class="px-4 text-right">
-                                    <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-link text-primary p-0 mr-3 hover-scale" title="Sửa">
-                                        <i class="fas fa-pen-nib"></i>
-                                    </a>
-                                    <button class="btn btn-link text-danger p-0 hover-scale" onclick="deleteRoom('@item.Id')" title="Xóa">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    <div class="action-buttons">
+                                        <a asp-action="Update" asp-route-id="@item.Id"
+                                               class="btn-icon btn-icon-link btn-edit" title="Chỉnh sửa">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <button class="btn-icon btn-delete" onclick="deleteRoom('@item.Id')" title="Xóa">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -110,7 +116,7 @@
                 </table>
             </div>
         </div>
-        
+
         @if (Model.TotalPages > 1)
         {
             <div class="card-footer bg-transparent border-0 py-4 px-4">
@@ -119,7 +125,8 @@
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
                             <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                                <a class="page-link border-0 shadow-sm" href="?PageNumber=@i&SearchTerm=@Context.Request.Query["SearchTerm"]" 
+                                <a class="page-link border-0 shadow-sm"
+                                   href="?PageNumber=@i&SearchTerm=@Context.Request.Query["SearchTerm"]"
                                    style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">@i</a>
                             </li>
                         }
@@ -136,19 +143,93 @@
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.4);
     }
-    .stat-card { border-radius: 18px; border: 1px solid #f1f5f9; transition: all 0.2s; }
-    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
+
+    /* === Cải tiến nút icon thao tác === */
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;           /* Khoảng cách giữa Edit và Delete */
+    }
+
+    .btn-icon, .btn-icon-link {
+        width: 38px;          /* Tăng nhẹ kích thước cho dễ bấm */
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #64748b;       /* Màu xám trung tính ban đầu */
+        font-size: 1.1rem;    /* Icon to hơn, dễ nhìn */
+        transition: all 0.2s ease;
+        text-decoration: none;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .btn-icon:hover, .btn-icon-link:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #4f46e5;       /* Màu primary khi hover */
+        border-color: #c7d2fe;
+        background: #f8f7ff;
+    }
+
+    /* Nút Edit */
+    .btn-edit {
+        color: #4f46e5;       /* Màu indigo ngay từ đầu */
+        border-color: #c7d2fe;
+    }
+
+    .btn-edit:hover {
+        background: #f0efff;
+        color: #4338ca;
+        border-color: #a5b4fc;
+    }
+
+    /* Nút Delete */
+    .btn-delete {
+        color: #ef4444;
+        border-color: #fecaca;
+    }
+
+    .btn-delete:hover {
+        background: #fef2f2;
+        color: #dc2626;
+        border-color: #fca5a5;
+    }
+
+    /* === Các phần còn lại giữ nguyên hoặc tinh chỉnh nhẹ === */
+    .stat-card {
+        border-radius: 18px;
+        border: 1px solid #f1f5f9;
+        transition: all 0.25s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+    }
+
     .stat-icon {
         width: 48px;
         height: 48px;
         border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 1.2rem;
     }
+
     .bg-soft-primary { background: #eef2ff; }
-    .bg-soft-success { background: #f0fdf4; }
-    .badge-soft-indigo { color: #4f46e5; background: #eef2ff; }
-    
+    .bg-soft-success  { background: #f0fdf4; }
+    .badge-soft-indigo { 
+        color: #4f46e5; 
+        background: #eef2ff; 
+        font-weight: 500;
+    }
+
     .form-control {
         border-radius: 12px;
         border: 1px solid #e2e8f0;
@@ -157,48 +238,49 @@
         font-size: 0.875rem;
         transition: all 0.2s;
     }
+
     .form-control:focus {
         background: #fff;
         border-color: #4f46e5;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
     }
-    .hover-scale:hover { transform: scale(1.15); transition: 0.2s; }
+
+    .bg-light-faded { background-color: #fbfcfd; }
     .italic { font-style: italic; }
     .font-weight-600 { font-weight: 600; }
     .font-weight-500 { font-weight: 500; }
-    .bg-light-faded { background-color: #fbfcfd; }
 </style>
 
 @section Scripts {
     <script>
-        function deleteRoom(id) {
-            Swal.fire({
-                title: 'Xác nhận xóa?',
-                text: "Phòng họp sẽ tạm dừng hoạt động và ẩn khỏi danh sách.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Đồng ý xóa',
-                cancelButtonText: 'Bỏ qua'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post(`/MeetingRoom/Delete/${id}`, function(response) {
-                        if (response.success) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => location.reload());
-                        } else {
-                            Swal.fire('Lỗi', response.message, 'error');
-                        }
-                    });
-                }
-            });
-        }
+            function deleteRoom(id) {
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: "Phòng họp sẽ tạm dừng hoạt động và ẩn khỏi danh sách.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Đồng ý xóa',
+                    cancelButtonText: 'Bỏ qua'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post(`/MeetingRoom/Delete/${id}`, function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => location.reload());
+                            } else {
+                                Swal.fire('Lỗi', response.message, 'error');
+                            }
+                        });
+                    }
+                });
+            }
     </script>
 }
