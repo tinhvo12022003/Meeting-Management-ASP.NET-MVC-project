@@ -116,7 +116,7 @@ public class UserService : IUserService
             request,
             baseFilter: x => x.RowStatus == RowStatus.ACTIVE,
             searchFields: "FullName,Email,Phone,Birthday,Username",
-            includes: new[] { "Company,Department" }
+            includes: new[] { "Company", "Department" }
         );
 
         var viewModels = paginatedResult.Items.Select(x => new UserViewModel

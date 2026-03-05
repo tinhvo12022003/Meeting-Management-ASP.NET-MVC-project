@@ -1,0 +1,437 @@
+@using MeetingManagement.Common
+@using MeetingManagement.Models.DTOs
+@using MeetingManagement.Enum
+@model PaginatedResponse<UserViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 p-0 bg-transparent">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-muted small text-decoration-none">Quản trị</a></li>
+                    <li class="breadcrumb-item active small" aria-current="page">Người dùng</li>
+                </ol>
+            </nav>
+            <h3 class="font-weight-bold mb-0">Quản lý Người dùng</h3>
+            <p class="text-muted small mb-0">Hệ thống quản lý tài khoản, phân quyền và thông tin nhân sự nội bộ.</p>
+        </div>
+        <div>
+            <a asp-action="Register" class="btn btn-primary px-4"
+               style="border-radius: 8px; background: #4f46e5; border: none;">
+                <i class="fas fa-plus mr-1"></i> Thêm người dùng
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #eef2ff; color: #4f46e5;">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <span class="label">Tổng số người dùng</span>
+                <span class="value">@Model.TotalRecords</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #f0fdf4; color: #16a34a;">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="stat-content">
+                <span class="label">Quản trị viên</span>
+                <span class="value">@Model.Items.Count(x => x.userType == UserType.MANAGER)</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fff7ed; color: #ea580c;">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-content">
+                <span class="label">Trưởng bộ phận</span>
+                <span class="value">@Model.Items.Count(x => x.userType == UserType.HEAD)</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fdf2f8; color: #db2777;">
+                <i class="fas fa-user-tag"></i>
+            </div>
+            <div class="stat-content">
+                <span class="label">Nhân viên</span>
+                <span class="value">@Model.Items.Count(x => x.userType == UserType.STAFF)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table Section -->
+    <div class="table-container">
+        <div class="table-header">
+            <div class="search-box">
+                <form method="get" id="filterForm" class="d-flex w-100 gap-3">
+                    <div class="position-relative flex-grow-1">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="searchTerm" id="userSearch"
+                               placeholder="Tìm tên, email hoặc tên đăng nhập..."
+                               value="@ViewContext.HttpContext.Request.Query["searchTerm"]">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="custom-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Người dùng</th>
+                        <th>Thông tin liên hệ</th>
+                        <th>Phòng ban / Công ty</th>
+                        <th>Vai trò</th>
+                        <th class="text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar" 
+                                             style="background-image: url('https://ui-avatars.com/api/?name=@item.FullName&background=random&color=fff');">
+                                        </div>
+                                        <div class="user-info">
+                                            <span class="name">@item.FullName</span>
+                                            <span class="username">@@@item.Username</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="contact-info">
+                                        <span class="email d-block"><i class="far fa-envelope mr-1 text-muted"></i> @item.Email</span>
+                                        <span class="phone d-block"><i class="fas fa-phone-alt mr-1 text-muted"></i> @item.Phone</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="org-info">
+                                        <span class="dept">@item.DepartmentName</span>
+                                        <span class="company text-muted small d-block">@item.CompanyName</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    @{
+                                        var badgeClass = item.userType switch {
+                                            UserType.MANAGER => "badge-admin",
+                                            UserType.HEAD => "badge-head",
+                                            _ => "badge-staff"
+                                        };
+                                        var typeLabel = item.userType switch {
+                                            UserType.MANAGER => "Quản trị viên",
+                                            UserType.HEAD => "Trưởng bộ phận",
+                                            _ => "Nhân viên"
+                                        };
+                                    }
+                                    <span class="badge-role @badgeClass">@typeLabel</span>
+                                </td>
+                                <td>
+                                    <div class="action-btns justify-content-end">
+                                        <a asp-action="Update" asp-route-id="@item.Id" class="btn-icon btn-edit" title="Chỉnh sửa">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <form asp-action="Delete" method="post" id="deleteForm-@item.Id" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="Id" value="@item.Id" />
+                                            <button type="button" class="btn-icon btn-delete" title="Xóa" onclick="confirmDelete('@item.Id', '@item.FullName')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted">Không tìm thấy người dùng nào phù hợp.</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <div class="pagination-info">
+                Hiển thị <b>@Model.Items.Count</b> trên tổng số <b>@Model.TotalRecords</b> người dùng
+            </div>
+            <div class="pagination-btns">
+                <a class="btn-page @(Model.PageNumber <= 1 ? "disabled" : "")" 
+                   href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">
+                   <i class="fas fa-chevron-left"></i>
+                </a>
+                
+                @for (int i = 1; i <= Math.Ceiling((double)Model.TotalRecords / Model.PageSize); i++)
+                {
+                    <a class="btn-page @(i == Model.PageNumber ? "active" : "")" 
+                       href="@Url.Action("Index", new { pageNumber = i, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">@i</a>
+                }
+                
+                <a class="btn-page @(Model.PageNumber >= Math.Ceiling((double)Model.TotalRecords / Model.PageSize) ? "disabled" : "")" 
+                   href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">
+                   <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .stat-content .label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-content .value {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 2px;
+        }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 450px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.65rem 1rem 0.65rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            outline: none;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            background: #fdfdfd;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .custom-table th {
+            background: #f9fafb;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .custom-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            vertical-align: middle;
+        }
+
+        .user-cell { display: flex; align-items: center; gap: 0.875rem; }
+        .user-avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background-size: cover; background-position: center;
+            border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        .user-info .name { display: block; font-weight: 600; color: var(--text-main); }
+        .user-info .username { font-size: 0.75rem; color: var(--text-muted); }
+
+        .contact-info .email, .contact-info .phone { font-size: 0.8rem; }
+
+        .badge-role {
+            padding: 0.35rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-admin { background: #fee2e2; color: #991b1b; }
+        .badge-head { background: #fef9c3; color: #854d0e; }
+        .badge-staff { background: #dcfce7; color: #166534; }
+
+        .action-btns { display: flex; gap: 0.5rem; }
+        .btn-icon {
+            width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; border: 1px solid var(--border-color);
+            background: white; color: var(--text-muted); transition: var(--transition);
+            text-decoration: none; cursor: pointer; padding: 0;
+        }
+        .btn-icon:hover { color: var(--primary-color); border-color: var(--primary-color); background: #f5f3ff; }
+        .btn-delete:hover { border-color: var(--danger); color: var(--danger); background: #fef2f2; }
+
+        .table-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);
+        }
+        .pagination-btns { display: flex; gap: 0.375rem; }
+        .btn-page {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border-color); background: white; border-radius: 8px;
+            font-size: 0.8rem; cursor: pointer; text-decoration: none !important; color: var(--text-main);
+        }
+        .btn-page.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .btn-page.disabled { pointer-events: none; opacity: 0.5; }
+
+        @@media (max-width: 991px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @@media (max-width: 767px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .custom-table th:nth-child(2), .custom-table td:nth-child(2),
+            .custom-table th:nth-child(3), .custom-table td:nth-child(3) { display: none; }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            var successMsg = '@TempData["Success"]';
+            var errorMsg = '@TempData["Error"]';
+            
+            if (successMsg) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: successMsg,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+            
+            if (errorMsg) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        });
+
+        function confirmDelete(id, name) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: `Bạn có chắc chắn muốn xóa người dùng "${name}"? Thao tác này không thể hoàn tác.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Hủy bỏ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var form = document.getElementById('deleteForm-' + id);
+                    if (form) {
+                        form.submit();
+                    }
+                }
+            });
+        }
+    </script>
+}

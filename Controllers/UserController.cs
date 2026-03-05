@@ -1,3 +1,4 @@
+using MeetingManagement.Common;
 using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -5,13 +6,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MeetingManagement.Controllers;
 
-[Route("user")]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
     public UserController(IUserService userService)
     {
         _userService = userService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index(PaginatedRequest request)
+    {
+        var result = await _userService.Find(request);
+        return View(result);
     }
 
     [Authorize]
@@ -26,32 +33,44 @@ public class UserController : Controller
     {
         if (ModelState.IsValid)
         {
-            
+            await _userService.CreateUser(model);
             return RedirectToAction("Index");
         }
-        await _userService.CreateUser(model);
         return View(model);
     }
 
-
+    [HttpPost]
     public async Task<IActionResult> Update(UserUpdateModel model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
+            return View(model);
+        }
+        try 
+        {
+            await _userService.UpdateUser(model);
+            TempData["Success"] = "Cập nhật người dùng thành công!";
             return RedirectToAction("Index");
         }
-        await _userService.UpdateUser(model);
-        return View(model);
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+            return View(model);
+        }
     } 
 
-
+    [HttpPost]
     public async Task<IActionResult> Delete(string Id)
     {
-        if (ModelState.IsValid)
+        try 
         {
-            return RedirectToAction("Index");
+            await _userService.DeleteUser(Id);
+            TempData["Success"] = "Xóa người dùng thành công!";
         }
-        await _userService.DeleteUser(Id);
-        return View();
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        return RedirectToAction("Index");
     }
 }
