@@ -106,7 +106,7 @@ public class MeetingService : IMeetingService
         meeting.DepartmentId = model.DepartmentId;
         meeting.RoomId = model.RoomId;
         meeting.Color = model.Color;
-        meeting.RowStatus = model.RowStatus;
+        //meeting.RowStatus = model.RowStatus;
         meeting.UpdateAt = DateTime.Now;
         meeting.UpdateBy = _helper.GetCurrentUser();
 
@@ -201,6 +201,32 @@ public class MeetingService : IMeetingService
             TotalRecords = paginatedResult.TotalRecords,
             PageNumber = paginatedResult.PageNumber,
             PageSize = paginatedResult.PageSize
+        };
+    }
+
+    public async Task<MeetingUpdateModel> GetUpdateModel(string id)
+    {
+        var meeting = await _unitOfWork.Meetings.GetById(id);
+        if (meeting == null)
+        {
+            throw new Exception(MessageConstant.NOT_EXISTED);
+        }
+
+        return new MeetingUpdateModel
+        {
+            Id = meeting.Id,
+            Title = meeting.Title,
+            StartAt = meeting.StartAt,
+            EndAt = meeting.EndAt,
+            Type = meeting.Type,
+            Description = meeting.Description,
+            Organization = meeting.Organization,
+            Url = meeting.Url,
+            Color = meeting.Color,
+            CompanyId = meeting.CompanyId,
+            DepartmentId = meeting.DepartmentId,
+            RoomId = meeting.RoomId,
+            RowStatus = meeting.RowStatus
         };
     }
 }

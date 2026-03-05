@@ -79,10 +79,22 @@ public class MeetingController : Controller
 
     public async Task<IActionResult> Update(string id)
     {
-        // retrieve existing meeting and send to view (not used currently)
-        var meeting = await _meetingService.Find(new PaginatedRequest { PageSize = 1 });
-        // we'll keep placeholder; actual update handled via POST below
-        return View();
+        try
+        {
+            var model = await _meetingService.GetUpdateModel(id);
+            
+            // Prepare data for dropdowns
+            ViewBag.Rooms = await _meetingRoomService.GetAll();
+            ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+            
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     [HttpPost]

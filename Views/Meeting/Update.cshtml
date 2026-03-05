@@ -1,0 +1,414 @@
+@using MeetingManagement.Models.DTOs
+@using MeetingManagement.Enum
+@model MeetingUpdateModel
+
+@{
+    ViewData["Title"] = "Cập nhật Cuộc họp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var rooms = ViewBag.Rooms as List<MeetingRoomViewModel> ?? new List<MeetingRoomViewModel>();
+    var companies = ViewBag.Companies as List<CompanyViewModel> ?? new List<CompanyViewModel>();
+    var departments = ViewBag.Departments as List<DepartmentViewModel> ?? new List<DepartmentViewModel>();
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <!-- Breadcrumb & Header -->
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 p-0 bg-transparent">
+                        <li class="breadcrumb-item"><a asp-action="Index" class="text-muted small text-decoration-none">Quản lý Lịch họp</a></li>
+                        <li class="breadcrumb-item active small" aria-current="page">Chỉnh sửa cuộc họp</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <a asp-action="Index" class="btn btn-light btn-sm rounded-circle mr-3 shadow-sm back-btn">
+                        <i class="fas fa-arrow-left text-muted"></i>
+                    </a>
+                    <div>
+                        <h3 class="font-weight-bold mb-0">Cập nhật thông tin cuộc họp</h3>
+                        <p class="text-muted small mb-0">Chỉnh sửa chi tiết về thời gian, địa điểm và thành phần tham dự.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm main-card">
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Update" method="post" id="updateMeetingForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4" style="border-radius: 12px;"></div>
+                        
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Basic Information Section -->
+                        <div class="section-title mb-4">
+                            <span class="badge badge-soft-primary px-3 py-2">1. Thông tin chung</span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Title" class="custom-label">Tiêu đề cuộc họp <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-heading"></i></span>
+                                </div>
+                                <input asp-for="Title" class="form-control" placeholder="Nhập tên cuộc họp..." required>
+                            </div>
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="StartAt" class="custom-label">Thời gian bắt đầu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                    </div>
+                                    <input asp-for="StartAt" type="datetime-local" class="form-control" required>
+                                </div>
+                                <span asp-validation-for="StartAt" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="EndAt" class="custom-label">Thời gian kết thúc <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                    </div>
+                                    <input asp-for="EndAt" type="datetime-local" class="form-control" required>
+                                </div>
+                                <span asp-validation-for="EndAt" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Type" class="custom-label">Hình thức <span class="text-danger">*</span></label>
+                                <select asp-for="Type" class="form-control custom-select">
+                                    <option value="@MeetingType.OFFLINE">Trực tiếp (Offline)</option>
+                                    <option value="@MeetingType.ONLINE">Trực tuyến (Online)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="RoomId" class="custom-label">Phòng họp <span class="text-danger">*</span></label>
+                                <select asp-for="RoomId" class="form-control custom-select" required>
+                                    <option value="">-- Chọn phòng họp --</option>
+                                    @foreach (var room in rooms)
+                                    {
+                                        <option value="@room.Id">@room.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="RoomId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4" id="urlGroup" style="@(Model.Type == MeetingType.ONLINE ? "" : "display:none;")">
+                            <label asp-for="Url" class="custom-label">Liên kết cuộc họp (URL)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                </div>
+                                <input asp-for="Url" class="form-control" placeholder="https://meet.google.com/...">
+                            </div>
+                            <span asp-validation-for="Url" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Organization Section -->
+                        <div class="section-title mb-4 mt-2">
+                            <span class="badge badge-soft-primary px-3 py-2">2. Thành phần & Tổ chức</span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="CompanyId" class="custom-label">Công ty <span class="text-danger">*</span></label>
+                                <select asp-for="CompanyId" id="companySelect" class="form-control custom-select" required>
+                                    <option value="">-- Chọn công ty --</option>
+                                    @foreach (var c in companies)
+                                    {
+                                        <option value="@c.Id">@c.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CompanyId" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="DepartmentId" class="custom-label">Phòng ban <span class="text-danger">*</span></label>
+                                <select asp-for="DepartmentId" id="deptSelect" class="form-control custom-select" required>
+                                    <option value="">-- Chọn phòng ban --</option>
+                                    @foreach (var d in departments)
+                                    {
+                                        <option value="@d.Id" data-company-id="@d.CompanyId">@d.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Organization" class="custom-label">Tổ chức bên ngoài (nếu có)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                </div>
+                                <input asp-for="Organization" class="form-control" placeholder="Tên đối tác, khách hàng...">
+                            </div>
+                        </div>
+
+                        <!-- Additional Details -->
+                        <div class="section-title mb-4 mt-2">
+                            <span class="badge badge-soft-primary px-3 py-2">3. Chi tiết bổ sung</span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Description" class="custom-label">Ghi chú / Nội dung</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả ngắn gọn nội dung cuộc họp..."></textarea>
+                        </div>
+
+                        <div class="row align-items-end">
+                            <div class="col-md-6 mb-4">
+                                <label class="custom-label">Màu sắc đánh dấu</label>
+                                <div class="d-flex gap-3 align-items-center">
+                                    <input type="color" asp-for="Color" class="color-picker-input" id="colorPicker">
+                                    <span class="text-muted small" id="colorText">@Model.Color</span>
+                                </div>
+                            </div>
+                            <!-- <div class="col-md-6 mb-4">
+                                <label asp-for="RowStatus" class="custom-label">Trạng thái</label>
+                                <select asp-for="RowStatus" class="form-control custom-select">
+                                    <option value="@RowStatus.ACTIVE">Đang hoạt động</option>
+                                    <option value="@RowStatus.INACTIVE">Hủy lịch / Đã xóa</option>
+                                </select>
+                            </div> -->
+                        </div>
+
+                        <hr class="my-5 opacity-5">
+
+                        <div class="d-flex justify-content-end align-items-center gap-3">
+                            <a asp-action="Index" class="btn btn-link text-muted text-decoration-none mr-4">Hủy thay đổi</a>
+                            <button type="submit" class="btn btn-save px-5">
+                                <i class="fas fa-save mr-2"></i> Lưu cập nhật
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tip Card -->
+            <div class="mt-4 p-4 info-box shadow-sm">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="icon-circle bg-white text-primary">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <h6 class="font-weight-bold mb-1">Mẹo nhỏ:</h6>
+                        <p class="small text-muted mb-0">Hệ thống sẽ tự động kiểm tra xem có sự trùng lặp thời gian với các cuộc họp khác trong cùng phòng hay không trước khi lưu.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-light: #eef2ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        .main-card {
+            border-radius: 24px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            background: var(--primary-light);
+            color: var(--primary-color) !important;
+        }
+
+        .custom-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #475569;
+            letter-spacing: 0.025em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control, .custom-select {
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+            height: auto;
+            font-size: 0.95rem;
+            background-color: #f8fafc;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .form-control:focus, .custom-select:focus {
+            background-color: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+
+        .input-group-text {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            color: #94a3b8;
+            padding-left: 1.25rem;
+            padding-right: 0.75rem;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .section-title .badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border-radius: 8px;
+        }
+
+        .badge-soft-primary {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .btn-save {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 2.5rem;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.4);
+            color: white;
+            filter: brightness(1.1);
+        }
+
+        .info-box {
+            background: #f1f5f9;
+            border-radius: 20px;
+            border-left: 6px solid var(--primary-color);
+        }
+
+        .icon-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .color-picker-input {
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            overflow: hidden;
+            background: none;
+        }
+
+        .color-picker-input::-webkit-color-swatch {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .gap-3 { gap: 1rem; }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Handle Meeting Type change (Online/Offline)
+            const toggleUrlGroup = () => {
+                if ($('#Type').val() == '@MeetingType.ONLINE') {
+                    $('#urlGroup').slideDown(300);
+                } else {
+                    $('#urlGroup').slideUp(300);
+                }
+            };
+
+            $('#Type').change(toggleUrlGroup);
+            toggleUrlGroup();
+
+            // Color picker text update
+            $('#colorPicker').on('input', function() {
+                $('#colorText').text($(this).val().toUpperCase());
+            });
+
+            // Department filtering based on Company
+            const filterDepartments = () => {
+                const selectedCompanyId = $('#companySelect').val();
+                const $deptSelect = $('#deptSelect');
+                const currentDeptId = $deptSelect.val();
+
+                $deptSelect.find('option').each(function() {
+                    const companyId = $(this).data('company-id');
+                    if (!companyId || companyId == selectedCompanyId) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                // If current selected department is hidden, reset to empty
+                const $selectedOption = $deptSelect.find('option:selected');
+                if ($selectedOption.css('display') === 'none') {
+                    $deptSelect.val('');
+                }
+            };
+
+            $('#companySelect').change(filterDepartments);
+            
+            // Re-run filter on page load to ensure consistency
+            filterDepartments();
+            
+            // Re-select actual value after filtering if it was hidden by mistake
+            $('#deptSelect').val('@Model.DepartmentId');
+
+            // Client-side validation for dates
+            $('#updateMeetingForm').submit(function(e) {
+                const startAt = new Date($('#StartAt').val());
+                const endAt = new Date($('#EndAt').val());
+
+                if (startAt >= endAt) {
+                    alert('Thời gian kết thúc phải sau thời gian bắt đầu.');
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}

@@ -151,6 +151,24 @@
                                 <div class="row">
                                     <div class="col-6 pr-2">
                                         <div class="form-group mb-3">
+                                            <label class="small text-muted">Hình thức <span class="text-danger">*</span></label>
+                                            <select id="q-type" class="form-control q-input">
+                                                <option value="1">Trực tiếp (Offline)</option>
+                                                <option value="2">Trực tuyến (Online)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 pl-2" id="q-url-group" style="display: none;">
+                                        <div class="form-group mb-3">
+                                            <label class="small text-muted">URL cuộc họp</label>
+                                            <input id="q-url" type="text" class="form-control q-input" placeholder="https://...">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6 pr-2">
+                                        <div class="form-group mb-3">
                                             <label class="small text-muted">Công ty <span class="text-danger">*</span></label>
                                             <select id="q-company" class="form-control q-input">
                                                 <option value="">-- Chọn --</option>
@@ -990,6 +1008,16 @@
                 }
             });
 
+            // Handle Type toggle in Quick Create
+            $('#q-type').change(function() {
+                if ($(this).val() == '2') { // ONLINE
+                    $('#q-url-group').slideDown(200);
+                } else {
+                    $('#q-url-group').slideUp(200);
+                    $('#q-url').val('');
+                }
+            });
+
             // --- QUICK CREATE LOGIC ---
             let isCreating = false;
 
@@ -1002,6 +1030,8 @@
                 const roomId = $('#q-room').val();
                 const companyId = $('#q-company').val();
                 const departmentId = $('#q-dept').val();
+                const type = $('#q-type').val();
+                const url = $('#q-url').val();
 
                 // Validation for auto-save (must be silent and have all data)
                 if (silent && (!title || title.length < 5 || !startAt || !endAt || !roomId || !companyId || !departmentId)) {
@@ -1036,7 +1066,8 @@
                     CompanyId: companyId,
                     DepartmentId: departmentId,
                     Color: currColor,
-                    Type: 1, // OFFLINE
+                    Type: type,
+                    Url: url,
                     RowStatus: 1 // ACTIVE
                 };
 
@@ -1107,6 +1138,8 @@
                     roomId: $('#q-room').val(),
                     companyId: $('#q-company').val(),
                     departmentId: $('#q-dept').val(),
+                    type: $('#q-type').val(),
+                    url: $('#q-url').val(),
                     color: currColor
                 };
 
@@ -1251,7 +1284,8 @@
                         CompanyId: eventData.companyId,
                         DepartmentId: eventData.departmentId,
                         Color: eventData.color || currColor, // Use the color from draft or current active color
-                        Type: 1, // OFFLINE (MeetingType.OFFLINE = 1)
+                        Type: eventData.type || 1, 
+                        Url: eventData.url || '',
                         RowStatus: 1 // ACTIVE (RowStatus.ACTIVE = 1)
                     };
 
@@ -1307,6 +1341,7 @@
                 },
 
                 eventClick: function(info) {
+                    info.jsEvent.preventDefault();
                     const event = info.event;
                     const props = event.extendedProps;
                     
