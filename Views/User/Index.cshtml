@@ -72,13 +72,71 @@
     <!-- Users Table Section -->
     <div class="table-container">
         <div class="table-header">
-            <div class="search-box">
-                <form method="get" id="filterForm" class="d-flex w-100 gap-3">
-                    <div class="position-relative flex-grow-1">
-                        <i class="fas fa-search"></i>
-                        <input type="text" name="searchTerm" id="userSearch"
-                               placeholder="Tìm tên, email hoặc tên đăng nhập..."
-                               value="@ViewContext.HttpContext.Request.Query["searchTerm"]">
+            <div class="filter-box w-100">
+                <form method="get" id="filterForm" class="row g-3 align-items-center">
+                    <div class="col-lg-4 col-md-6 position-relative">
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" name="searchTerm" id="userSearch" class="form-control"
+                                   placeholder="Tìm tên, email hoặc tên đăng nhập..."
+                                   value="@ViewContext.HttpContext.Request.Query["searchTerm"]">
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <select name="companyId" id="companyFilter" class="form-control custom-select" onchange="this.form.submit()">
+                            <option value="">-- Tất cả công ty --</option>
+                            @if (ViewBag.Companies != null)
+                            {
+                                foreach (var company in (IEnumerable<CompanyViewModel>)ViewBag.Companies)
+                                {
+                                    if (ViewBag.SelectedCompanyId == company.Id)
+                                    {
+                                        <option value="@company.Id" selected>@company.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@company.Id">@company.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <select name="departmentId" id="departmentFilter" class="form-control custom-select" onchange="this.form.submit()">
+                            <option value="">-- Tất cả phòng ban --</option>
+                            @if (ViewBag.Departments != null)
+                            {
+                                foreach (var dept in (IEnumerable<DepartmentViewModel>)ViewBag.Departments)
+                                {
+                                    if (ViewBag.SelectedDepartmentId == dept.Id)
+                                    {
+                                        <option value="@dept.Id" selected>@dept.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@dept.Id">@dept.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6">
+                        <div class="d-flex gap-2">
+                            @* <button type="submit" class="btn btn-primary w-100" style="background: #4f46e5; border: none; border-radius: 8px;">
+                                <i class="fas fa-filter mr-1"></i> Lọc
+                            </button> *@
+                            @if (!string.IsNullOrEmpty(ViewContext.HttpContext.Request.Query["searchTerm"]) || 
+                                 !string.IsNullOrEmpty(ViewContext.HttpContext.Request.Query["companyId"]) || 
+                                 !string.IsNullOrEmpty(ViewContext.HttpContext.Request.Query["departmentId"]))
+                            {
+                                <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius: 8px;" title="Xóa bộ lọc">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            }
+                        </div>
                     </div>
                 </form>
             </div>
@@ -174,18 +232,33 @@
             </div>
             <div class="pagination-btns">
                 <a class="btn-page @(Model.PageNumber <= 1 ? "disabled" : "")" 
-                   href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">
+                   href="@Url.Action("Index", new { 
+                       pageNumber = Model.PageNumber - 1, 
+                       searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"],
+                       companyId = ViewContext.HttpContext.Request.Query["companyId"],
+                       departmentId = ViewContext.HttpContext.Request.Query["departmentId"]
+                   })">
                    <i class="fas fa-chevron-left"></i>
                 </a>
                 
                 @for (int i = 1; i <= Math.Ceiling((double)Model.TotalRecords / Model.PageSize); i++)
                 {
                     <a class="btn-page @(i == Model.PageNumber ? "active" : "")" 
-                       href="@Url.Action("Index", new { pageNumber = i, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">@i</a>
+                       href="@Url.Action("Index", new { 
+                           pageNumber = i, 
+                           searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"],
+                           companyId = ViewContext.HttpContext.Request.Query["companyId"],
+                           departmentId = ViewContext.HttpContext.Request.Query["departmentId"]
+                       })">@i</a>
                 }
                 
                 <a class="btn-page @(Model.PageNumber >= Math.Ceiling((double)Model.TotalRecords / Model.PageSize) ? "disabled" : "")" 
-                   href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1, searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"] })">
+                   href="@Url.Action("Index", new { 
+                       pageNumber = Model.PageNumber + 1, 
+                       searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"],
+                       companyId = ViewContext.HttpContext.Request.Query["companyId"],
+                       departmentId = ViewContext.HttpContext.Request.Query["departmentId"]
+                   })">
                    <i class="fas fa-chevron-right"></i>
                 </a>
             </div>
@@ -266,40 +339,49 @@
         }
 
         .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .search-box {
+        .filter-box {
+            background: #fbfbfb;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .search-input-wrapper {
             position: relative;
-            flex-grow: 1;
-            max-width: 450px;
         }
 
-        .search-box i {
+        .search-icon {
             position: absolute;
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
+            z-index: 10;
         }
 
-        .search-box input {
-            width: 100%;
-            padding: 0.65rem 1rem 0.65rem 2.75rem;
+        .search-input-wrapper input {
+            padding-left: 2.75rem !important;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            outline: none;
             transition: var(--transition);
-            font-size: 0.875rem;
-            background: #fdfdfd;
         }
 
-        .search-box input:focus {
+        .custom-select {
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            height: 40px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .custom-select:focus, .search-input-wrapper input:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+            outline: none;
         }
 
         .custom-table {

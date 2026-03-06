@@ -1,0 +1,258 @@
+@using MeetingManagement.Models.DTOs
+@using MeetingManagement.Enum
+@model UserUpdateModel
+
+@{
+    ViewData["Title"] = "Cập nhật thông tin";
+    Layout = "_Layout";
+    var departments = ViewBag.Departments as List<DepartmentViewModel> ?? new List<DepartmentViewModel>();
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            <!-- Breadcrumb & Header -->
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 p-0 bg-transparent">
+                        <li class="breadcrumb-item"><a asp-action="Index" class="text-muted small text-decoration-none">Quản lý Người dùng</a></li>
+                        <li class="breadcrumb-item active small" aria-current="page">Cập nhật</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <a asp-action="Index" class="btn btn-light btn-sm rounded-circle mr-3 shadow-sm back-btn">
+                        <i class="fas fa-arrow-left text-muted"></i>
+                    </a>
+                    <div>
+                        <h3 class="font-weight-bold mb-0">Cập nhật hồ sơ</h3>
+                        <p class="text-muted small mb-0">Chỉnh sửa thông tin cá nhân và phân quyền hệ thống.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm main-card">
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Update" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4" style="border-radius: 12px;"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <!-- Left Column: Account Settings -->
+                            <div class="col-md-5 border-right-md pr-md-4">
+                                <div class="section-title mb-4">
+                                    <span class="badge badge-soft-primary px-3 py-2">Cấu hình tài khoản</span>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label class="custom-label">Tên đăng nhập</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                        </div>
+                                        <input asp-for="Username" class="form-control bg-light">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label asp-for="UserType" class="custom-label">Vai trò hệ thống</label>
+                                    <select asp-for="UserType" asp-items="Html.GetEnumSelectList<UserType>()" class="form-control custom-select">
+                                    </select>
+                                    <span asp-validation-for="UserType" class="text-danger small"></span>
+                                </div>
+
+                                @* <div class="form-group mb-4">
+                                    <label asp-for="RowStatus" class="custom-label">Trạng thái hoạt động</label>
+                                    <select asp-for="RowStatus" asp-items="Html.GetEnumSelectList<RowStatus>()" class="form-control custom-select">
+                                    </select>
+                                    <span asp-validation-for="RowStatus" class="text-danger small"></span>
+                                </div> *@
+
+                                <div class="p-3 bg-light" style="border-radius: 12px; border: 1px dashed #e2e8f0;">
+                                    <h6 class="small font-weight-bold mb-2">Đổi mật khẩu</h6>
+                                    <div class="form-group mb-2">
+                                        <input asp-for="PlainPassword" type="password" class="form-control form-control-sm" placeholder="Mật khẩu mới" />
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <input asp-for="ConfirmPlainPassword" type="password" class="form-control form-control-sm" placeholder="Xác nhận mật khẩu" />
+                                    </div>
+                                    <p class="text-muted mt-2 mb-0" style="font-size: 0.7rem;">Để trống nếu không muốn thay đổi mật khẩu hiện tại.</p>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Personal & Org Info -->
+                            <div class="col-md-7 pl-md-4 mt-4 mt-md-0">
+                                <div class="section-title mb-4">
+                                    <span class="badge badge-soft-success px-3 py-2">Thông tin định danh</span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label asp-for="FullName" class="custom-label">Họ và tên <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="far fa-user"></i></span>
+                                            </div>
+                                            <input asp-for="FullName" class="form-control" required>
+                                        </div>
+                                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Email" class="custom-label">Email công việc <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="far fa-envelope"></i></span>
+                                            </div>
+                                            <input asp-for="Email" type="email" class="form-control" required>
+                                        </div>
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Phone" class="custom-label">Số điện thoại</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-phone-alt"></i></span>
+                                            </div>
+                                            <input asp-for="Phone" class="form-control">
+                                        </div>
+                                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Birthday" class="custom-label">Ngày sinh</label>
+                                        <input asp-for="Birthday" type="date" class="form-control">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Gender" class="custom-label">Giới tính</label>
+                                        <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-control custom-select">
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Address" class="custom-label">Địa chỉ</label>
+                                    <input asp-for="Address" class="form-control" placeholder="Số nhà, đường, thành phố...">
+                                </div>
+
+                                <div class="section-title mb-4 mt-4">
+                                    <span class="badge badge-soft-warning px-3 py-2">Tổ chức & Công tác</span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="CompanyId" class="custom-label">Công ty</label>
+                                        <select asp-for="CompanyId" id="companySelect" class="form-control custom-select">
+                                            <option value="">-- Chọn công ty --</option>
+                                            @if (ViewBag.Companies != null)
+                                            {
+                                                foreach (var c in (IEnumerable<CompanyViewModel>)ViewBag.Companies)
+                                                {
+                                                    <option value="@c.Id">@c.Name</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="DepartmentId" class="custom-label">Phòng ban <span class="text-danger">*</span></label>
+                                        <select asp-for="DepartmentId" id="deptSelect" class="form-control custom-select" required>
+                                            <option value="">-- Chọn phòng ban --</option>
+                                            @foreach (var dept in departments)
+                                            {
+                                                <option value="@dept.Id" data-company="@dept.CompanyId">@dept.Name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" style="opacity: 0.1;">
+
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a asp-action="Index" class="btn btn-link text-muted text-decoration-none mr-3">Hủy thay đổi</a>
+                            <button type="submit" class="btn btn-save px-5">
+                                <i class="fas fa-save mr-2"></i> Cập nhật hồ sơ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root { 
+            --primary-color: #4f46e5; 
+            --primary-light: #eef2ff;
+            --success-light: #f0fdf4;
+            --success-color: #16a34a;
+            --warning-light: #fffbeb;
+            --warning-color: #d97706;
+        }
+        
+        .main-card { border-radius: 20px; background: #fff; overflow: hidden; }
+        .back-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px; transition: all 0.3s; }
+        .back-btn:hover { transform: translateX(-5px); background: var(--primary-light); color: var(--primary-color) !important; }
+        
+        .custom-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: #64748b; margin-bottom: 0.4rem; display: block; letter-spacing: 0.025em; }
+        .form-control, .custom-select { border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 0.65rem 1rem; height: auto; font-size: 0.9rem; background-color: #f8fafc; transition: all 0.2s; }
+        .form-control:focus, .custom-select:focus { background-color: #fff; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08); outline: none; }
+        
+        .input-group-text { background: #f1f5f9; border: 1.5px solid #e2e8f0; border-right: none; border-radius: 10px 0 0 10px; color: #94a3b8; font-size: 0.85rem; }
+        .input-group .form-control { border-left: none; border-radius: 0 10px 10px 0; }
+        
+        .btn-save { background: var(--primary-color); color: white; border: none; border-radius: 10px; padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); transition: all 0.3s; }
+        .btn-save:hover { background: #4338ca; transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); color: white; }
+        
+        .badge-soft-primary { background-color: var(--primary-light); color: var(--primary-color); border-radius: 6px; }
+        .badge-soft-success { background-color: var(--success-light); color: var(--success-color); border-radius: 6px; }
+        .badge-soft-warning { background-color: var(--warning-light); color: var(--warning-color); border-radius: 6px; }
+        
+        .section-title { position: relative; }
+        
+        @@media (min-width: 768px) { .border-right-md { border-right: 1px solid #f1f5f9; } }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+             // Logic lọc phòng ban theo công ty
+            $('#companySelect').on('change', function() {
+                var selectedCompanyId = $(this).val();
+                
+                if (!selectedCompanyId) {
+                    $('#deptSelect option').show();
+                } else {
+                    $('#deptSelect option').each(function() {
+                        var deptCompanyId = $(this).data('company');
+                        // Always show the default empty option
+                        if (!deptCompanyId) return;
+
+                        if (deptCompanyId == selectedCompanyId) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                }
+                
+                // If the currently selected department is hidden, reset it
+                var currentDeptOption = $('#deptSelect option:selected');
+                if (currentDeptOption.length && currentDeptOption.data('company') && currentDeptOption.data('company') != selectedCompanyId) {
+                    $('#deptSelect').val('');
+                }
+            });
+
+            // Trigger change once on load to filter based on existing company
+            $('#companySelect').trigger('change');
+        });
+    </script>
+}

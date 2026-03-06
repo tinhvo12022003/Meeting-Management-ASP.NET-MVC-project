@@ -1,149 +1,235 @@
 @using MeetingManagement.Models.DTOs
+@using MeetingManagement.Enum
 @model UserCreateModel
 
 @{
-    ViewData["Title"] = "Register User";
+    ViewData["Title"] = "Thêm mới Người dùng";
     Layout = "_Layout";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/admin-form.css" asp-append-version="true">
-    <style>
-        .container-center {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-    </style>
-}
-
-<div class="container-center">
-    <nav aria-label="breadcrumb" style="width: 100%; max-width: 800px;">
-        <ol class="breadcrumb" style="background: transparent; padding: 0; margin-bottom: 2rem;">
-            <li class="breadcrumb-item"><a href="#">Hệ thống</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Thêm nhân viên mới</li>
-        </ol>
-    </nav>
-
-    <div class="admin-form-container">
-        <div class="admin-form-header">
-            <div>
-                <h2>Thêm tài khoản mới</h2>
-                <p class="text-muted mb-0" style="font-size: 0.875rem;">Thiết lập thông tin cho nhân viên mới trong hệ thống.</p>
-            </div>
-        </div>
-
-        <div class="admin-form-body">
-            <!-- Ảnh đại diện -->
-            <div class="admin-avatar-section">
-                <div class="admin-avatar-preview" id="avatarPreview">
-                    <ion-icon name="person"></ion-icon>
-                </div>
-                <div class="admin-avatar-info">
-                    <input type="file" id="adminAvatarUpload" style="display: none;" accept="image/*">
-                    <button class="btn btn-ghost mb-2" onclick="document.getElementById('adminAvatarUpload').click()">
-                        <i class="fas fa-upload mr-2"></i> Tải ảnh lên
-                    </button>
-                    <p>Định dạng JPG, PNG. Dung lượng tối đa 2MB.</p>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            <!-- Breadcrumb & Header -->
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 p-0 bg-transparent">
+                        <li class="breadcrumb-item"><a asp-action="Index" class="text-muted small text-decoration-none">Quản lý Người dùng</a></li>
+                        <li class="breadcrumb-item active small" aria-current="page">Thêm mới</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <a asp-action="Index" class="btn btn-light btn-sm rounded-circle mr-3 shadow-sm back-btn">
+                        <i class="fas fa-arrow-left text-muted"></i>
+                    </a>
+                    <div>
+                        <h3 class="font-weight-bold mb-0">Tạo tài khoản mới</h3>
+                        <p class="text-muted small mb-0">Thiết lập thông tin định danh và phân quyền cho nhân sự mới.</p>
+                    </div>
                 </div>
             </div>
 
-            <form id="createAccountForm">
-                <!-- Section 1: Thông tin tài khoản -->
-                <div class="form-section">
-                    <div class="form-section-title">
-                        <ion-icon name="key-outline"></ion-icon> Thông tin tài khoản
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="adminUsername">Tên đăng nhập *</label>
-                            <input type="text" id="adminUsername" placeholder="Ví dụ: anv_123" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="adminEmail">Email công việc *</label>
-                            <input type="email" id="adminEmail" placeholder="an.nguyen@company.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="tempPassword">Mật khẩu tạm thời</label>
-                            <input type="password" id="tempPassword" placeholder="••••••••">
-                        </div>
-                        <div class="form-group">
-                            <label for="userRole">Phân quyền hệ thống</label>
-                            <select id="userRole">
-                                <option value="staff">Nhân viên (Staff)</option>
-                                <option value="manager">Quản lý (Manager)</option>
-                                <option value="admin">Quản trị viên (Admin)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+            <div class="card border-0 shadow-sm main-card">
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4" style="border-radius: 12px;"></div>
 
-                <!-- Section 2: Thông tin cá nhân -->
-                <div class="form-section">
-                    <div class="form-section-title">
-                        <ion-icon name="person-outline"></ion-icon> Thông tin cá nhân
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="adminFullName">Họ và tên *</label>
-                            <input type="text" id="adminFullName" placeholder="Nguyễn Văn An" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="adminPhone">Số điện thoại</label>
-                            <input type="tel" id="adminPhone" placeholder="090 123 4567">
-                        </div>
-                        <div class="form-group">
-                            <label for="department">Phòng ban</label>
-                            <select id="department">
-                                <option value="hr">Nhân sự (HR)</option>
-                                <option value="tech">Kỹ thuật (Tech)</option>
-                                <option value="sale">Kinh doanh (Sales)</option>
-                                <option value="mkt">Marketing</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="startDate">Ngày gia nhập</label>
-                            <input type="date" id="startDate">
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="adminNote">Ghi chú (Nội bộ)</label>
-                            <textarea id="adminNote" rows="3" placeholder="Thông tin bổ sung về nhân viên..."></textarea>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
+                        <div class="row">
+                            <!-- Left Column: Security & Role -->
+                            <div class="col-md-5 border-right-md pr-md-4">
+                                <div class="section-title mb-4">
+                                    <span class="badge badge-soft-primary px-3 py-2">Bảo mật & Phân quyền</span>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label asp-for="Username" class="custom-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                        </div>
+                                        <input asp-for="Username" class="form-control" placeholder="Ví dụ: nva_123" required />
+                                    </div>
+                                    <span asp-validation-for="Username" class="text-danger small"></span>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label asp-for="UserType" class="custom-label">Vai trò hệ thống</label>
+                                    <select asp-for="UserType" asp-items="Html.GetEnumSelectList<UserType>()" class="form-control custom-select">
+                                    </select>
+                                    <span asp-validation-for="UserType" class="text-danger small"></span>
+                                </div>
 
-        <div class="admin-form-footer">
-            <button type="button" class="btn btn-ghost">Hủy bỏ</button>
-            <button type="submit" form="createAccountForm" class="btn btn-primary">Xác nhận tạo tài khoản</button>
+                                <div class="p-4 bg-light" style="border-radius: 15px; border: 1px dashed #cbd5e1;">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="PlainPassword" class="custom-label">Mật khẩu ban đầu <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                            </div>
+                                            <input asp-for="PlainPassword" type="password" class="form-control" placeholder="••••••••" required />
+                                        </div>
+                                        <span asp-validation-for="PlainPassword" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="form-group mb-0">
+                                        <label asp-for="ConfirmPlainPassword" class="custom-label">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            </div>
+                                            <input asp-for="ConfirmPlainPassword" type="password" class="form-control" placeholder="••••••••" required />
+                                        </div>
+                                        <span asp-validation-for="ConfirmPlainPassword" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Personal & Organization -->
+                            <div class="col-md-7 pl-md-4 mt-4 mt-md-0">
+                                <div class="section-title mb-4">
+                                    <span class="badge badge-soft-success px-3 py-2">Thông tin nhân sự</span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="FullName" class="custom-label">Họ và tên <span class="text-danger">*</span></label>
+                                        <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn A" required>
+                                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Email" class="custom-label">Email công vụ <span class="text-danger">*</span></label>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="example@@company.com" required>
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Phone" class="custom-label">Điện thoại</label>
+                                        <input asp-for="Phone" class="form-control" placeholder="090...">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label asp-for="Gender" class="custom-label">Giới tính</label>
+                                        <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-control custom-select"></select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label asp-for="Birthday" class="custom-label">Ngày sinh</label>
+                                        <input asp-for="Birthday" type="date" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Address" class="custom-label">Địa chỉ liên hệ</label>
+                                    <input asp-for="Address" class="form-control" placeholder="Văn phòng, số nhà...">
+                                </div>
+
+                                <div class="section-title mb-4 mt-4">
+                                    <span class="badge badge-soft-warning px-3 py-2">Tổ chức & Công tác</span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="CompanyId" class="custom-label">Công ty <span class="text-danger">*</span></label>
+                                        <select asp-for="CompanyId" id="companySelect" class="form-control custom-select" required>
+                                            <option value="">-- Chọn công ty --</option>
+                                            @if (ViewBag.Companies != null)
+                                            {
+                                                foreach (var c in (IEnumerable<CompanyViewModel>)ViewBag.Companies)
+                                                {
+                                                    <option value="@c.Id">@c.Name</option>
+                                                }
+                                            }
+                                        </select>
+                                        <span asp-validation-for="CompanyId" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="DepartmentId" class="custom-label">Phòng ban <span class="text-danger">*</span></label>
+                                        <select asp-for="DepartmentId" id="deptSelect" class="form-control custom-select" required>
+                                            <option value="">-- Chọn phòng ban --</option>
+                                            @if (ViewBag.Departments != null)
+                                            {
+                                                foreach (var d in (IEnumerable<DepartmentViewModel>)ViewBag.Departments)
+                                                {
+                                                    <option value="@d.Id" data-company="@d.CompanyId">@d.Name</option>
+                                                }
+                                            }
+                                        </select>
+                                        <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 opacity-1">
+
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a asp-action="Index" class="btn btn-link text-muted text-decoration-none mr-3">Trở về danh sách</a>
+                            <button type="submit" class="btn btn-save px-5">
+                                <i class="fas fa-user-plus mr-2"></i> Khởi tạo tài khoản
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        :root { 
+            --primary-color: #4f46e5; 
+            --primary-light: #eef2ff;
+            --success-light: #f0fdf4;
+            --success-color: #16a34a;
+            --warning-light: #fffbeb;
+            --warning-color: #d97706;
+        }
+        
+        .main-card { border-radius: 20px; background: #fff; }
+        .back-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; transition: all 0.3s; }
+        .back-btn:hover { transform: translateX(-4px); background: var(--primary-light); color: var(--primary-color) !important; }
+        
+        .custom-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #475569; margin-bottom: 0.5rem; display: block; letter-spacing: 0.5px; }
+        .form-control, .custom-select { border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 0.7rem 1rem; height: auto; font-size: 0.95rem; background-color: #f8fafc; transition: all 0.2s; }
+        .form-control:focus, .custom-select:focus { background-color: #fff; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08); outline: none; }
+        
+        .input-group-text { background: #f1f5f9; border: 1.5px solid #e2e8f0; border-right: none; border-radius: 10px 0 0 10px; color: #94a3b8; }
+        .input-group .form-control { border-left: none; border-radius: 0 10px 10px 0; }
+        
+        .btn-save { background: var(--primary-color); color: white; border: none; border-radius: 10px; padding: 0.8rem 2.5rem; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15); transition: all 0.3s; }
+        .btn-save:hover { background: #4338ca; transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2); color: white; }
+        
+        .badge-soft-primary { background-color: var(--primary-light); color: var(--primary-color); border-radius: 8px; font-weight: 600; }
+        .badge-soft-success { background-color: var(--success-light); color: var(--success-color); border-radius: 8px; font-weight: 600; }
+        .badge-soft-warning { background-color: var(--warning-light); color: var(--warning-color); border-radius: 8px; font-weight: 600; }
+        
+        @@media (min-width: 768px) { .border-right-md { border-right: 1px solid #f1f5f9; } }
+    </style>
+}
+
 @section Scripts {
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script>
         $(document).ready(function () {
-            // Avatar preview logic
-            $('#adminAvatarUpload').on('change', function () {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        $('#avatarPreview').html(`<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`);
-                    }
-                    reader.readAsDataURL(file);
+             $('#companySelect').on('change', function() {
+                var selectedCompanyId = $(this).val();
+                if (!selectedCompanyId) {
+                    $('#deptSelect option').show();
+                } else {
+                    $('#deptSelect option').each(function() {
+                        var deptCompanyId = $(this).data('company');
+                        if (deptCompanyId == selectedCompanyId || !deptCompanyId) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                }
+                if ($('#deptSelect option:selected').css('display') === 'none') {
+                    $('#deptSelect').val('');
                 }
             });
-
-            // Form submit logic
-            $('#createAccountForm').on('submit', function (e) {
-                e.preventDefault();
-                alert('Tài khoản đã được khởi tạo thành công!');
-            });
+            $('#companySelect').trigger('change');
         });
     </script>
 }

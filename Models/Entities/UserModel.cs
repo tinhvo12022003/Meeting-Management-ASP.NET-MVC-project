@@ -19,8 +19,8 @@ public class UserModel : BaseModel
     public Gender Gender {get; set;}
     public UserType userType {get; set;}
     
-    public string Username = string.Empty;
-    public string HashPassword = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string HashPassword { get; set; } = string.Empty;
 
 
     // relationship

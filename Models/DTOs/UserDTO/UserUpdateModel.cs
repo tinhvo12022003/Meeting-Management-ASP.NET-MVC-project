@@ -5,7 +5,6 @@ namespace MeetingManagement.Models.DTOs;
 
 public class UserUpdateModel
 {
-    
     public string Id {get; set;} = string.Empty;
 
     [StringLength(maximumLength:100)]
@@ -25,20 +24,17 @@ public class UserUpdateModel
     public DateOnly? Birthday { get; set; }
 
     [EnumDataType(typeof(Gender), ErrorMessage = "Invalid gender!")]
-    public Gender Gender;
+    public Gender Gender { get; set; }
 
     [EnumDataType(typeof(UserType), ErrorMessage = "Invalid type user!")]
-    public UserType userType;
+    public UserType UserType { get; set; }
 
     public string Username {get; set;} = string.Empty;
     public string PlainPassword {get; set;} = string.Empty;
+
+    [Compare("PlainPassword", ErrorMessage = "Mật khẩu xác nhận không khớp")]
     public string ConfirmPlainPassword {get; set;} = string.Empty;
 
     public string CompanyId {get; set;} = string.Empty;
     public string DepartmentId {get; set;} = string.Empty;
-
-    [EnumDataType(typeof(RowStatus), ErrorMessage = "Invalid status!")]
-    public RowStatus RowStatus {get; set;}
-
-
 }

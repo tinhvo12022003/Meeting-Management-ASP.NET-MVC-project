@@ -85,12 +85,12 @@
                     
                     <div class="company-filter" style="min-width: 200px;">
                         @{
-                            var companies = ViewBag.Companies as List<CompanyViewModel> ?? new List<CompanyViewModel>();
+                            List<CompanyViewModel>? companies = ViewBag.Companies as List<CompanyViewModel> ?? new List<CompanyViewModel>();
                             var selectedCompanyId = ViewBag.SelectedCompanyId?.ToString();
                         }
                         <select name="companyId" class="form-control" style="border-radius: 10px; height: 45px; border: 1px solid #e2e8f0;" onchange="document.getElementById('filterForm').submit()">
                             <option value="">-- Tất cả công ty --</option>
-                            @foreach (var company in companies)
+                            @foreach (CompanyViewModel company in companies)
                             {
                                 <option value="@company.Id" selected="@(selectedCompanyId == company.Id)">@company.Name</option>
                             }

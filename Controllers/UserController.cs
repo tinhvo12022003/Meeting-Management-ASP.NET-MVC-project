@@ -9,23 +9,56 @@ namespace MeetingManagement.Controllers;
 public class UserController : Controller
 {
     private readonly IUserService _userService;
-    public UserController(IUserService userService)
+    private readonly ICompanyService _companyService;
+    private readonly IDepartmentService _departmentService;
+
+    public UserController(IUserService userService, ICompanyService companyService, IDepartmentService departmentService)
     {
         _userService = userService;
+        _companyService = companyService;
+        _departmentService = departmentService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(PaginatedRequest request)
+    public async Task<IActionResult> Index(PaginatedRequest request, string? companyId = null, string? departmentId = null)
     {
-        var result = await _userService.Find(request);
+        var result = await _userService.Find(request, companyId, departmentId);
+
+        var companies = await _companyService.GetAllActive();
+        var departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, companyId)).Items;
+
+        ViewBag.Companies = companies;
+        ViewBag.Departments = departments;
+        ViewBag.SelectedCompanyId = companyId;
+        ViewBag.SelectedDepartmentId = departmentId;
+
         return View(result);
     }
 
     [Authorize]
     [HttpGet]
-    public IActionResult Register()
+    public async Task<IActionResult> Register()
     {
+        ViewBag.Companies = await _companyService.GetAllActive();
+        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 })).Items;
         return View();
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> Update(string id)
+    {
+        var model = await _userService.GetUpdateModelById(id);
+        if (model == null)
+        {
+            TempData["Error"] = "Không tìm thấy người dùng!";
+            return RedirectToAction("Index");
+        }
+
+        ViewBag.Companies = await _companyService.GetAllActive();
+        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+        
+        return View(model);
     }
 
     [HttpPost]
@@ -36,6 +69,8 @@ public class UserController : Controller
             await _userService.CreateUser(model);
             return RedirectToAction("Index");
         }
+        ViewBag.Companies = await _companyService.GetAllActive();
+        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
         return View(model);
     }
 
@@ -44,6 +79,8 @@ public class UserController : Controller
     {
         if (!ModelState.IsValid)
         {
+            ViewBag.Companies = await _companyService.GetAllActive();
+            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
             return View(model);
         }
         try 
@@ -55,6 +92,8 @@ public class UserController : Controller
         catch (Exception ex)
         {
             TempData["Error"] = ex.Message;
+            ViewBag.Companies = await _companyService.GetAllActive();
+            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
             return View(model);
         }
     } 
