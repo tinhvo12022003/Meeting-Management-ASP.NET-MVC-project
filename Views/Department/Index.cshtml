@@ -177,7 +177,7 @@
 
         <div class="table-footer">
             <div class="pagination-info">
-                Hiển thị <b>@Model.Items.Count</b> trên tổng số <b>@Model.TotalRecords</b> phòng ban
+                Hiển thị <b>@Model?.Items.Count</b> trên tổng số <b>@Model.TotalRecords</b> phòng ban
             </div>
             <div class="pagination-btns">
                 <a class="btn-page @(Model.PageNumber <= 1 ? "disabled" : "")" 

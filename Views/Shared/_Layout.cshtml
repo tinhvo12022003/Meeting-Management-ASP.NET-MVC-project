@@ -48,14 +48,15 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a asp-controller="User" asp-action="Profile"
+                           class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "User" && ViewContext.RouteData.Values["Action"]?.ToString() == "Profile" ? "active" : "")">
                         <i class="fas fa-user-circle menu-icon"></i>
                         <span class="menu-text">Hồ sơ cá nhân</span>
                     </a>
                 </li>
                 <li>
                     <a asp-controller="User" asp-action="Index"
-                           class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "User" ? "active" : "")">
+                           class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "User" && ViewContext.RouteData.Values["Action"]?.ToString() != "Profile" ? "active" : "")">
                         <i class="fas fa-users-cog menu-icon"></i>
                         <span class="menu-text">Người dùng</span>
                     </a>

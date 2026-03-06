@@ -1,4 +1,5 @@
 using MeetingManagement.Common;
+using MeetingManagement.Helper;
 using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -11,12 +12,83 @@ public class UserController : Controller
     private readonly IUserService _userService;
     private readonly ICompanyService _companyService;
     private readonly IDepartmentService _departmentService;
+    private readonly UserHelper _userHelper;
 
-    public UserController(IUserService userService, ICompanyService companyService, IDepartmentService departmentService)
+    public UserController(IUserService userService, ICompanyService companyService, IDepartmentService departmentService, UserHelper userHelper)
     {
         _userService = userService;
         _companyService = companyService;
         _departmentService = departmentService;
+        _userHelper = userHelper;
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> Profile()
+    {
+        var userId = _userHelper.GetCurrentUser();
+        var model = await _userService.GetUpdateModelById(userId);
+        if (model == null)
+        {
+            TempData["Error"] = "Không tìm thấy thông tin người dùng!";
+            return RedirectToAction("Index", "Home");
+        }
+
+        ViewBag.Companies = await _companyService.GetAllActive();
+        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+
+        return View(model);
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> Profile(UserUpdateModel model)
+    {
+        var currentUserId = _userHelper.GetCurrentUser();
+        
+        // Security check: Ensure the user is only updating their own profile
+        if (model.Id != currentUserId)
+        {
+            TempData["Error"] = "Bạn không có quyền cập nhật thông tin của người khác!";
+            return RedirectToAction("Profile");
+        }
+
+        if (string.IsNullOrWhiteSpace(model.PlainPassword))
+        {
+            ModelState.Remove("PlainPassword");
+            ModelState.Remove("ConfirmPlainPassword");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            TempData["Error"] = "Dữ liệu không hợp lệ: " + errors;
+
+            ViewBag.Companies = await _companyService.GetAllActive();
+            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+            return View(model);
+        }
+
+        try
+        {
+            // Set some default values for empty fields if needed
+            if (string.IsNullOrEmpty(model.Username))
+            {
+                var user = await _userService.GetUpdateModelById(currentUserId);
+                if (user != null) model.Username = user.Username;
+            }
+
+            await _userService.UpdateUser(model);
+            TempData["Success"] = "Cập nhật thông tin cá nhân thành công!";
+            return RedirectToAction("Profile");
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+            ViewBag.Companies = await _companyService.GetAllActive();
+            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+            return View(model);
+        }
     }
 
     [HttpGet]
