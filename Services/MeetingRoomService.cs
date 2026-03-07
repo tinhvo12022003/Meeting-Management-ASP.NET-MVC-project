@@ -140,7 +140,7 @@ public class MeetingRoomService : IMeetingRoomService
         }).ToList();
     }
 
-    public async Task<MeetingRoomViewModel> GetById(string id)
+    public async Task<MeetingRoomViewModel?> GetById(string id)
     {
         var x = await _unitOfWork.MeetingRooms.GetById(id);
         if (x == null) return null;

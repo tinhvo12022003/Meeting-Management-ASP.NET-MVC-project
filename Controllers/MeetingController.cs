@@ -3,9 +3,12 @@ using MeetingManagement.Enum;
 using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using MeetingManagement.Attr.Permission;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MeetingManagement.Controllers;
 
+[Authorize]
 public class MeetingController : Controller
 {
     private readonly IMeetingService _meetingService;
@@ -25,6 +28,7 @@ public class MeetingController : Controller
         _departmentService = departmentService;
     }
 
+    [Permission("Meeting.Index.View")]
     public async Task<IActionResult> Index(PaginatedRequest request)
     {
         var result = await _meetingService.Find(request);
@@ -37,6 +41,7 @@ public class MeetingController : Controller
         return View(result);
     }
 
+    [Permission("Meeting.Create.View")]
     public IActionResult Create()
     {
         // The 'Create' page is currently handled by AJAX/JavaScript on the index view.
@@ -45,6 +50,7 @@ public class MeetingController : Controller
     }
 
     [HttpPost]
+    [Permission("Meeting.Create.Insert")]
     public async Task<IActionResult> Create(MeetingCreateModel model)
     {
         if (!ModelState.IsValid)
@@ -77,6 +83,7 @@ public class MeetingController : Controller
         }
     }
 
+    [Permission("Meeting.Update.View")]
     public async Task<IActionResult> Update(string id)
     {
         try
@@ -98,6 +105,7 @@ public class MeetingController : Controller
     }
 
     [HttpPost]
+    [Permission("Meeting.Update.Edit")]
     public async Task<IActionResult> Update(MeetingUpdateModel model)
     {
         if (!ModelState.IsValid)
@@ -129,6 +137,7 @@ public class MeetingController : Controller
     }
 
     [HttpPost]
+    [Permission("Meeting.Reschedule.Edit")]
     public async Task<IActionResult> Reschedule([FromBody] MeetingRescheduleModel model)
     {
         try
@@ -143,6 +152,7 @@ public class MeetingController : Controller
     }
 
     [HttpPost]
+    [Permission("Meeting.Delete.Delete")]
     public async Task<IActionResult> Delete(string id)
     {
         try
@@ -158,6 +168,7 @@ public class MeetingController : Controller
     }
 
     [HttpGet]
+    [Permission("Meeting.Index.View")]
     public async Task<IActionResult> GetCalendarEvents()
     {
         try

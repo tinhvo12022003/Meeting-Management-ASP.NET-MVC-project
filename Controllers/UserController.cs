@@ -4,9 +4,11 @@ using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MeetingManagement.Attr.Permission;
 
 namespace MeetingManagement.Controllers;
 
+[Authorize]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
@@ -22,7 +24,7 @@ public class UserController : Controller
         _userHelper = userHelper;
     }
 
-    [Authorize]
+    [Permission("User.Profile.View")]
     [HttpGet]
     public async Task<IActionResult> Profile()
     {
@@ -40,7 +42,7 @@ public class UserController : Controller
         return View(model);
     }
 
-    [Authorize]
+    [Permission("User.Profile.Edit")]
     [HttpPost]
     public async Task<IActionResult> Profile(UserUpdateModel model)
     {
@@ -92,6 +94,7 @@ public class UserController : Controller
     }
 
     [HttpGet]
+    [Permission("User.Index.View")]
     public async Task<IActionResult> Index(PaginatedRequest request, string? companyId = null, string? departmentId = null)
     {
         var result = await _userService.Find(request, companyId, departmentId);
@@ -107,7 +110,7 @@ public class UserController : Controller
         return View(result);
     }
 
-    [Authorize]
+    [Permission("User.Register.View")]
     [HttpGet]
     public async Task<IActionResult> Register()
     {
@@ -116,7 +119,7 @@ public class UserController : Controller
         return View();
     }
 
-    [Authorize]
+    [Permission("User.Update.View")]
     [HttpGet]
     public async Task<IActionResult> Update(string id)
     {
@@ -134,6 +137,7 @@ public class UserController : Controller
     }
 
     [HttpPost]
+    [Permission("User.Register.Insert")]
     public async Task<IActionResult> Register(UserCreateModel model)
     {
         if (ModelState.IsValid)
@@ -147,6 +151,7 @@ public class UserController : Controller
     }
 
     [HttpPost]
+    [Permission("User.Update.Edit")]
     public async Task<IActionResult> Update(UserUpdateModel model)
     {
         if (!ModelState.IsValid)
@@ -171,6 +176,7 @@ public class UserController : Controller
     } 
 
     [HttpPost]
+    [Permission("User.Delete.Delete")]
     public async Task<IActionResult> Delete(string Id)
     {
         try 

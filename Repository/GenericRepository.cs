@@ -124,9 +124,13 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     }
 
     public virtual async Task<int> AddRange(IEnumerable<T> entities)
-{
-    await _dbSet.AddRangeAsync(entities);
-    return entities.Count(); 
-}
+    {
+        await _dbSet.AddRangeAsync(entities);
+        return entities.Count();
+    }
 
+    public virtual void DeleteRange(IEnumerable<T> entities)
+    {
+        _dbSet.RemoveRange(entities);
+    }
 }

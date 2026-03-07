@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Linq;
 using MeetingManagement.Config;
 using Microsoft.AspNetCore.Authorization;
 
@@ -16,24 +17,41 @@ public class PermissionAuthorizationHandler
         if (permissionClaim == null)
             return Task.CompletedTask;
 
-        var permissions =
-            JsonSerializer.Deserialize<List<string>>(permissionClaim.Value);
+        var permissions = JsonSerializer.Deserialize<List<string>>(permissionClaim.Value);
 
-        if (permissions == null)
-            return Task.CompletedTask;
+        var req = requirement.Permission; // Ví dụ: "Meeting.Index.View"
+        var parts = req.Split('.');
+        if (parts.Length < 2) return Task.CompletedTask;
 
-        // Exact match
-        if (permissions.Contains(requirement.Permission))
+        var controller = parts[0];
+        var action = parts[1];
+
+        // 1. Kiểm tra Siêu Admin (*.*)
+        if (permissions.Contains("*.*"))
         {
             context.Succeed(requirement);
             return Task.CompletedTask;
         }
 
-        var controller = requirement.Permission.Split('.')[0];
-
+        // 2. Kiểm tra Quản trị Controller (Controller.*)
         if (permissions.Contains($"{controller}.*"))
         {
             context.Succeed(requirement);
+            return Task.CompletedTask;
+        }
+
+        // 3. Kiểm tra Quản trị hành động cụ thể (Controller.Action.FullPermission)
+        if (permissions.Contains($"{controller}.{action}.FullPermission"))
+        {
+            context.Succeed(requirement);
+            return Task.CompletedTask;
+        }
+
+        // 4. Kiểm tra quyền chính xác (Exact Match)
+        if (permissions.Contains(req))
+        {
+            context.Succeed(requirement);
+            return Task.CompletedTask;
         }
 
         return Task.CompletedTask;

@@ -23,4 +23,5 @@ public interface IGenericRepository<T> where T : class
     );
 
     public Task<int> AddRange(IEnumerable<T> entities);
+    public void DeleteRange(IEnumerable<T> entities);
 }

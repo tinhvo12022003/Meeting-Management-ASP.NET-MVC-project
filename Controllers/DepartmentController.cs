@@ -3,6 +3,7 @@ using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MeetingManagement.Attr.Permission;
 
 namespace MeetingManagement.Controllers;
 
@@ -19,6 +20,7 @@ public class DepartmentController : Controller
     }
 
     [HttpGet]
+    [Permission("Department.Index.View")]
     public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string? searchTerm = null, string? companyId = null)
     {
         var request = new PaginatedRequest
@@ -41,6 +43,7 @@ public class DepartmentController : Controller
     }
 
     [HttpGet]
+    [Permission("Department.Create.View")]
     public async Task<IActionResult> Create()
     {
         var companies = await _companyService.GetAllActive();
@@ -49,6 +52,7 @@ public class DepartmentController : Controller
     }
 
     [HttpPost]
+    [Permission("Department.Create.Insert")]
     public async Task<IActionResult> Create(DepartmentCreateModel model)
     {
         if (!ModelState.IsValid)
@@ -72,6 +76,7 @@ public class DepartmentController : Controller
     }
 
     [HttpGet]
+    [Permission("Department.Update.View")]
     public async Task<IActionResult> Update(string id)
     {
         if (string.IsNullOrWhiteSpace(id))
@@ -87,6 +92,7 @@ public class DepartmentController : Controller
     }
 
     [HttpPost]
+    [Permission("Department.Update.Edit")]
     public async Task<IActionResult> Update(DepartmentUpdateModel model)
     {
         if (!ModelState.IsValid)
@@ -112,6 +118,7 @@ public class DepartmentController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Permission("Department.Delete.Delete")]
     public async Task<IActionResult> Delete(string id)
     {
         try

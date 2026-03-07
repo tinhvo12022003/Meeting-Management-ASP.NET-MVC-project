@@ -2,9 +2,12 @@ using MeetingManagement.Common;
 using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using MeetingManagement.Attr.Permission;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MeetingManagement.Controllers;
 
+[Authorize]
 public class MeetingRoomController : Controller
 {
     private readonly IMeetingRoomService _meetingRoomService;
@@ -16,12 +19,14 @@ public class MeetingRoomController : Controller
         _companyService = companyService;
     }
 
+    [Permission("MeetingRoom.Index.View")]
     public async Task<IActionResult> Index(PaginatedRequest request)
     {
         var result = await _meetingRoomService.Find(request);
         return View(result);
     }
 
+    [Permission("MeetingRoom.Create.View")]
     public async Task<IActionResult> Create()
     {
         ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
@@ -29,6 +34,7 @@ public class MeetingRoomController : Controller
     }
 
     [HttpPost]
+    [Permission("MeetingRoom.Create.Insert")]
     public async Task<IActionResult> Create(MeetingRoomCreateModel model)
     {
         if (!ModelState.IsValid)
@@ -51,6 +57,7 @@ public class MeetingRoomController : Controller
         }
     }
 
+    [Permission("MeetingRoom.Update.View")]
     public async Task<IActionResult> Update(string id)
     {
         var room = await _meetingRoomService.GetById(id);
@@ -70,6 +77,7 @@ public class MeetingRoomController : Controller
     }
 
     [HttpPost]
+    [Permission("MeetingRoom.Update.Edit")]
     public async Task<IActionResult> Update(MeetingRoomUpdateModel model)
     {
         if (!ModelState.IsValid)
@@ -93,6 +101,7 @@ public class MeetingRoomController : Controller
     }
 
     [HttpPost]
+    [Permission("MeetingRoom.Delete.Delete")]
     public async Task<IActionResult> Delete(string id)
     {
         try

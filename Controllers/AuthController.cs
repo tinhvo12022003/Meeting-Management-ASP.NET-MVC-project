@@ -1,7 +1,9 @@
 using MeetingManagement.Interface.IService;
 using MeetingManagement.Models.DTOs;
+using MeetingManagement.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MeetingManagement.Attr.Permission;
 
 namespace MeetingManagement.Controllers;
 
@@ -9,10 +11,14 @@ namespace MeetingManagement.Controllers;
 public class AuthController : Controller
 {
     private readonly IAuthService _authService;
+    private readonly IUserService _userService;
+    private readonly IPermissionService _permissionService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, IUserService userService, IPermissionService permissionService)
     {
         _authService = authService;
+        _userService = userService;
+        _permissionService = permissionService;
     }
 
     [AllowAnonymous]
@@ -77,6 +83,7 @@ public class AuthController : Controller
         }
     }
 
+    [Authorize]
     [HttpPost("logout")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
@@ -137,6 +144,7 @@ public class AuthController : Controller
 
     [Authorize]
     [HttpGet("me")]
+    [Permission("Auth.Me.View")]
     public IActionResult Me()
     {
         return Ok(new
@@ -146,9 +154,54 @@ public class AuthController : Controller
     }
 
     [Authorize]
-    public IActionResult Authorized ()
+    [Permission("Auth.Authorized.View")]
+    public async Task<IActionResult> Authorized (string? userId)
     {
+        var users = (await _userService.Find(new PaginatedRequest { PageSize = 1000 })).Items;
+        ViewBag.Users = users;
+        ViewBag.SelectedUserId = userId;
+
+        // Define the permission structure based on controllers in the project
+        var permissionConfig = new List<dynamic>
+        {
+            new { Controller = "Meeting", DisplayName = "Quản lý Lịch họp", Actions = new[] { "Index", "Create", "Update", "Delete", "Reschedule" } },
+            new { Controller = "User", DisplayName = "Quản lý Người dùng", Actions = new[] { "Index", "Register", "Update", "Delete", "Profile" } },
+            new { Controller = "Company", DisplayName = "Quản lý Công ty", Actions = new[] { "Index", "Create", "Update", "Delete" } },
+            new { Controller = "Department", DisplayName = "Quản lý Phòng ban", Actions = new[] { "Index", "Create", "Update", "Delete" } },
+            new { Controller = "MeetingRoom", DisplayName = "Quản lý Phòng họp", Actions = new[] { "Index", "Create", "Update", "Delete" } },
+            new { Controller = "Auth", DisplayName = "Phân quyền & Tài khoản", Actions = new[] { "Authorized", "Me" } }
+        };
+
+        ViewBag.PermissionConfig = permissionConfig;
+
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var userPermissions = (await _permissionService.Find(new PaginatedRequest { PageSize = 1000 })).Items
+                .Where(p => p.Username == users.FirstOrDefault(u => u.Id == userId)?.Username)
+                .ToList();
+            ViewBag.UserPermissions = userPermissions;
+        }
+
         return View();
+    }
+
+    [Authorize]
+    [HttpPost("save-permissions")]
+    [Permission("Auth.Authorized.Edit")]
+    public async Task<IActionResult> SavePermissions([FromBody] PermissionCreateBulkModel model)
+    {
+        try
+        {
+            // First, delete existing permissions for this user to avoid duplicates if necessary, 
+            // but AddBulkPermissions seems to handle it or we can update the service.
+            // For now, let's assume AddBulkPermissions works as intended.
+            await _permissionService.AddBulkPermissions(model);
+            return Json(new { success = true, message = "Cập nhật quyền hạn thành công!" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
     }
 
 }

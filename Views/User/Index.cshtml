@@ -228,12 +228,12 @@
 
         <div class="table-footer">
             <div class="pagination-info">
-                Hiển thị <b>@Model.Items.Count</b> trên tổng số <b>@Model.TotalRecords</b> người dùng
+                Hiển thị <b>@Model?.Items?.Count</b> trên tổng số <b>@Model?.TotalRecords</b> người dùng
             </div>
             <div class="pagination-btns">
-                <a class="btn-page @(Model.PageNumber <= 1 ? "disabled" : "")" 
+                <a class="btn-page @(Model?.PageNumber <= 1 ? "disabled" : "")" 
                    href="@Url.Action("Index", new { 
-                       pageNumber = Model.PageNumber - 1, 
+                       pageNumber = Model?.PageNumber - 1, 
                        searchTerm = ViewContext.HttpContext.Request.Query["searchTerm"],
                        companyId = ViewContext.HttpContext.Request.Query["companyId"],
                        departmentId = ViewContext.HttpContext.Request.Query["departmentId"]

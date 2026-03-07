@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-// using System.Text.Json;
+using System.Text.Json;
 using MeetingManagement.Config;
 using MeetingManagement.Data.Context;
 using MeetingManagement.Interface.IService;
@@ -29,38 +29,39 @@ public class JwtTokenService : IJwtTokenService
             new Claim(ClaimTypes.NameIdentifier, UserId), 
             new Claim(ClaimTypes.Name, Username),
         };
-        // var permissionList = new List<string>();
+        var permissionList = new List<string>();
 
-        // foreach (var p in permissions)
-        // {
-        //     var controller = p.Controller ?? "*";
-        //     var action = string.IsNullOrEmpty(p.Action) ? "*" : p.Action;
+        foreach (var p in permissions)
+        {
+            var controller = string.IsNullOrWhiteSpace(p.Controller) ? "*" : p.Controller;
+            var action = string.IsNullOrWhiteSpace(p.Action) ? "*" : p.Action;
 
-        //     if (p.FullPermission)
-        //     {
-        //         permissionList.Add($"{controller}.*");
-        //         continue;
-        //     }
+            if (p.FullPermission)
+            {
+                permissionList.Add($"{controller}.*");
+                continue;
+            }
 
-        //     if (p.View)
-        //         permissionList.Add($"{controller}.{action}.View");
-        //     if (p.Insert)
-        //         permissionList.Add($"{controller}.{action}.Insert");
-        //     if (p.Edit)
-        //         permissionList.Add($"{controller}.{action}.Edit");
-        //     if (p.Delete)
-        //         permissionList.Add($"{controller}.{action}.Delete");
-        //     if (p.InsertAll)
-        //         permissionList.Add($"{controller}.{action}.InsertAll");
-        //     if (p.EditAll)
-        //         permissionList.Add($"{controller}.{action}.EditAll");
-        //     if (p.DeleteAll)
-        //         permissionList.Add($"{controller}.{action}.DeleteAll");
-        // }
-        // claims.Add(new Claim(
-        //     "Permissions",
-        //     JsonSerializer.Serialize(permissionList)
-        // ));
+            if (p.View)
+                permissionList.Add($"{controller}.{action}.View");
+            if (p.Insert)
+                permissionList.Add($"{controller}.{action}.Insert");
+            if (p.Edit)
+                permissionList.Add($"{controller}.{action}.Edit");
+            if (p.Delete)
+                permissionList.Add($"{controller}.{action}.Delete");
+            if (p.InsertAll)
+                permissionList.Add($"{controller}.{action}.InsertAll");
+            if (p.EditAll)
+                permissionList.Add($"{controller}.{action}.EditAll");
+            if (p.DeleteAll)
+                permissionList.Add($"{controller}.{action}.DeleteAll");
+        }
+        
+        claims.Add(new Claim(
+            "Permissions",
+            JsonSerializer.Serialize(permissionList)
+        ));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

@@ -10,5 +10,5 @@ public interface IMeetingRoomService
     public Task Delete (string Id);
     public Task<PaginatedResponse<MeetingRoomViewModel>> Find (PaginatedRequest request);
     public Task<List<MeetingRoomViewModel>> GetAll();
-    public Task<MeetingRoomViewModel> GetById(string id);
+    public Task<MeetingRoomViewModel?> GetById(string id);
 }

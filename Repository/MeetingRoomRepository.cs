@@ -13,7 +13,7 @@ public class MeetingRoomRepository : GenericRepository<MeetingRoomModel>, IMeeti
         _context = context;
     }
 
-    public async Task<MeetingRoomModel> GetByName (string Name)
+    public async Task<MeetingRoomModel?> GetByName (string Name)
     {
         var query = await _context.MeetingRoom.FirstOrDefaultAsync(x => x.Name == Name);
         return query;

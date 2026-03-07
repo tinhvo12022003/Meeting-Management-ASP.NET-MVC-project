@@ -1,257 +1,257 @@
-
+@using MeetingManagement.Models.DTOs
 @{
-    ViewData["Title"] = "Phân quyền";
+    ViewData["Title"] = "Phân quyền người dùng";
+    var users = ViewBag.Users as List<UserViewModel> ?? new List<UserViewModel>();
+    var selectedUserId = ViewBag.SelectedUserId as string;
+    var permissionConfig = ViewBag.PermissionConfig as List<dynamic> ?? new List<dynamic>();
+    var userPermissions = ViewBag.UserPermissions as List<PermissionViewModel> ?? new List<PermissionViewModel>();
 }
 
 @section Styles {
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/admin-form.css" asp-append-version="true">
-    <link rel="stylesheet" href="~/css/authorized.css" asp-append-version="true">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --border: #e2e8f0;
+            --bg-light: #f8fafc;
+        }
+
+        .permission-card {
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .permission-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header-permission {
+            background: #fff;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .controller-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+
+        .table-permission {
+            margin-bottom: 0;
+            font-size: 0.875rem;
+        }
+
+        .table-permission th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            padding: 0.75rem 1rem;
+            border-top: none;
+            white-space: nowrap;
+        }
+
+        .table-permission td {
+            vertical-align: middle;
+            padding: 0.75rem 1rem;
+        }
+
+        .custom-control-label::before, .custom-control-label::after {
+            top: 0.1rem;
+        }
+
+        .action-name {
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .user-selector-card {
+            background: var(--primary-gradient, linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%));
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-update {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
+        }
+
+        .btn-update:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+            color: white;
+        }
+
+        .full-permission-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+        }
+        
+        .sticky-save {
+            position: sticky;
+            bottom: 20px;
+            z-index: 100;
+            text-align: right;
+        }
+    </style>
 }
 
-<div class="container-center">
-    <nav aria-label="breadcrumb" style="width: 100%; max-width: 800px;">
-        <ol class="breadcrumb" style="background: transparent; padding: 0; margin-bottom: 2rem;">
-            <li class="breadcrumb-item"><a href="#">Hệ thống</a></li>
-            <li class="breadcrumb-item"><a href="#">Người dùng</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Phân quyền</li>
-        </ol>
-    </nav>
-
-    <div class="admin-form-container">
-        <div class="admin-form-header">
-            <div>
-                <h2>Thiết lập quyền hạn</h2>
-                <p class="text-muted mb-0" style="font-size: 0.875rem;">Quản lý chi tiết các hành động người
-                    dùng có thể thực hiện.</p>
-            </div>
-        </div>
-
-        <div class="admin-form-body">
-            <!-- User Selection/Display Section -->
-            <div class="user-profile-header mb-4">
-                <div class="d-flex align-items-center">
-                    <div class="user-avatar mr-3">
-                        <img src="https://ui-avatars.com/api/?name=Nguyen+Van+An&background=4f46e5&color=fff"
-                             alt="User Avatar" class="rounded-circle"
-                             style="width: 64px; height: 64px; border: 3px solid #e2e8f0;">
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-11">
+            
+            <!-- User Selection -->
+            <div class="user-selector-card">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <h2 class="font-weight-bold mb-3">Phân quyền Hệ thống</h2>
+                        <p class="mb-0 text-white-50">Chọn người dùng và cấp các quyền truy cập tương ứng cho từng chức năng của hệ thống.</p>
                     </div>
-                    <div class="user-info">
-                        <h4 class="mb-1" style="font-weight: 700; color: var(--text-dark);">Nguyễn Văn An</h4>
-                        <div class="d-flex align-items-center text-muted" style="font-size: 0.875rem;">
-                            <span class="mr-3"><i class="far fa-envelope mr-1"></i> an.nguyen@company.com</span>
-                            <span><i class="fas fa-id-badge mr-1"></i> ID: #USR-1204</span>
-                        </div>
-                        <div class="mt-2 text-primary" id="btnChangeUser"
-                             style="font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
-                            <i class="fas fa-exchange-alt mr-1"></i> Thay đổi người dùng
+                    <div class="col-md-5 mt-3 mt-md-0">
+                        <div class="form-group mb-0">
+                            <label class="small text-white-50 font-weight-bold mb-2">CHỌN NGƯỜI DÙNG CẦN PHÂN QUYỀN</label>
+                            <select id="userSelect" class="form-control form-control-lg border-0 shadow-sm" style="border-radius:12px;">
+                                <option value="">-- Chọn nhân viên --</option>
+                                @foreach (var u in users)
+                                {
+                                    <option value="@u.Id" selected="@(selectedUserId == u.Id)">[@u.Username] @u.FullName</option>
+                                }
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- User Search Section (Hidden by default) -->
-            <div id="userSearchSection" class="mb-4"
-                 style="display: none; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0" style="font-weight: 600;">Tìm kiếm người dùng</h6>
-                    <button type="button" id="closeSearch" class="btn p-0 text-muted"
-                            style="background:none; border:none;"><i class="fas fa-times"></i></button>
+            @if (string.IsNullOrEmpty(selectedUserId))
+            {
+                <div class="text-center py-5 bg-white border rounded-lg shadow-sm">
+                    <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-illustraion-download-in-svg-png-gif-file-formats--no-data-found-failure-error-web-interface-pack-user-illustrations-4712053.png" style="width: 200px; opacity:0.6" />
+                    <h5 class="mt-4 text-muted">Vui lòng chọn một người dùng để bắt đầu phân quyền</h5>
                 </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text bg-white border-right-0"
-                              style="border-radius: 8px 0 0 8px;"><i class="fas fa-search text-muted"></i></span>
-                    </div>
-                    <input type="text" class="form-control border-left-0"
-                           style="border-radius: 0 8px 8px 0;" placeholder="Nhập tên, email..."
-                           id="userSearchInput">
-                </div>
-                <div class="search-results" style="max-height: 150px; overflow-y: auto;">
-                    <div class="p-2 border-bottom d-flex align-items-center result-item"
-                         style="cursor: pointer;">
-                        <div class="mr-2 rounded-circle"
-                             style="width: 24px; height: 24px; background: #4f46e5; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;">
-                            TB
+            }
+            else
+            {
+                <div id="permissionGrid">
+                    @foreach (var config in permissionConfig)
+                    {
+                        var controllerPermissions = userPermissions.Where(p => p.Controller == config.Controller).ToList();
+                        var hasFullAtController = controllerPermissions.Any(p => p.FullPermission && p.Action == "*");
+
+                        <div class="permission-card" data-controller="@config.Controller">
+                            <div class="card-header-permission">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary-light p-2 mr-3" style="width:40px; height:40px; display:flex; align-items:center; justify-content:center; color: var(--primary)">
+                                        <i class="fas fa-boxes"></i>
+                                    </div>
+                                    <div>
+                                        <div class="controller-title">@config.DisplayName</div>
+                                        <span class="small text-muted">Controller: @config.Controller</span>
+                                    </div>
+                                </div>
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input controller-full" id="full_@config.Controller" 
+                                           data-controller="@config.Controller" @(hasFullAtController ? "checked" : "")>
+                                    <label class="custom-control-label font-weight-bold" for="full_@config.Controller">Full Access</label>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-permission table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width: 200px;">Hành động (Action)</th>
+                                            <th class="text-center">View</th>
+                                            <th class="text-center">Insert</th>
+                                            <th class="text-center">Edit</th>
+                                            <th class="text-center">Delete</th>
+                                            <th class="text-center">Ins All</th>
+                                            <th class="text-center">Ed All</th>
+                                            <th class="text-center">Del All</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (string action in config.Actions)
+                                        {
+                                            var p = controllerPermissions.FirstOrDefault(cp => cp.Action == action);
+                                            <tr class="action-row" data-action="@action">
+                                                <td><span class="action-name">@action</span></td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                        <input type="checkbox" class="custom-control-input perm-check" id="v_@config.Controller@action" data-type="View" @(p?.View == true ? "checked" : "")>
+                                                        <label class="custom-control-label" for="v_@config.Controller@action"></label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                        <input type="checkbox" class="custom-control-input perm-check" id="i_@config.Controller@action" data-type="Insert" @(p?.Insert == true ? "checked" : "")>
+                                                        <label class="custom-control-label" for="i_@config.Controller@action"></label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                        <input type="checkbox" class="custom-control-input perm-check" id="e_@config.Controller@action" data-type="Edit" @(p?.Edit == true ? "checked" : "")>
+                                                        <label class="custom-control-label" for="e_@config.Controller@action"></label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                        <input type="checkbox" class="custom-control-input perm-check" id="d_@config.Controller@action" data-type="Delete" @(p?.Delete == true ? "checked" : "")>
+                                                        <label class="custom-control-label" for="d_@config.Controller@action"></label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                        <input type="checkbox" class="custom-control-input perm-check" id="ia_@config.Controller@action" data-type="InsertAll" @(p?.InsertAll == true ? "checked" : "")>
+                                                        <label class="custom-control-label" for="ia_@config.Controller@action"></label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                        <input type="checkbox" class="custom-control-input perm-check" id="ea_@config.Controller@action" data-type="EditAll" @(p?.EditAll == true ? "checked" : "")>
+                                                        <label class="custom-control-label" for="ea_@config.Controller@action"></label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                        <input type="checkbox" class="custom-control-input perm-check" id="da_@config.Controller@action" data-type="DeleteAll" @(p?.DeleteAll == true ? "checked" : "")>
+                                                        <label class="custom-control-label" for="da_@config.Controller@action"></label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <span style="font-size: 0.875rem;">Trần Thị Bích (bich.tt@company.com)</span>
-                    </div>
-                    <div class="p-2 border-bottom d-flex align-items-center result-item"
-                         style="cursor: pointer;">
-                        <div class="mr-2 rounded-circle"
-                             style="width: 24px; height: 24px; background: #10b981; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;">
-                            LC
-                        </div>
-                        <span style="font-size: 0.875rem;">Lê Văn Cường (cuong.lv@company.com)</span>
+                    }
+
+                    <div class="sticky-save mb-5">
+                        <button type="button" id="btnSavePermissions" class="btn-update shadow-lg">
+                            <i class="fas fa-save mr-2"></i> CẬP NHẬT QUYỀN HẠN
+                        </button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Full Control Banner -->
-            <div class="full-control-card">
-                <div>
-                    <h3>Quyền tối cao (Full Control)</h3>
-                    <p>Cho phép người dùng thực hiện tất cả các hành động trong hệ thống.</p>
-                </div>
-                <div class="custom-control custom-switch full-control-switch">
-                    <input type="checkbox" class="custom-control-input" id="fullControl">
-                    <label class="custom-control-label" for="fullControl"></label>
-                </div>
-            </div>
-
-            <!-- Permission Sections -->
-            <div class="form-section">
-                <div class="form-section-title">
-                    <i class="fas fa-list-check"></i> Chi tiết quyền hạn
-                </div>
-
-                <table class="permission-table">
-                    <thead>
-                        <tr>
-                            <th>Chức năng</th>
-                            <th class="text-center">Xem</th>
-                            <th class="text-center">Thêm</th>
-                            <th class="text-center">Sửa</th>
-                            <th class="text-center">Xóa</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="permission-item">
-                            <td>
-                                <div class="permission-group-title">
-                                    <i class="fas fa-users text-muted"></i> Quản lý người dùng
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="userView">
-                                    <label class="custom-control-label" for="userView"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="userCreate">
-                                    <label class="custom-control-label" for="userCreate"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="userEdit">
-                                    <label class="custom-control-label" for="userEdit"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="userDelete">
-                                    <label class="custom-control-label" for="userDelete"></label>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="permission-item">
-                            <td>
-                                <div class="permission-group-title">
-                                    <i class="fas fa-folder-open text-muted"></i> Quản lý dự án
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="projectView">
-                                    <label class="custom-control-label" for="projectView"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="projectCreate">
-                                    <label class="custom-control-label" for="projectCreate"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="projectEdit">
-                                    <label class="custom-control-label" for="projectEdit"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="projectDelete">
-                                    <label class="custom-control-label" for="projectDelete"></label>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="permission-item">
-                            <td>
-                                <div class="permission-group-title">
-                                    <i class="fas fa-file-invoice-dollar text-muted"></i> Quản lý tài chính
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="finView">
-                                    <label class="custom-control-label" for="finView"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="finCreate">
-                                    <label class="custom-control-label" for="finCreate"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="finEdit">
-                                    <label class="custom-control-label" for="finEdit"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="finDelete">
-                                    <label class="custom-control-label" for="finDelete"></label>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="permission-item">
-                            <td>
-                                <div class="permission-group-title">
-                                    <i class="fas fa-chart-line text-muted"></i> Báo cáo hệ thống
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="reportView">
-                                    <label class="custom-control-label" for="reportView"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input sub-permission"
-                                           id="reportExport">
-                                    <label class="custom-control-label" for="reportExport"></label>
-                                </div>
-                            </td>
-                            <td class="text-center">-</td>
-                            <td class="text-center">-</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="admin-form-footer">
-            <button type="button" class="btn btn-ghost">Hủy bỏ</button>
-            <button type="submit" class="btn btn-primary" id="savePermissions">Lưu thay đổi</button>
+            }
         </div>
     </div>
 </div>
@@ -259,63 +259,114 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Logic Phân quyền
-            const $fullControl = $('#fullControl');
-            const $subPermissions = $('.sub-permission');
+            // Handle user change
+            $('#userSelect').on('change', function () {
+                const userId = $(this).val();
+                window.location.href = '@Url.Action("Authorized", "Auth")?userId=' + userId;
+            });
 
-            // 1. Khi nhấn "Full Control"
-            $fullControl.on('change', function () {
+            // Handle Full Permission (Controller level)
+            $('.controller-full').on('change', function () {
+                const controllerCard = $(this).closest('.permission-card');
                 const isChecked = $(this).prop('checked');
-                // Set tất cả các quyền con theo trạng thái của Full Control
-                $subPermissions.prop('checked', isChecked);
+                
+                // Toggle all checkboxes in this controller card
+                controllerCard.find('.perm-check').prop('checked', isChecked);
+                
+                if (isChecked) {
+                    controllerCard.find('.table-responsive').addClass('opacity-50');
+                    controllerCard.find('.perm-check').prop('disabled', true);
+                } else {
+                    controllerCard.find('.table-responsive').removeClass('opacity-50');
+                    controllerCard.find('.perm-check').prop('disabled', false);
+                }
             });
 
-            // 2. Khi nhấn từng quyền con
-            $subPermissions.on('change', function () {
-                // Nếu bỏ check bất kỳ quyền con nào -> bỏ check Full Control
-                if (!$(this).prop('checked')) {
-                    $fullControl.prop('checked', false);
+            // Initial check for visually disabling already "Full Access" controllers
+            $('.controller-full:checked').each(function() {
+                const controllerCard = $(this).closest('.permission-card');
+                controllerCard.find('.table-responsive').addClass('opacity-50');
+                controllerCard.find('.perm-check').prop('disabled', true);
+            });
+
+            // Save Permissions
+            $('#btnSavePermissions').on('click', function () {
+                const userId = $('#userSelect').val();
+                if (!userId) {
+                    Swal.fire('Lỗi', 'Vui lòng chọn người dùng!', 'error');
+                    return;
                 }
-                // Nếu tất cả quyền con đều đã được check -> tự động check Full Control
-                else {
-                    const allChecked = $subPermissions.length === $subPermissions.filter(':checked').length;
-                    if (allChecked) {
-                        $fullControl.prop('checked', true);
+
+                const payload = {
+                    userId: userId,
+                    permissions: []
+                };
+
+                $('.permission-card').each(function () {
+                    const controller = $(this).data('controller');
+                    const isFull = $(this).find('.controller-full').prop('checked');
+
+                    if (isFull) {
+                        // All permissions for this controller
+                        payload.permissions.push({
+                            controller: controller,
+                            action: "*",
+                            fullPermission: true,
+                            view: true, insert: true, edit: true, delete: true,
+                            insertAll: true, editAll: true, deleteAll: true
+                        });
+                    } else {
+                        // Collect per-action permissions
+                        $(this).find('.action-row').each(function () {
+                            const action = $(this).data('action');
+                            const row = $(this);
+                            
+                            const p = {
+                                controller: controller,
+                                action: action,
+                                fullPermission: false,
+                                view: row.find('[data-type="View"]').prop('checked'),
+                                insert: row.find('[data-type="Insert"]').prop('checked'),
+                                edit: row.find('[data-type="Edit"]').prop('checked'),
+                                delete: row.find('[data-type="Delete"]').prop('checked'),
+                                insertAll: row.find('[data-type="InsertAll"]').prop('checked'),
+                                editAll: row.find('[data-type="EditAll"]').prop('checked'),
+                                deleteAll: row.find('[data-type="DeleteAll"]').prop('checked')
+                            };
+
+                            // Only add if at least one permission is checked
+                            if (p.view || p.insert || p.edit || p.delete || p.insertAll || p.editAll || p.deleteAll) {
+                                payload.permissions.push(p);
+                            }
+                        });
                     }
-                }
-            });
-
-            // Logic Thay đổi người dùng
-            $('#btnChangeUser').on('click', function () {
-                $('#userSearchSection').slideDown();
-            });
-
-            $('#closeSearch').on('click', function () {
-                $('#userSearchSection').slideUp();
-            });
-
-            $('.result-item').on('click', function () {
-                const nameAndEmail = $(this).find('span').text();
-                const name = nameAndEmail.split('(')[0].trim();
-                const email = nameAndEmail.split('(')[1].replace(')', '').trim();
-
-                // Cập nhật giao diện (Mô phỏng)
-                $('.user-info h4').text(name);
-                $('.user-info span:first').html(`<i class="far fa-envelope mr-1"></i> ${email}`);
-
-                // Ẩn search section
-                $('#userSearchSection').slideUp();
-            });
-
-            // Submit logic
-            $('#savePermissions').on('click', function () {
-                const permissions = {};
-                $subPermissions.each(function () {
-                    permissions[$(this).attr('id')] = $(this).prop('checked') ? 1 : 0;
                 });
 
-                console.log('Permissions to save:', permissions);
-                alert('Đã cập nhật quyền hạn thành công!');
+                // Send to API
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                $.ajax({
+                    url: '/auth/save-permissions',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function (res) {
+                        if (res.success) {
+                            Swal.fire('Thành công', res.message, 'success').then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire('Lỗi', res.message, 'error');
+                        }
+                    },
+                    error: function (err) {
+                        Swal.fire('Lỗi', 'Có lỗi xảy ra khi kết nối server.', 'error');
+                    }
+                });
             });
         });
     </script>
