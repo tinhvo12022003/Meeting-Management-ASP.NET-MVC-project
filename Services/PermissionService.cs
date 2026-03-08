@@ -125,8 +125,9 @@ public class PermissionService : IPermissionService
             throw new Exception("User không tồn tại.");
         if (model.Permissions == null || model.Permissions.Count == 0)
             throw new Exception("Danh sách permission không được rỗng.");
-        // 1. Xóa tất cả permission cũ của user
-        var oldPermissions = (await _unitOfWork.Permissions.GetAll()).Where(p => p.UserId == model.UserId).ToList();
+
+        // 1. Xóa tất cả permission cũ của user — filter trực tiếp ở DB, không load all vào RAM
+        var oldPermissions = await _unitOfWork.Permissions.GetByUserId(model.UserId);
         _unitOfWork.Permissions.DeleteRange(oldPermissions);
 
         // 2. Map sang entity
@@ -144,6 +145,7 @@ public class PermissionService : IPermissionService
             InsertAll      = p.FullPermission || p.InsertAll,
             UserId         = model.UserId
         }).ToList();
+
         // 3. AddRange một lần duy nhất → commit 1 transaction
         await _unitOfWork.Permissions.AddRange(permissionEntities);
         await _unitOfWork.CommitAsync();

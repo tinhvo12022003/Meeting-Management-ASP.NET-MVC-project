@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "BLANnxVCyTc=",
+  "dgSpecHash": "L7UE7Knhd94=",
   "success": true,
   "projectFilePath": "C:\\Users\\tvo22\\OneDrive\\Máy tính\\Projects\\Main-Meeting\\Meeting-Management-ASP.NET-MVC-project\\MeetingManagement.csproj",
   "expectedPackageFiles": [
@@ -47,12 +47,13 @@
     "C:\\Users\\tvo22\\.nuget\\packages\\system.composition.hosting\\9.0.0\\system.composition.hosting.9.0.0.nupkg.sha512",
     "C:\\Users\\tvo22\\.nuget\\packages\\system.composition.runtime\\9.0.0\\system.composition.runtime.9.0.0.nupkg.sha512",
     "C:\\Users\\tvo22\\.nuget\\packages\\system.composition.typedparts\\9.0.0\\system.composition.typedparts.9.0.0.nupkg.sha512",
-    "C:\\Users\\tvo22\\.nuget\\packages\\system.configuration.configurationmanager\\9.0.4\\system.configuration.configurationmanager.9.0.4.nupkg.sha512",
+    "C:\\Users\\tvo22\\.nuget\\packages\\system.configuration.configurationmanager\\10.0.3\\system.configuration.configurationmanager.10.0.3.nupkg.sha512",
     "C:\\Users\\tvo22\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.0.1\\system.identitymodel.tokens.jwt.8.0.1.nupkg.sha512",
     "C:\\Users\\tvo22\\.nuget\\packages\\system.linq.dynamic.core\\1.7.1\\system.linq.dynamic.core.1.7.1.nupkg.sha512",
     "C:\\Users\\tvo22\\.nuget\\packages\\system.memory.data\\8.0.1\\system.memory.data.8.0.1.nupkg.sha512",
+    "C:\\Users\\tvo22\\.nuget\\packages\\system.runtime.caching\\10.0.3\\system.runtime.caching.10.0.3.nupkg.sha512",
     "C:\\Users\\tvo22\\.nuget\\packages\\system.security.cryptography.pkcs\\9.0.4\\system.security.cryptography.pkcs.9.0.4.nupkg.sha512",
-    "C:\\Users\\tvo22\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.4\\system.security.cryptography.protecteddata.9.0.4.nupkg.sha512"
+    "C:\\Users\\tvo22\\.nuget\\packages\\system.security.cryptography.protecteddata\\10.0.3\\system.security.cryptography.protecteddata.10.0.3.nupkg.sha512"
   ],
   "logs": []
 }

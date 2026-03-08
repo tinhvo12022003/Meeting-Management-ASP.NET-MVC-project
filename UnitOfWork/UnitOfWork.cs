@@ -42,8 +42,14 @@ public class UnitOfWork : IUnitOfWork
         return await _context.SaveChangesAsync();
     }
 
+    private bool _disposed = false;
     public void Dispose()
     {
-        _context.Dispose();
+        if (!_disposed)
+        {
+            _context.Dispose();
+            _disposed = true;
+        }
+        GC.SuppressFinalize(this);
     }
 }

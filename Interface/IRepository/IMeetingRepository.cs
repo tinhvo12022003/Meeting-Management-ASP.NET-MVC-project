@@ -7,4 +7,5 @@ public interface IMeetingRepository : IGenericRepository<MeetingModel>
     public Task<bool> IsMeetingOverlap (DateTime startAt, DateTime endAt, string roomId, string? excludeId = null);
     public Task<bool> HasActiveMeetings(string roomId);
     public Task<MeetingModel?> GetMeeting (DateTime StartAt, DateTime EndAt, string roomId);
+    public Task<List<MeetingModel>> GetByDateRange(DateTime start, DateTime end);
 }

@@ -4,7 +4,6 @@ using MeetingManagement.Interface.IRepository;
 using MeetingManagement.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace MeetingManagement.Repository;
 
 public class DepartmentRepository : GenericRepository<DepartmentModel>, IDepartmentRepository
@@ -25,5 +24,11 @@ public class DepartmentRepository : GenericRepository<DepartmentModel>, IDepartm
         return await _context.Department.AnyAsync(x => x.Company.Id == CompanyId && x.Name == DepartmentName && x.RowStatus == RowStatus.ACTIVE);
     }
 
-
+    public async Task<List<DepartmentModel>> GetAllActive()
+    {
+        return await _context.Department
+            .Where(x => x.RowStatus == RowStatus.ACTIVE)
+            .OrderBy(x => x.Name)
+            .ToListAsync();
+    }
 }

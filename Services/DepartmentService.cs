@@ -13,6 +13,8 @@ public class DepartmentService : IDepartmentService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserHelper _helper;
+    private const string ALL_ACTIVE_DEPTS_CACHE_KEY = "AllActiveDepartments";
+
     public DepartmentService(IUnitOfWork unitOfWork, UserHelper helper)
     {
         _unitOfWork = unitOfWork;
@@ -33,14 +35,16 @@ public class DepartmentService : IDepartmentService
         var department = new DepartmentModel
         {
             Name = model.Name,
+            Location = model.Location,
             CompanyId = model.CompanyId,
             RowStatus = RowStatus.ACTIVE,
-            CreateAt = DateTime.UtcNow,
+            CreateAt = DateTime.Now,
             CreateBy = _helper.GetCurrentUser()
         };
 
         await _unitOfWork.Departments.Add(department);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_DEPTS_CACHE_KEY);
     }
 
     public async Task Update(DepartmentUpdateModel model)
@@ -61,11 +65,13 @@ public class DepartmentService : IDepartmentService
 
         department.CompanyId = model.CompanyId;
         department.Name = model.Name;
-        department.UpdateAt = DateTime.UtcNow;
+        department.Location = model.Location;
+        department.UpdateAt = DateTime.Now;
         department.UpdateBy = _helper.GetCurrentUser();
 
         await _unitOfWork.Departments.Update(department);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_DEPTS_CACHE_KEY);
     }
 
     public async Task Delete (string DepartmentId)
@@ -85,11 +91,12 @@ public class DepartmentService : IDepartmentService
             throw new Exception(MessageConstant.INACTIVE);
         }
         department.RowStatus = RowStatus.INACTIVE;
-        department.UpdateAt = DateTime.UtcNow;
+        department.UpdateAt = DateTime.Now;
         department.UpdateBy = _helper.GetCurrentUser();
         
         await _unitOfWork.Departments.Update(department);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_DEPTS_CACHE_KEY);
     }
 
     public async Task<PaginatedResponse<DepartmentViewModel>> Find(PaginatedRequest request, string? companyId = null)
@@ -97,7 +104,7 @@ public class DepartmentService : IDepartmentService
         var paginatedResult = await _unitOfWork.Departments.GetPaginated(
             request,
             baseFilter: x => x.RowStatus == RowStatus.ACTIVE && (string.IsNullOrEmpty(companyId) || x.CompanyId == companyId),
-            searchFields: "Name,Location,TotalStaff", 
+            searchFields: "Name,Location",
             includes: new [] {"Company", "Users"}
         );
         var viewModels = paginatedResult.Items.Select(x => new DepartmentViewModel
@@ -107,7 +114,8 @@ public class DepartmentService : IDepartmentService
             CompanyId = x.CompanyId,
             CompanyName = x.Company?.Name ?? string.Empty,
             TotalStaff = x.Users?.Count ?? 0,
-            ManagerName = x.Users?.FirstOrDefault(u => u.userType == UserType.HEAD || u.userType == UserType.MANAGER)?.FullName ?? "Chưa cập nhật"
+            Location = x.Location,
+            ManagerName = x.Users?.FirstOrDefault(u => u.userType == UserType.MANAGER)?.FullName ?? "Chưa cập nhật"
 
         }).ToList();
 
@@ -129,8 +137,27 @@ public class DepartmentService : IDepartmentService
         {
             Id = dept.Id,
             Name = dept.Name ?? string.Empty,
+            Location = dept.Location,
             CompanyId = dept.CompanyId,
             RowStatus = dept.RowStatus
         };
+    }
+
+    public async Task<List<DepartmentViewModel>> GetAllActive()
+    {
+        var cachedData = CacheHelper.Get<List<DepartmentViewModel>>(ALL_ACTIVE_DEPTS_CACHE_KEY);
+        if (cachedData != null) return cachedData;
+
+        var depts = await _unitOfWork.Departments.GetAllActive();
+        var result = depts.Select(x => new DepartmentViewModel
+        {
+            Id = x.Id,
+            Name = x.Name,
+            CompanyId = x.CompanyId,
+            Location = x.Location
+        }).ToList();
+
+        CacheHelper.Set(ALL_ACTIVE_DEPTS_CACHE_KEY, result, 30);
+        return result;
     }
 }

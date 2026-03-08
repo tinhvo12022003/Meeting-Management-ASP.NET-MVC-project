@@ -132,4 +132,25 @@ public class DepartmentController : Controller
         }
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetDepartmentsByCompany(string companyId)
+    {
+        if (string.IsNullOrWhiteSpace(companyId))
+        {
+            return Json(new { success = false, message = "CompanyId không hợp lệ" });
+        }
+
+        try
+        {
+            var allDepartments = await _departmentService.GetAllActive();
+            var departments = allDepartments.Where(d => d.CompanyId == companyId).ToList();
+            return Json(new { success = true, data = departments });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
 }

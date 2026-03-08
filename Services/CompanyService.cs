@@ -6,7 +6,6 @@ using MeetingManagement.Interface.IService;
 using MeetingManagement.Interface.IUnitOfWork;
 using MeetingManagement.Models;
 using MeetingManagement.Models.DTOs;
-using System.Linq.Expressions;
 
 namespace MeetingManagement.Service;
 
@@ -14,11 +13,11 @@ public class CompanyService : ICompanyService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserHelper _helper;
+    private const string ALL_ACTIVE_COMPANIES_CACHE_KEY = "AllActiveCompanies";
     public CompanyService(IUnitOfWork unitOfWork, UserHelper helper)
     {
         _unitOfWork = unitOfWork;
         _helper = helper;
-        // _companyRepository = companyRepository;
     }
 
     public async Task Create(CompanyCreateModel model)
@@ -46,6 +45,7 @@ public class CompanyService : ICompanyService
         };
         await _unitOfWork.Companies.Add(company);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_COMPANIES_CACHE_KEY);
     }
 
     public async Task Update(CompanyUpdateModel model)
@@ -74,6 +74,7 @@ public class CompanyService : ICompanyService
 
         await _unitOfWork.Companies.Update(company);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_COMPANIES_CACHE_KEY);
     }
 
     public async Task Delete(string CompanyId)
@@ -97,12 +98,14 @@ public class CompanyService : ICompanyService
 
         await _unitOfWork.Companies.Update(company);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_COMPANIES_CACHE_KEY);
     }
 
     public async Task<PaginatedResponse<CompanyViewModel>> Find(PaginatedRequest request)
     {
-        // Xây dựng filter theo ColumnFilters["status"], nếu không có thì lấy tất cả
-        Expression<Func<CompanyModel, bool>>? baseFilter = null;
+        // Xây dựng filter theo ColumnFilters["status"], mặc định chỉ lấy ACTIVE
+        System.Linq.Expressions.Expression<Func<CompanyModel, bool>> baseFilter =
+            x => x.RowStatus == RowStatus.ACTIVE;
 
         if (request.ColumnFilters != null &&
             request.ColumnFilters.TryGetValue("status", out var statusValue) &&
@@ -116,7 +119,7 @@ public class CompanyService : ICompanyService
 
         var paginatedResult = await _unitOfWork.Companies.GetPaginated(
             request,
-            baseFilter: x => x.RowStatus == RowStatus.ACTIVE,  
+            baseFilter: baseFilter,  // Dùng filter động thay vì hardcode ACTIVE
             searchFields: "Name,Address"
         );
         var viewModels = paginatedResult.Items.Select(x => new CompanyViewModel
@@ -158,9 +161,12 @@ public class CompanyService : ICompanyService
 
     public async Task<List<CompanyViewModel>> GetAllActive()
     {
-        var allCompanies = await _unitOfWork.Companies.GetAll();
-        var activeCompanies = allCompanies.Where(x => x.RowStatus == RowStatus.ACTIVE).ToList();
-        return activeCompanies.Select(x => new CompanyViewModel
+        var cachedData = CacheHelper.Get<List<CompanyViewModel>>(ALL_ACTIVE_COMPANIES_CACHE_KEY);
+        if (cachedData != null) return cachedData;
+
+        // Dùng repository method có DB-level filter — không load toàn bộ bảng vào RAM
+        var activeCompanies = await _unitOfWork.Companies.GetAllActive();
+        var result = activeCompanies.Select(x => new CompanyViewModel
         {
             Id = x.Id,
             Name = x.Name,
@@ -170,5 +176,8 @@ public class CompanyService : ICompanyService
             TaxCode = x.TaxCode,
             rowStatus = x.RowStatus
         }).ToList();
+
+        CacheHelper.Set(ALL_ACTIVE_COMPANIES_CACHE_KEY, result, 30); // Cache trong 30 phút
+        return result;
     }
 }

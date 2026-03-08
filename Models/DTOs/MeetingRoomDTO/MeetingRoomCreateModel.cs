@@ -15,6 +15,8 @@ public class MeetingRoomCreateModel
     [NotNull]
     public string CompanyId {get; set;} = string.Empty;
 
+    public string Location {get; set;} = string.Empty;
+
     public int Capacity {get; set;}
 
     [Required]

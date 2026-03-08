@@ -35,6 +35,13 @@ public class MeetingService : IMeetingService
             throw new Exception("Thời gian kết thúc phải sau thời gian bắt đầu.");
         }
 
+        // Verify room exists and is active
+        var room = await _unitOfWork.MeetingRooms.GetById(model.RoomId);
+        if (room == null || room.RowStatus == RowStatus.INACTIVE)
+        {
+            throw new Exception("Phòng họp không tồn tại hoặc đã bị xóa. Vui lòng chọn phòng khác.");
+        }
+
         var isExisted = await _unitOfWork.Meetings.IsMeetingOverlap(model.StartAt, model.EndAt, model.RoomId);
         if (isExisted)
         {
@@ -86,6 +93,13 @@ public class MeetingService : IMeetingService
         if (meeting.RowStatus == RowStatus.INACTIVE)
         {
             throw new Exception(MessageConstant.INACTIVE);
+        }
+
+        // Verify room exists and is active (especially if RoomId changed)
+        var room = await _unitOfWork.MeetingRooms.GetById(model.RoomId);
+        if (room == null || room.RowStatus == RowStatus.INACTIVE)
+        {
+            throw new Exception("Phòng họp không tồn tại hoặc đã bị xóa. Vui lòng chọn phòng khác.");
         }
 
         // Check for overlap with other meetings
@@ -228,6 +242,27 @@ public class MeetingService : IMeetingService
             RoomId = meeting.RoomId,
             RowStatus = meeting.RowStatus
         };
+    }
+
+    public async Task<List<MeetingViewModel>> GetCalendarEvents(DateTime start, DateTime end)
+    {
+        var meetings = await _unitOfWork.Meetings.GetByDateRange(start, end);
+        return meetings.Select(x => new MeetingViewModel
+        {
+            Id = x.Id,
+            Title = x.Title,
+            StartAt = x.StartAt,
+            EndAt = x.EndAt,
+            Type = x.Type,
+            Description = x.Description,
+            Organization = x.Organization,
+            Url = x.Url,
+            Color = x.Color,
+            CreatedBy = x.CreateBy,
+            RoomName = x.MeetingRoom?.Name ?? string.Empty,
+            CompanyName = x.Company?.Name ?? string.Empty,
+            DepartmentName = x.Department?.Name ?? string.Empty
+        }).ToList();
     }
 }
 

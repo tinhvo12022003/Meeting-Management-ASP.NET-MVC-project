@@ -13,6 +13,8 @@ public class DepartmentUpdateModel
     [Length(minimumLength: 5, maximumLength: 50, ErrorMessage = "Fix length required!")]
     public string Name {get; set;} = string.Empty;
 
+    public string Location {get; set;} = string.Empty;
+
     [Required]
     [NotNull]
     public string CompanyId {get; set;} = string.Empty;

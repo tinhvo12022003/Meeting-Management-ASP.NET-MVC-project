@@ -114,6 +114,11 @@ namespace MeetingManagement.Migrations
                         .HasColumnType("NVARCHAR(100)")
                         .HasDefaultValue("SYSTEM");
 
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnName("Location");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(255)")
@@ -264,6 +269,11 @@ namespace MeetingManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NVARCHAR(100)")
                         .HasDefaultValue("SYSTEM");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(255)")
+                        .HasColumnName("Location");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -463,7 +473,7 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR(50)")
+                        .HasColumnType("NVARCHAR(100)")
                         .HasColumnName("FullName");
 
                     b.Property<byte>("Gender")
@@ -472,7 +482,7 @@ namespace MeetingManagement.Migrations
 
                     b.Property<string>("HashPassword")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR(100)")
+                        .HasColumnType("NVARCHAR(512)")
                         .HasColumnName("Password");
 
                     b.Property<string>("Phone")

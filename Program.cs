@@ -95,7 +95,6 @@ builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
 builder.Services.AddScoped<IMeetingRoomRepository, MeetingRoomRepository>();
 builder.Services.AddScoped<IMeetingUserRepository, MeetingUserRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -113,6 +112,7 @@ builder.Services.AddScoped<IMeetingUserService, MeetingUserService>();
 
 
 builder.Services.AddScoped<UserHelper>();
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<HashingLibrary>();
 
 

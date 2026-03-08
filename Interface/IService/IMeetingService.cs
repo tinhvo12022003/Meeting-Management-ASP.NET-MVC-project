@@ -10,4 +10,5 @@ public interface IMeetingService
     public Task Delete (string Id);
     public Task<PaginatedResponse<MeetingViewModel>> Find (PaginatedRequest request);
     public Task<MeetingUpdateModel> GetUpdateModel(string id);
+    public Task<List<MeetingViewModel>> GetCalendarEvents(DateTime start, DateTime end);
 }

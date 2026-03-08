@@ -8,4 +8,5 @@ public interface IRefreshTokenRepository : IGenericRepository<RefreshTokenModel>
     public Task<IEnumerable<RefreshTokenModel>> GetActiveByUserId(string accountId);
     public Task<RefreshTokenModel?> GetByTokenHash(string tokenHash);
     public Task RevokeAllByUserId(string accountId);
+    public Task PurgeExpiredByUserId(string userId, int olderThanDays);
 }

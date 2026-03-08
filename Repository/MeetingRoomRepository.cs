@@ -1,4 +1,5 @@
 using MeetingManagement.Data.Context;
+using MeetingManagement.Enum;
 using MeetingManagement.Interface.IRepository;
 using MeetingManagement.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,14 @@ public class MeetingRoomRepository : GenericRepository<MeetingRoomModel>, IMeeti
 
     public async Task<MeetingRoomModel?> GetByName (string Name)
     {
-        var query = await _context.MeetingRoom.FirstOrDefaultAsync(x => x.Name == Name);
-        return query;
+        return await _context.MeetingRoom.FirstOrDefaultAsync(x => x.Name == Name && x.RowStatus == RowStatus.ACTIVE);
+    }
+
+    public async Task<List<MeetingRoomModel>> GetAllActive()
+    {
+        return await _context.MeetingRoom
+            .Where(x => x.RowStatus == RowStatus.ACTIVE)
+            .OrderBy(x => x.Name)
+            .ToListAsync();
     }
 }

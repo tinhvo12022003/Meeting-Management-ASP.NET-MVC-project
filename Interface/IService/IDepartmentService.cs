@@ -9,4 +9,5 @@ public interface IDepartmentService
     public Task Delete(string DepartmentId);
     public Task<PaginatedResponse<DepartmentViewModel>> Find(PaginatedRequest request, string? companyId = null);
     public Task<DepartmentUpdateModel?> GetById(string id);
+    public Task<List<DepartmentViewModel>> GetAllActive();
 }

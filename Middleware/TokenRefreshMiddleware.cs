@@ -19,6 +19,24 @@ public class TokenRefreshMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
+        // Bỏ qua static files — không cần xác thực token cho .css, .js, .png, font, v.v.
+        var path = context.Request.Path.Value ?? string.Empty;
+        if (path.StartsWith("/lib/", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("/css/", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("/js/",  StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("/img/", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("/fonts/", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".ico",  StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".png",  StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".jpg",  StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".svg",  StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".woff", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".woff2",StringComparison.OrdinalIgnoreCase))
+        {
+            await _next(context);
+            return;
+        }
+
         var accessToken = context.Request.Cookies["access_token"];
         var refreshToken = context.Request.Cookies["refresh_token"];
 

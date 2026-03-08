@@ -1,5 +1,14 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MeetingManagement.Enum;
 public enum UserType
 {
-    STAFF = 1, HEAD = 2, MANAGER = 3
+    [Display(Name = "Nhân viên")]
+    STAFF = 1, 
+    
+    [Display(Name = "Quản lý bộ phận")]
+    MANAGER = 2, 
+    
+    [Display(Name = "Quản trị viên")]
+    ADMIN = 3
 }

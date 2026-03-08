@@ -12,6 +12,8 @@ public class MeetingRoomService : IMeetingRoomService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserHelper _helper;
+    private const string ALL_ACTIVE_ROOMS_CACHE_KEY = "AllActiveMeetingRooms";
+
     public MeetingRoomService(IUnitOfWork unitOfWork, UserHelper helper)
     {
         _unitOfWork = unitOfWork;
@@ -35,6 +37,7 @@ public class MeetingRoomService : IMeetingRoomService
             Name = model.Name,
             Capacity = model.Capacity,
             CompanyId = model.CompanyId,
+            Location = model.Location,
             RowStatus = RowStatus.ACTIVE,
             CreateAt = DateTime.Now,
             CreateBy = _helper.GetCurrentUser()
@@ -42,6 +45,7 @@ public class MeetingRoomService : IMeetingRoomService
 
         await _unitOfWork.MeetingRooms.Add(room);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_ROOMS_CACHE_KEY);
     }
 
     public async Task Update (MeetingRoomUpdateModel model)
@@ -64,12 +68,14 @@ public class MeetingRoomService : IMeetingRoomService
         }
         room.Name = model.Name;
         room.Capacity = model.Capacity;
+        room.Location = model.Location;
         room.CompanyId = model.CompanyId;
         room.UpdateAt = DateTime.Now;
         room.UpdateBy = _helper.GetCurrentUser();
 
         await _unitOfWork.MeetingRooms.Update(room);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_ROOMS_CACHE_KEY);
     }
 
     public async Task Delete (string RoomId)
@@ -88,7 +94,6 @@ public class MeetingRoomService : IMeetingRoomService
             throw new Exception(MessageConstant.INACTIVE);
         }
 
-        // --- FIX: Check for active meetings before deleting ---
         var hasActiveMeetings = await _unitOfWork.Meetings.HasActiveMeetings(RoomId);
         if (hasActiveMeetings)
         {
@@ -101,13 +106,14 @@ public class MeetingRoomService : IMeetingRoomService
 
         await _unitOfWork.MeetingRooms.Update(room);
         await _unitOfWork.CommitAsync();
+        CacheHelper.Remove(ALL_ACTIVE_ROOMS_CACHE_KEY);
     }
     public async Task<PaginatedResponse<MeetingRoomViewModel>> Find (PaginatedRequest request)
     {
         var paginatedResult = await _unitOfWork.MeetingRooms.GetPaginated(
             request,
             baseFilter: x => x.RowStatus == RowStatus.ACTIVE,
-            searchFields: "Name",
+            searchFields: "Name,Location",
             includes: new[] { "Company" }
         );
 
@@ -116,6 +122,7 @@ public class MeetingRoomService : IMeetingRoomService
             Id = x.Id,
             Name = x.Name,
             Capacity = x.Capacity,
+            Location = x.Location,
             CompanyName = x.Company?.Name ?? string.Empty,
             CompanyId = x.CompanyId
         }).ToList();
@@ -131,24 +138,33 @@ public class MeetingRoomService : IMeetingRoomService
 
     public async Task<List<MeetingRoomViewModel>> GetAll()
     {
-        var rooms = await _unitOfWork.MeetingRooms.GetAll();
-        return rooms.Select(x => new MeetingRoomViewModel
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Capacity = x.Capacity
-        }).ToList();
+        var cachedData = CacheHelper.Get<List<MeetingRoomViewModel>>(ALL_ACTIVE_ROOMS_CACHE_KEY);
+        if (cachedData != null) return cachedData;
+
+        var rooms = await _unitOfWork.MeetingRooms.GetAllActive();
+        var result = rooms
+            .Select(x => new MeetingRoomViewModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Location = x.Location,
+                Capacity = x.Capacity
+            }).ToList();
+
+        CacheHelper.Set(ALL_ACTIVE_ROOMS_CACHE_KEY, result, 30);
+        return result;
     }
 
     public async Task<MeetingRoomViewModel?> GetById(string id)
     {
         var x = await _unitOfWork.MeetingRooms.GetById(id);
-        if (x == null) return null;
+        if (x == null || x.RowStatus == RowStatus.INACTIVE) return null;
         return new MeetingRoomViewModel
         {
             Id = x.Id,
             Name = x.Name,
             Capacity = x.Capacity,
+            Location = x.Location,
             CompanyName = x.Company?.Name ?? string.Empty,
             CompanyId = x.CompanyId
         };

@@ -8,10 +8,18 @@ public class AutoMapperConfig : Profile
 {
     public AutoMapperConfig()
     {
+        // company mapper
         CreateMap<CompanyModel, CompanyViewModel>();
+
+
+        // department mapper 
         CreateMap<DepartmentModel, DepartmentViewModel>().ForMember(
             des => des.CompanyName, opt => opt.MapFrom(s => s.Company != null ? s.Company.Name : "")
         );
+
+        
+
+        // meeting mapper
         CreateMap<MeetingModel, MeetingViewModel>().ForMember(
             des => des.RoomName, opt => opt.MapFrom(s => s.MeetingRoom != null ? s.MeetingRoom.Name : "")
         ).ForMember(
@@ -19,9 +27,14 @@ public class AutoMapperConfig : Profile
         ).ForMember(
             des => des.DepartmentName, opt => opt.MapFrom(s => s.Department != null ? s.Department.Name : "")
         );
+
+
+        // meeting room mapper
         CreateMap<MeetingRoomModel, MeetingRoomViewModel>().ForMember(
             des => des.CompanyName, opt => opt.MapFrom(s => s.Company != null ? s.Company.Name : "")
         );
+
+
         CreateMap<MeetingUserModel, MeetingUserViewModel>().ForMember(
             des => des.Title, opt => opt.MapFrom(s => s.Meeting != null ? s.Meeting.Title : "")
         ).ForMember(
@@ -31,6 +44,7 @@ public class AutoMapperConfig : Profile
         ).ForMember(
             des => des.RoomName, opt => opt.MapFrom(s => s.Meeting != null && s.Meeting.MeetingRoom != null ? s.Meeting.MeetingRoom.Name : "")
         );
+
 
         CreateMap<UserModel, UserViewModel>().ForMember(
             des => des.CompanyName, opt => opt.MapFrom(s => s.Company != null ? s.Company.Name : "")

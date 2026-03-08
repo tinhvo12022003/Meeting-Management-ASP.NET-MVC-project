@@ -29,7 +29,7 @@ public class MeetingRoomController : Controller
     [Permission("MeetingRoom.Create.View")]
     public async Task<IActionResult> Create()
     {
-        ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+        ViewBag.Companies = await _companyService.GetAllActive();
         return View();
     }
 
@@ -39,7 +39,7 @@ public class MeetingRoomController : Controller
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+            ViewBag.Companies = await _companyService.GetAllActive();
             return View(model);
         }
 
@@ -52,7 +52,7 @@ public class MeetingRoomController : Controller
         catch (Exception ex)
         {
             TempData["Error"] = ex.Message;
-            ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+            ViewBag.Companies = await _companyService.GetAllActive();
             return View(model);
         }
     }
@@ -68,11 +68,12 @@ public class MeetingRoomController : Controller
             Id = room.Id,
             Name = room.Name,
             Capacity = room.Capacity,
+            Location = room.Location,
             CompanyId = room.CompanyId,
             RowStatus = MeetingManagement.Enum.RowStatus.ACTIVE // Defaulting or fetching
         };
 
-        ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+        ViewBag.Companies = await _companyService.GetAllActive();
         return View(updateModel);
     }
 
@@ -82,7 +83,7 @@ public class MeetingRoomController : Controller
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+            ViewBag.Companies = await _companyService.GetAllActive();
             return View(model);
         }
 
@@ -95,7 +96,7 @@ public class MeetingRoomController : Controller
         catch (Exception ex)
         {
             TempData["Error"] = ex.Message;
-            ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+            ViewBag.Companies = await _companyService.GetAllActive();
             return View(model);
         }
     }

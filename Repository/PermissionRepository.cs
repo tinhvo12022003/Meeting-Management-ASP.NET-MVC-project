@@ -24,4 +24,14 @@ public class PermissionRepository : GenericRepository<PermissionModel>, IPermiss
         var query = await _context.Permission.FirstOrDefaultAsync(x => x.UserId == UserId && x.Controller == Controller && x.Action == Action);
         return query;
     }
+
+    /// <summary>
+    /// Lấy tất cả permission của một user, filter trực tiếp ở DB — không load all vào RAM.
+    /// </summary>
+    public async Task<List<PermissionModel>> GetByUserId(string userId)
+    {
+        return await _context.Permission
+            .Where(x => x.UserId == userId)
+            .ToListAsync();
+    }
 }

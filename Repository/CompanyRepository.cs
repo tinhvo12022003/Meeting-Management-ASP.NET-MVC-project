@@ -23,4 +23,13 @@ public class CompanyRepository : GenericRepository<CompanyModel>, ICompanyReposi
     {
         return await _context.Company.AnyAsync(x => x.Name == Name && x.RowStatus == RowStatus.ACTIVE);
     }
+
+    /// <summary>Filter trực tiếp ở DB — không load toàn bộ bảng Companies vào RAM.</summary>
+    public async Task<List<CompanyModel>> GetAllActive()
+    {
+        return await _context.Company
+            .Where(x => x.RowStatus == RowStatus.ACTIVE)
+            .OrderBy(x => x.Name)
+            .ToListAsync();
+    }
 }

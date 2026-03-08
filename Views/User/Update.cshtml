@@ -151,7 +151,7 @@
                                             {
                                                 foreach (var c in (IEnumerable<CompanyViewModel>)ViewBag.Companies)
                                                 {
-                                                    <option value="@c.Id">@c.Name</option>
+                                                    <option value="@c.Id" selected="@(c.Id == Model.CompanyId)">@c.Name</option>
                                                 }
                                             }
                                         </select>
@@ -160,9 +160,12 @@
                                         <label asp-for="DepartmentId" class="custom-label">Phòng ban <span class="text-danger">*</span></label>
                                         <select asp-for="DepartmentId" id="deptSelect" class="form-control custom-select" required>
                                             <option value="">-- Chọn phòng ban --</option>
-                                            @foreach (var dept in departments)
+                                            @if (ViewBag.Departments != null)
                                             {
-                                                <option value="@dept.Id" data-company="@dept.CompanyId">@dept.Name</option>
+                                                foreach (var d in (IEnumerable<DepartmentViewModel>)ViewBag.Departments)
+                                                {
+                                                    <option value="@d.Id" selected="@(d.Id == Model.DepartmentId)">@d.Name</option>
+                                                }
                                             }
                                         </select>
                                         <span asp-validation-for="DepartmentId" class="text-danger small"></span>
@@ -187,72 +190,46 @@
 </div>
 
 @section Styles {
-    <style>
-        :root { 
-            --primary-color: #4f46e5; 
-            --primary-light: #eef2ff;
-            --success-light: #f0fdf4;
-            --success-color: #16a34a;
-            --warning-light: #fffbeb;
-            --warning-color: #d97706;
-        }
-        
-        .main-card { border-radius: 20px; background: #fff; overflow: hidden; }
-        .back-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px; transition: all 0.3s; }
-        .back-btn:hover { transform: translateX(-5px); background: var(--primary-light); color: var(--primary-color) !important; }
-        
-        .custom-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: #64748b; margin-bottom: 0.4rem; display: block; letter-spacing: 0.025em; }
-        .form-control, .custom-select { border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 0.65rem 1rem; height: auto; font-size: 0.9rem; background-color: #f8fafc; transition: all 0.2s; }
-        .form-control:focus, .custom-select:focus { background-color: #fff; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08); outline: none; }
-        
-        .input-group-text { background: #f1f5f9; border: 1.5px solid #e2e8f0; border-right: none; border-radius: 10px 0 0 10px; color: #94a3b8; font-size: 0.85rem; }
-        .input-group .form-control { border-left: none; border-radius: 0 10px 10px 0; }
-        
-        .btn-save { background: var(--primary-color); color: white; border: none; border-radius: 10px; padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); transition: all 0.3s; }
-        .btn-save:hover { background: #4338ca; transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); color: white; }
-        
-        .badge-soft-primary { background-color: var(--primary-light); color: var(--primary-color); border-radius: 6px; }
-        .badge-soft-success { background-color: var(--success-light); color: var(--success-color); border-radius: 6px; }
-        .badge-soft-warning { background-color: var(--warning-light); color: var(--warning-color); border-radius: 6px; }
-        
-        .section-title { position: relative; }
-        
-        @@media (min-width: 768px) { .border-right-md { border-right: 1px solid #f1f5f9; } }
-    </style>
+    <link rel="stylesheet" href="~/css/update-user.css">
 }
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-             // Logic lọc phòng ban theo công ty
+            var initialLoad = true;
+            // Only trigger AJAX if company is changed manually
+            // On initial load, the server already provides the correct department list
             $('#companySelect').on('change', function() {
                 var selectedCompanyId = $(this).val();
-                
+                var $deptSelect = $('#deptSelect');
+
                 if (!selectedCompanyId) {
-                    $('#deptSelect option').show();
-                } else {
-                    $('#deptSelect option').each(function() {
-                        var deptCompanyId = $(this).data('company');
-                        // Always show the default empty option
-                        if (!deptCompanyId) return;
+                    $deptSelect.html('<option value="">-- Chọn phòng ban --</option>');
+                    return;
+                }
 
-                        if (deptCompanyId == selectedCompanyId) {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
+                // If this is the initial load call from trigger('change'), we might want to skip it
+                // but let's just make it more robust. 
+                $.ajax({
+                    url: '/Department/GetDepartmentsByCompany',
+                    type: 'GET',
+                    data: { companyId: selectedCompanyId },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            var options = '<option value="">-- Chọn phòng ban --</option>';
+                            response.data.forEach(function(dept) {
+                                options += '<option value="' + dept.id + '">' + dept.name + '</option>';
+                            });
+                            
+                            $deptSelect.html(options);
+                            // If it's the same company as the model, try to restore DepartmentId
+                            if (selectedCompanyId === '@Model.CompanyId') {
+                                $deptSelect.val('@Model.DepartmentId');
+                            }
                         }
-                    });
-                }
-                
-                // If the currently selected department is hidden, reset it
-                var currentDeptOption = $('#deptSelect option:selected');
-                if (currentDeptOption.length && currentDeptOption.data('company') && currentDeptOption.data('company') != selectedCompanyId) {
-                    $('#deptSelect').val('');
-                }
+                    }
+                });
             });
-
-            // Trigger change once on load to filter based on existing company
-            $('#companySelect').trigger('change');
         });
     </script>
 }

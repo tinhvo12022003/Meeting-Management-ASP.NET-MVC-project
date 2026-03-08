@@ -46,7 +46,7 @@ public static class DbSeeder
                 Department = department, 
                 Company = company, 
                 Gender = Gender.MALE,
-                userType = UserType.HEAD,
+                userType = UserType.ADMIN,
                 RowStatus = RowStatus.ACTIVE, 
                 Username = "admin", 
                 HashPassword = "AQAAAAIAAYagAAAAECR3DscyOfXBdUWF3h6AZAFjF08kw2xrlysZTL5Y2Wx29h4qay07ZTohhhUXicYR/A=="

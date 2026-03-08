@@ -1,0 +1,57 @@
+.form-control:focus,
+.custom-select:focus {
+    background-color: #fff !important;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.btn-save {
+    background: linear-gradient(to right, #6366f1, #4f46e5);
+    padding: 0.9rem 2.2rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-save:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35) !important;
+    background: linear-gradient(to right, #4f46e5, #4338ca);
+}
+
+.btn-save:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25) !important;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    /* xám nhạt */
+    color: #4b5563;
+    /* xám đậm hơn text-muted */
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.btn-cancel:hover {
+    background: #f3f4f6;
+    /* xám rất nhạt */
+    border-color: #9ca3af;
+    color: #374151;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-cancel:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}

@@ -37,6 +37,27 @@ public class MeetingUserRepository : GenericRepository<MeetingUserModel>, IMeeti
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Phân trang trực tiếp ở DB — SQL Server thực hiện Skip/Take, không load toàn bộ dữ liệu vào RAM.
+    /// </summary>
+    public async Task<(List<MeetingUserModel> Items, int TotalCount)> GetPaginatedByUserId(
+        string userId, int pageNumber, int pageSize)
+    {
+        var query = _context.MeetingUser
+            .Include(x => x.Meeting)
+            .ThenInclude(m => m!.MeetingRoom)
+            .Include(x => x.User)
+            .Where(x => x.UserId == userId);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
     public async Task Delete(string meetingId, string userId)
     {
         var entity = await _context.MeetingUser.FirstOrDefaultAsync(x => x.MeetingId == meetingId && x.UserId == userId);

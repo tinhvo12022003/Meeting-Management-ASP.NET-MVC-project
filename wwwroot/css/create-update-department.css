@@ -1,0 +1,15 @@
+.form-control:focus,
+.custom-select:focus {
+    background-color: #fff !important;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.input-group-merge .form-control {
+    border-left: 0;
+}
+
+.input-group-merge .input-group-text {
+    border-right: 0;
+    border-radius: 8px 0 0 8px;
+}

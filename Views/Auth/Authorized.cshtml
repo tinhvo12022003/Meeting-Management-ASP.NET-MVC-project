@@ -1,4 +1,8 @@
 @using MeetingManagement.Models.DTOs
+<!-- 
+
+-->
+
 @{
     ViewData["Title"] = "Phân quyền người dùng";
     var users = ViewBag.Users as List<UserViewModel> ?? new List<UserViewModel>();
@@ -8,112 +12,7 @@
 }
 
 @section Styles {
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-light: #eef2ff;
-            --border: #e2e8f0;
-            --bg-light: #f8fafc;
-        }
-
-        .permission-card {
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            margin-bottom: 24px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
-        }
-
-        .permission-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-header-permission {
-            background: #fff;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .controller-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #1e293b;
-        }
-
-        .table-permission {
-            margin-bottom: 0;
-            font-size: 0.875rem;
-        }
-
-        .table-permission th {
-            background: var(--bg-light);
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            padding: 0.75rem 1rem;
-            border-top: none;
-            white-space: nowrap;
-        }
-
-        .table-permission td {
-            vertical-align: middle;
-            padding: 0.75rem 1rem;
-        }
-
-        .custom-control-label::before, .custom-control-label::after {
-            top: 0.1rem;
-        }
-
-        .action-name {
-            font-weight: 500;
-            color: #334155;
-        }
-
-        .user-selector-card {
-            background: var(--primary-gradient, linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%));
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            color: white;
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
-        }
-
-        .btn-update {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 1rem 3rem;
-            border-radius: 12px;
-            font-weight: 700;
-            transition: all 0.3s;
-            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
-        }
-
-        .btn-update:hover {
-            background: #4338ca;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-            color: white;
-        }
-
-        .full-permission-badge {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 6px;
-        }
-        
-        .sticky-save {
-            position: sticky;
-            bottom: 20px;
-            z-index: 100;
-            text-align: right;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/authorized.css">
 }
 
 <div class="container-fluid py-4">
@@ -145,7 +44,8 @@
             @if (string.IsNullOrEmpty(selectedUserId))
             {
                 <div class="text-center py-5 bg-white border rounded-lg shadow-sm">
-                    <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-illustraion-download-in-svg-png-gif-file-formats--no-data-found-failure-error-web-interface-pack-user-illustrations-4712053.png" style="width: 200px; opacity:0.6" />
+                    @* <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-illustraion-download-in-svg-png-gif-file-formats--no-data-found-failure-error-web-interface-pack-user-illustrations-4712053.png" style="width: 200px; opacity:0.6" /> *@
+                    <i class="fas fa-folder-open fa-3x mb-3 opacity-20"></i>
                     <h5 class="mt-4 text-muted">Vui lòng chọn một người dùng để bắt đầu phân quyền</h5>
                 </div>
             }

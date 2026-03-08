@@ -96,17 +96,31 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         }
 
         int totalRecords = await query.CountAsync(cancellationToken);
+
         if (!string.IsNullOrWhiteSpace(request.SortColumn))
         {
-            string direction = (request.SortDirection ?? "asc").ToLowerInvariant() == "desc" ? " descending" : "";
-            string orderByClause = $"{request.SortColumn}{direction}";
+            // Validate SortColumn — chỉ cho phép tên property thực tế của entity
+            // Ngăn Dynamic LINQ ném ParseException khi SortColumn không hợp lệ
+            var entityType = typeof(T);
+            var validProperty = entityType.GetProperty(
+                request.SortColumn,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
 
-            query = query.OrderBy(orderByClause); // Dynamic LINQ magic!
+            if (validProperty != null)
+            {
+                string direction = (request.SortDirection ?? "asc").ToLowerInvariant() == "desc" ? " descending" : "";
+                query = query.OrderBy($"{validProperty.Name}{direction}");
+            }
+            else
+            {
+                // SortColumn không hợp lệ → dùng sort mặc định
+                query = query.OrderBy("Id");
+            }
         }
         else
         {
-            // Default sort nếu không chỉ định (tùy entity, ví dụ CreatedAt)
-            // query = query.OrderBy(e => EF.Property<DateTime>(e, "CreatedAt"));
+            // Luôn có ORDER BY để pagination deterministic (cùng trang luôn trả cùng dữ liệu)
+            query = query.OrderBy("Id");
         }
 
         var items = await query

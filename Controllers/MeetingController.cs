@@ -35,8 +35,8 @@ public class MeetingController : Controller
         
         // Prepare data for filters or dropdowns
         ViewBag.Rooms = await _meetingRoomService.GetAll();
-        ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
-        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+        ViewBag.Companies = await _companyService.GetAllActive();
+        ViewBag.Departments = await _departmentService.GetAllActive();
         
         return View(result);
     }
@@ -92,8 +92,8 @@ public class MeetingController : Controller
             
             // Prepare data for dropdowns
             ViewBag.Rooms = await _meetingRoomService.GetAll();
-            ViewBag.Companies = (await _companyService.Find(new PaginatedRequest { PageSize = 100 })).Items;
-            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 100 })).Items;
+            ViewBag.Companies = await _companyService.GetAllActive();
+            ViewBag.Departments = await _departmentService.GetAllActive();
             
             return View(model);
         }
@@ -169,15 +169,18 @@ public class MeetingController : Controller
 
     [HttpGet]
     [Permission("Meeting.Index.View")]
-    public async Task<IActionResult> GetCalendarEvents()
+    public async Task<IActionResult> GetCalendarEvents(DateTime? start, DateTime? end)
     {
         try
         {
-            // Fetch all active meetings for the calendar
-            var result = await _meetingService.Find(new PaginatedRequest { PageSize = 1000 });
+            // FullCalendar sends 'start' and 'end' parameters as ISO8601 strings.
+            // If they are null, we fall back to a reasonable default range (e.g., current month).
+            DateTime from = start ?? DateTime.Now.AddMonths(-1);
+            DateTime to = end ?? DateTime.Now.AddMonths(1);
+
+            var result = await _meetingService.GetCalendarEvents(from, to);
             
-            var events = result.Items
-                .Where(m => m.StartAt != default && m.EndAt != default) // Filter out invalid dates
+            var events = result
                 .Select(m => new {
                     id = m.Id,
                     title = m.Title,
@@ -202,7 +205,7 @@ public class MeetingController : Controller
         }
         catch (Exception ex)
         {
-            return Json(new { error = ex.Message }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            return Json(new { error = ex.Message });
         }
     }
 }

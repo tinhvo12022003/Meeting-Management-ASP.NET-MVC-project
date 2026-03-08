@@ -112,24 +112,22 @@ public class MeetingUserService : IMeetingUserService
 
     public async Task<PaginatedResponse<MeetingUserViewModel>> GetUserMeetings(string userId, PaginatedRequest request)
     {
-        var meetingUsers = await _unitOfWork.MeetingUsers.GetByUserId(userId);
-        
-        var total = meetingUsers.Count;
-        var items = meetingUsers
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .Select(p => new MeetingUserViewModel
-            {
-                MeetingId = p.MeetingId,
-                UserId = p.UserId,
-                FullName = p.User?.FullName ?? string.Empty,
-                Title = p.Meeting?.Title ?? string.Empty,
-                StartAt = p.Meeting?.StartAt ?? DateTime.MinValue,
-                EndAt = p.Meeting?.EndAt ?? DateTime.MinValue,
-                RoomName = p.Meeting?.MeetingRoom?.Name ?? string.Empty,
-                Role = p.Role,
-                IsConfirmed = p.IsConfirmed
-            }).ToList();
+        // Phân trang trực tiếp tại DB — không load toàn bộ records về RAM
+        var (meetingUsers, total) = await _unitOfWork.MeetingUsers.GetPaginatedByUserId(
+            userId, request.PageNumber, request.PageSize);
+
+        var items = meetingUsers.Select(p => new MeetingUserViewModel
+        {
+            MeetingId = p.MeetingId,
+            UserId = p.UserId,
+            FullName = p.User?.FullName ?? string.Empty,
+            Title = p.Meeting?.Title ?? string.Empty,
+            StartAt = p.Meeting?.StartAt ?? DateTime.MinValue,
+            EndAt = p.Meeting?.EndAt ?? DateTime.MinValue,
+            RoomName = p.Meeting?.MeetingRoom?.Name ?? string.Empty,
+            Role = p.Role,
+            IsConfirmed = p.IsConfirmed
+        }).ToList();
 
         return new PaginatedResponse<MeetingUserViewModel>
         {

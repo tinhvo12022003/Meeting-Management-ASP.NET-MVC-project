@@ -150,7 +150,7 @@
                                             {
                                                 foreach (var d in (IEnumerable<DepartmentViewModel>)ViewBag.Departments)
                                                 {
-                                                    <option value="@d.Id" data-company="@d.CompanyId">@d.Name</option>
+                                                    <option value="@d.Id">@d.Name</option>
                                                 }
                                             }
                                         </select>
@@ -176,60 +176,51 @@
 </div>
 
 @section Styles {
-    <style>
-        :root { 
-            --primary-color: #4f46e5; 
-            --primary-light: #eef2ff;
-            --success-light: #f0fdf4;
-            --success-color: #16a34a;
-            --warning-light: #fffbeb;
-            --warning-color: #d97706;
-        }
-        
-        .main-card { border-radius: 20px; background: #fff; }
-        .back-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; transition: all 0.3s; }
-        .back-btn:hover { transform: translateX(-4px); background: var(--primary-light); color: var(--primary-color) !important; }
-        
-        .custom-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #475569; margin-bottom: 0.5rem; display: block; letter-spacing: 0.5px; }
-        .form-control, .custom-select { border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 0.7rem 1rem; height: auto; font-size: 0.95rem; background-color: #f8fafc; transition: all 0.2s; }
-        .form-control:focus, .custom-select:focus { background-color: #fff; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08); outline: none; }
-        
-        .input-group-text { background: #f1f5f9; border: 1.5px solid #e2e8f0; border-right: none; border-radius: 10px 0 0 10px; color: #94a3b8; }
-        .input-group .form-control { border-left: none; border-radius: 0 10px 10px 0; }
-        
-        .btn-save { background: var(--primary-color); color: white; border: none; border-radius: 10px; padding: 0.8rem 2.5rem; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15); transition: all 0.3s; }
-        .btn-save:hover { background: #4338ca; transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2); color: white; }
-        
-        .badge-soft-primary { background-color: var(--primary-light); color: var(--primary-color); border-radius: 8px; font-weight: 600; }
-        .badge-soft-success { background-color: var(--success-light); color: var(--success-color); border-radius: 8px; font-weight: 600; }
-        .badge-soft-warning { background-color: var(--warning-light); color: var(--warning-color); border-radius: 8px; font-weight: 600; }
-        
-        @@media (min-width: 768px) { .border-right-md { border-right: 1px solid #f1f5f9; } }
-    </style>
+    <link rel="stylesheet" href="~/css/register-user.css">
 }
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-             $('#companySelect').on('change', function() {
+            var initialLoad = true;
+            $('#companySelect').on('change', function() {
                 var selectedCompanyId = $(this).val();
+                var $deptSelect = $('#deptSelect');
+                var currentDeptId = $deptSelect.val();
+
                 if (!selectedCompanyId) {
-                    $('#deptSelect option').show();
-                } else {
-                    $('#deptSelect option').each(function() {
-                        var deptCompanyId = $(this).data('company');
-                        if (deptCompanyId == selectedCompanyId || !deptCompanyId) {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
+                    $deptSelect.html('<option value="">-- Chọn phòng ban --</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/department/GetDepartmentsByCompany',
+                    type: 'GET',
+                    data: { companyId: selectedCompanyId },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            var options = '<option value="">-- Chọn phòng ban --</option>';
+                            response.data.forEach(function(dept) {
+                                options += '<option value="' + dept.id + '">' + dept.name + '</option>';
+                            });
+                            
+                            var valToSet = initialLoad ? '@(Model?.DepartmentId ?? "")' : currentDeptId;
+                            $deptSelect.html(options);
+                            if (valToSet) {
+                                $deptSelect.val(valToSet);
+                            }
+                            initialLoad = false;
                         }
-                    });
-                }
-                if ($('#deptSelect option:selected').css('display') === 'none') {
-                    $('#deptSelect').val('');
-                }
+                    },
+                    error: function() {
+                        alert('Lỗi khi tải danh sách phòng ban!');
+                    }
+                });
             });
-            $('#companySelect').trigger('change');
+
+            if($('#companySelect').val()) {
+                $('#companySelect').trigger('change');
+            }
         });
     </script>
 }

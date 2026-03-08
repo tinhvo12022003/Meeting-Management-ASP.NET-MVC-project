@@ -34,4 +34,16 @@ public class MeetingRepository : GenericRepository<MeetingModel>, IMeetingReposi
         var query = await _context.Meeting.FirstOrDefaultAsync(x => x.StartAt == StartAt && x.EndAt == EndAt && x.RoomId == RoomId);
         return query;
     }
+
+    public async Task<List<MeetingModel>> GetByDateRange(DateTime start, DateTime end)
+    {
+        return await _context.Meeting
+            .Include(x => x.MeetingRoom)
+            .Include(x => x.Company)
+            .Include(x => x.Department)
+            .Where(x => x.RowStatus == RowStatus.ACTIVE && 
+                        x.StartAt < end && 
+                        x.EndAt > start)
+            .ToListAsync();
+    }
 }

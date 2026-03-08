@@ -75,6 +75,10 @@
             "System.Linq.Dynamic.Core": {
               "target": "Package",
               "version": "[1.7.1, )"
+            },
+            "System.Runtime.Caching": {
+              "target": "Package",
+              "version": "[10.0.3, )"
             }
           },
           "imports": [

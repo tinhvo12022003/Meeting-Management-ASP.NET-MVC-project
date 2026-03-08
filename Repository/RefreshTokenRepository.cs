@@ -46,4 +46,14 @@ public class RefreshTokenRepository : GenericRepository<RefreshTokenModel>, IRef
             .Where(t => t.UserId == UserId && t.RevokedAt == null)
             .ExecuteUpdateAsync(x => x.SetProperty(t => t.RevokedAt, now));
     }
+
+    public async Task PurgeExpiredByUserId(string userId, int olderThanDays)
+    {
+        var cutoff = DateTime.UtcNow.AddDays(-olderThanDays);
+        await _context.RefreshToken
+            .Where(t => t.UserId == userId && 
+                        (t.ExpiresAt < DateTime.UtcNow || t.RevokedAt != null) && 
+                        t.LoginAt < cutoff)
+            .ExecuteDeleteAsync();
+    }
 }

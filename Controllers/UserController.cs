@@ -37,7 +37,7 @@ public class UserController : Controller
         }
 
         ViewBag.Companies = await _companyService.GetAllActive();
-        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+        ViewBag.Departments = await _departmentService.GetAllActive();
 
         return View(model);
     }
@@ -67,7 +67,7 @@ public class UserController : Controller
             TempData["Error"] = "Dữ liệu không hợp lệ: " + errors;
 
             ViewBag.Companies = await _companyService.GetAllActive();
-            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+            ViewBag.Departments = await _departmentService.GetAllActive();
             return View(model);
         }
 
@@ -88,7 +88,7 @@ public class UserController : Controller
         {
             TempData["Error"] = ex.Message;
             ViewBag.Companies = await _companyService.GetAllActive();
-            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+            ViewBag.Departments = await _departmentService.GetAllActive();
             return View(model);
         }
     }
@@ -100,7 +100,10 @@ public class UserController : Controller
         var result = await _userService.Find(request, companyId, departmentId);
 
         var companies = await _companyService.GetAllActive();
-        var departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, companyId)).Items;
+        var allDepartments = await _departmentService.GetAllActive();
+        var departments = string.IsNullOrEmpty(companyId) 
+            ? allDepartments 
+            : allDepartments.Where(d => d.CompanyId == companyId).ToList();
 
         ViewBag.Companies = companies;
         ViewBag.Departments = departments;
@@ -115,7 +118,7 @@ public class UserController : Controller
     public async Task<IActionResult> Register()
     {
         ViewBag.Companies = await _companyService.GetAllActive();
-        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 })).Items;
+        ViewBag.Departments = await _departmentService.GetAllActive();
         return View();
     }
 
@@ -131,7 +134,10 @@ public class UserController : Controller
         }
 
         ViewBag.Companies = await _companyService.GetAllActive();
-        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+        var allDepts = await _departmentService.GetAllActive();
+        ViewBag.Departments = string.IsNullOrEmpty(model.CompanyId)
+            ? allDepts
+            : allDepts.Where(d => d.CompanyId == model.CompanyId).ToList();
         
         return View(model);
     }
@@ -146,18 +152,28 @@ public class UserController : Controller
             return RedirectToAction("Index");
         }
         ViewBag.Companies = await _companyService.GetAllActive();
-        ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+        ViewBag.Departments = await _departmentService.GetAllActive();
         return View(model);
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     [Permission("User.Update.Edit")]
     public async Task<IActionResult> Update(UserUpdateModel model)
     {
+        if (string.IsNullOrWhiteSpace(model.PlainPassword))
+        {
+            ModelState.Remove(nameof(model.PlainPassword));
+            ModelState.Remove(nameof(model.ConfirmPlainPassword));
+        }
+
         if (!ModelState.IsValid)
         {
             ViewBag.Companies = await _companyService.GetAllActive();
-            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+            var allDepts = await _departmentService.GetAllActive();
+            ViewBag.Departments = string.IsNullOrEmpty(model.CompanyId)
+                ? allDepts
+                : allDepts.Where(d => d.CompanyId == model.CompanyId).ToList();
             return View(model);
         }
         try 
@@ -170,7 +186,10 @@ public class UserController : Controller
         {
             TempData["Error"] = ex.Message;
             ViewBag.Companies = await _companyService.GetAllActive();
-            ViewBag.Departments = (await _departmentService.Find(new PaginatedRequest { PageSize = 1000 }, model.CompanyId)).Items;
+            var allDepts = await _departmentService.GetAllActive();
+            ViewBag.Departments = string.IsNullOrEmpty(model.CompanyId)
+                ? allDepts
+                : allDepts.Where(d => d.CompanyId == model.CompanyId).ToList();
             return View(model);
         }
     } 

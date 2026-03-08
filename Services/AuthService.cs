@@ -119,6 +119,10 @@ public class AuthService : IAuthService
             await _unitOfWork.RefreshTokens.Add(refreshTokenEntity);
         }
 
+        // Housekeeping: xóa token đã hết hạn/bị thu hồi quá 30 ngày của user này
+        // Dùng ExecuteDeleteAsync — xóa trực tiếp ở DB, không load vào RAM
+        await _unitOfWork.RefreshTokens.PurgeExpiredByUserId(account.Id, olderThanDays: 30);
+
         await _unitOfWork.CommitAsync();
 
         return new AccountLoginResponse
@@ -163,14 +167,13 @@ public class AuthService : IAuthService
         await _unitOfWork.RefreshTokens.Update(tokenData);
         await _unitOfWork.CommitAsync();
 
-        // Fetch user and account information
-        var account = await _unitOfWork.Users.GetById(tokenData.UserId);
-        var user = await _userRepository.GetById(tokenData.User.Id)
+        // Fetch user using UserId from the token record directly (safe, no navigation property dependency)
+        var user = await _userRepository.GetById(tokenData.UserId)
             ?? throw new Exception("User not found");
 
         var accessToken = await _jwtService.GenerateAccessToken(
             tokenData.UserId,
-            tokenData.User.Username
+            user.Username
         );
 
         return new AccountLoginResponse

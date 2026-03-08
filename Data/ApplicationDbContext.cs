@@ -89,6 +89,7 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).IsRequired().HasColumnName(name: "Id").HasColumnType(typeName: "NVARCHAR(100)").HasValueGenerator<PrefixStringIdGenerator>().ValueGeneratedOnAdd();
             entity.Property(e => e.Name).IsRequired().HasColumnName(name: "Name").HasColumnType(typeName: "NVARCHAR(255)");
+            entity.Property(e => e.Location).IsRequired().HasColumnName(name: "Location").HasColumnType(typeName: "NVARCHAR(100)");
             entity.Property(e => e.CompanyId).IsRequired().HasColumnName(name: "CompanyId").HasColumnType(typeName: "NVARCHAR(100)");
             entity.HasOne(a => a.Company).WithMany(p => p.Departments).HasForeignKey(a => a.CompanyId).OnDelete(DeleteBehavior.NoAction);
             entity.Property(e => e.TotalStaff).HasColumnName(name: "TotalStaff").HasColumnType(typeName: "INT");
@@ -121,6 +122,7 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).IsRequired().HasColumnName(name: "Id").HasColumnType(typeName: "NVARCHAR(100)").HasValueGenerator<PrefixStringIdGenerator>().ValueGeneratedOnAdd();
             entity.Property(e => e.Name).IsRequired().HasColumnName(name: "Name").HasColumnType(typeName: "NVARCHAR(255)");
+            entity.Property(e => e.Location).HasColumnName(name: "Location").HasColumnType(typeName: "NVARCHAR(255)");
             entity.Property(e => e.CompanyId).HasColumnName(name: "CompanyId").HasColumnType(typeName: "NVARCHAR(100)");
             entity.HasOne(a => a.Company).WithMany(p => p.Rooms).HasForeignKey(a => a.CompanyId).OnDelete(DeleteBehavior.NoAction);
             entity.Property(e => e.Capacity).HasColumnName(name: "Capacity").HasColumnType(typeName: "INT");
@@ -165,7 +167,7 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("Users");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).IsRequired().HasColumnName(name: "Id").HasColumnType(typeName: "NVARCHAR(100)").HasValueGenerator<PrefixStringIdGenerator>().ValueGeneratedOnAdd();
-            entity.Property(e => e.FullName).HasColumnName(name: "FullName").HasColumnType(typeName: "NVARCHAR(50)");
+            entity.Property(e => e.FullName).HasColumnName(name: "FullName").HasColumnType(typeName: "NVARCHAR(100)");
             entity.Property(e => e.Address).HasColumnName(name: "Address").HasColumnType(typeName: "NVARCHAR(255)");
             entity.Property(e => e.Phone).HasColumnName(name: "Phone").HasColumnType(typeName: "NVARCHAR(50)");
             entity.Property(e => e.Birthday).HasColumnName(name: "Birthday").HasColumnType(typeName: "DATE");
@@ -175,7 +177,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.CompanyId).HasColumnName(name: "CompanyId").HasColumnType(typeName: "NVARCHAR(100)");
             entity.HasOne(a => a.Company).WithMany(p => p.Users).HasForeignKey(a => a.CompanyId).OnDelete(DeleteBehavior.NoAction);
             entity.Property(e => e.Username).HasColumnName(name: "Username").HasColumnType(typeName: "NVARCHAR(100)");
-            entity.Property(e => e.HashPassword).HasColumnName(name: "Password").HasColumnType(typeName: "NVARCHAR(100)");
+            entity.Property(e => e.HashPassword).HasColumnName(name: "Password").HasColumnType(typeName: "NVARCHAR(512)");
             entity.Property(e => e.userType).HasColumnName(name: "Type").HasColumnType(typeName: "TINYINT").HasConversion<int>();
         });
 
