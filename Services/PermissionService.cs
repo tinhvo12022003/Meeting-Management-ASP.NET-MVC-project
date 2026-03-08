@@ -5,6 +5,7 @@ using MeetingManagement.Interface.IService;
 using MeetingManagement.Interface.IUnitOfWork;
 using MeetingManagement.Models;
 using MeetingManagement.Models.DTOs;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MeetingManagement.Service;
 
@@ -12,11 +13,13 @@ public class PermissionService : IPermissionService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserHelper _helper;
+    private readonly IMemoryCache _cache;
 
-    public PermissionService(IUnitOfWork unitOfWork, UserHelper helper)
+    public PermissionService(IUnitOfWork unitOfWork, UserHelper helper, IMemoryCache cache)
     {
         _unitOfWork = unitOfWork;
         _helper = helper;
+        _cache = cache;
     }
 
     public async Task Create (PermissionCreateModel model)
@@ -51,6 +54,7 @@ public class PermissionService : IPermissionService
         };
         await _unitOfWork.Permissions.Add(permission);
         await _unitOfWork.CommitAsync();
+        _cache.Remove($"permissions_{model.UserId}");
     }
 
     public async Task Update (PermissionUpdateModel model)
@@ -83,6 +87,7 @@ public class PermissionService : IPermissionService
 
         await _unitOfWork.Permissions.Update(permission);
         await _unitOfWork.CommitAsync();
+        _cache.Remove($"permissions_{model.UserId}");
     }
 
 
@@ -149,5 +154,41 @@ public class PermissionService : IPermissionService
         // 3. AddRange một lần duy nhất → commit 1 transaction
         await _unitOfWork.Permissions.AddRange(permissionEntities);
         await _unitOfWork.CommitAsync();
+        _cache.Remove($"permissions_{model.UserId}");
     }
-} 
+
+    public async Task<List<string>> GetPermissionsForUser(string userId)
+    {
+        var permissions = await _unitOfWork.Permissions.GetByUserId(userId);
+        var permissionList = new List<string>();
+
+        foreach (var p in permissions)
+        {
+            var controller = string.IsNullOrWhiteSpace(p.Controller) ? "*" : p.Controller;
+            var action = string.IsNullOrWhiteSpace(p.Action) ? "*" : p.Action;
+
+            if (p.FullPermission)
+            {
+                permissionList.Add($"{controller}.*");
+                continue;
+            }
+
+            if (p.View)
+                permissionList.Add($"{controller}.{action}.View");
+            if (p.Insert)
+                permissionList.Add($"{controller}.{action}.Insert");
+            if (p.Edit)
+                permissionList.Add($"{controller}.{action}.Edit");
+            if (p.Delete)
+                permissionList.Add($"{controller}.{action}.Delete");
+            if (p.InsertAll)
+                permissionList.Add($"{controller}.{action}.InsertAll");
+            if (p.EditAll)
+                permissionList.Add($"{controller}.{action}.EditAll");
+            if (p.DeleteAll)
+                permissionList.Add($"{controller}.{action}.DeleteAll");
+        }
+
+        return permissionList;
+    }
+}

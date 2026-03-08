@@ -8,6 +8,7 @@
     ViewData["Title"] = "Quản lý Lịch họp";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var currentUserId = UserHelper.GetCurrentUser();
+    var canEditOthers = await UserHelper.HasPermission("Meeting.Update.EditAll");
 }
 
 <div class="container-fluid py-4">
@@ -296,7 +297,7 @@
                                         <td class="text-right">
                                             <div class="action-btns d-flex align-items-center justify-content-end gap-2">
                                                 <!-- Nút Edit -->
-                                                @if (item.CreatedBy == currentUserId)
+                                                @if (item.CreatedBy == currentUserId || canEditOthers)
                                                 {
                                                     <a asp-action="Update" asp-route-id="@item.Id" 
                                                     class="btn-icon btn-edit" 
@@ -480,6 +481,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const currentUserId = '@currentUserId';
+            const canEditOthers = @canEditOthers.ToString().ToLower();
             var Calendar = FullCalendar.Calendar;
             var Draggable = FullCalendar.Draggable;
 
@@ -836,13 +838,13 @@
                 eventDidMount: function(info) {
                     // Add tooltip and custom styling to events
                     const props = info.event.extendedProps;
-                    const isMine = props.createdBy === currentUserId;
+                    const canEdit = props.createdBy === currentUserId || canEditOthers;
                     const creator = props.createdBy ? `<br/>ID Người tạo: ${props.createdBy}` : '';
-                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}${creator} ${!isMine ? '<br/>(Chỉ xem)' : ''}`;
+                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}${creator} ${!canEdit ? '<br/>(Chỉ xem)' : ''}`;
                     
-                    $(info.el).css('cursor', isMine ? 'pointer' : 'default');
+                    $(info.el).css('cursor', canEdit ? 'pointer' : 'default');
 
-                    if (!isMine) {
+                    if (!canEdit) {
                         $(info.el).addClass('event-blurred');
                     }
                     
@@ -867,7 +869,7 @@
 
                 // When an existing event is dropped (rescheduled)
                 eventDrop: function(info) {
-                    if (info.event.extendedProps.createdBy !== currentUserId) {
+                    if (info.event.extendedProps.createdBy !== currentUserId && !canEditOthers) {
                         Swal.fire('Quyền hạn', 'Bạn không thể dời lịch họp của người khác!', 'warning');
                         info.revert();
                         return;
@@ -907,7 +909,7 @@
                 
                 // When an existing event is resized (duration changed)
                 eventResize: function(info) {
-                    if (info.event.extendedProps.createdBy !== currentUserId) {
+                    if (info.event.extendedProps.createdBy !== currentUserId && !canEditOthers) {
                         Swal.fire('Quyền hạn', 'Bạn không thể thay đổi thời lượng họp của người khác!', 'warning');
                         info.revert();
                         return;
@@ -1057,7 +1059,7 @@
                     document.getElementById('editEventBtn').href = `/Meeting/Update/${event.id}`;
                     
                     // Permission Check
-                    if (props.createdBy === currentUserId) {
+                    if (props.createdBy === currentUserId || canEditOthers) {
                         document.getElementById('editEventBtn').style.display = 'inline-block';
                     } else {
                         document.getElementById('editEventBtn').style.display = 'none';

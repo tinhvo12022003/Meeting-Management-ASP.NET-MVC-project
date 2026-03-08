@@ -9,5 +9,6 @@ public interface IPermissionService
     public Task Update (PermissionUpdateModel model);
     // public Task Delete (string Id);
     public Task<PaginatedResponse<PermissionViewModel>> Find (PaginatedRequest request); 
+    public Task<List<string>> GetPermissionsForUser(string userId);
     public Task AddBulkPermissions(PermissionCreateBulkModel model);
 }
