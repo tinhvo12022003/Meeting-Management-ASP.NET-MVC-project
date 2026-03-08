@@ -2,10 +2,12 @@
 @using MeetingManagement.Models.DTOs
 @using MeetingManagement.Enum
 @model PaginatedResponse<MeetingViewModel>
+@inject MeetingManagement.Helper.UserHelper UserHelper
 
 @{
     ViewData["Title"] = "Quản lý Lịch họp";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentUserId = UserHelper.GetCurrentUser();
 }
 
 <div class="container-fluid py-4">
@@ -294,22 +296,29 @@
                                         <td class="text-right">
                                             <div class="action-btns d-flex align-items-center justify-content-end gap-2">
                                                 <!-- Nút Edit -->
-                                                <a asp-action="Update" asp-route-id="@item.Id" 
-                                                class="btn-icon btn-edit" 
-                                                title="Chỉnh sửa">
-                                                    <i class="fas fa-pen"></i>
-                                                </a>
+                                                @if (item.CreatedBy == currentUserId)
+                                                {
+                                                    <a asp-action="Update" asp-route-id="@item.Id" 
+                                                    class="btn-icon btn-edit" 
+                                                    title="Chỉnh sửa">
+                                                        <i class="fas fa-pen"></i>
+                                                    </a>
 
-                                                <!-- Nút Delete (giữ form để POST) -->
-                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" 
-                                                    style="margin: 0; display: inline;" 
-                                                    onsubmit="return confirm('Bạn có chắc muốn xóa cuộc họp này?');">
-                                                    <button type="submit" 
-                                                            class="btn-icon btn-delete" 
-                                                            title="Xóa">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </button>
-                                                </form>
+                                                    <!-- Nút Delete (giữ form để POST) -->
+                                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" 
+                                                        style="margin: 0; display: inline;" 
+                                                        onsubmit="return confirm('Bạn có chắc muốn xóa cuộc họp này?');">
+                                                        <button type="submit" 
+                                                                class="btn-icon btn-delete" 
+                                                                title="Xóa">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-light text-muted small"><i class="fas fa-lock mr-1"></i> Chỉ xem</span>
+                                                }
                                             </div>
                                         </td>
                                     </tr>
@@ -448,6 +457,17 @@
     <!-- FullCalendar CSS -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     <link rel="stylesheet" href="~/css/index-meeting.css">
+    <style>
+        .event-blurred {
+            opacity: 0.45 !important;
+            filter: grayscale(0.4) !important;
+            cursor: default !important;
+            border-style: dashed !important;
+        }
+        .event-blurred .fc-event-title, .event-blurred .fc-event-time {
+            font-weight: normal !important;
+        }
+    </style>
 }
 
 @section Scripts {
@@ -459,6 +479,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const currentUserId = '@currentUserId';
             var Calendar = FullCalendar.Calendar;
             var Draggable = FullCalendar.Draggable;
 
@@ -815,10 +836,15 @@
                 eventDidMount: function(info) {
                     // Add tooltip and custom styling to events
                     const props = info.event.extendedProps;
-                    const creator = props.createdBy ? `<br/>Người tạo: ${props.createdBy}` : '';
-                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}${creator}`;
+                    const isMine = props.createdBy === currentUserId;
+                    const creator = props.createdBy ? `<br/>ID Người tạo: ${props.createdBy}` : '';
+                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}${creator} ${!isMine ? '<br/>(Chỉ xem)' : ''}`;
                     
-                    $(info.el).css('cursor', 'pointer');
+                    $(info.el).css('cursor', isMine ? 'pointer' : 'default');
+
+                    if (!isMine) {
+                        $(info.el).addClass('event-blurred');
+                    }
                     
                     // Force the color again if needed (FullCalendar handles it but just in case)
                     if (props.color) {
@@ -841,6 +867,11 @@
 
                 // When an existing event is dropped (rescheduled)
                 eventDrop: function(info) {
+                    if (info.event.extendedProps.createdBy !== currentUserId) {
+                        Swal.fire('Quyền hạn', 'Bạn không thể dời lịch họp của người khác!', 'warning');
+                        info.revert();
+                        return;
+                    }
                     const evt = info.event;
                     $.ajax({
                         url: '/Meeting/Reschedule',
@@ -876,6 +907,11 @@
                 
                 // When an existing event is resized (duration changed)
                 eventResize: function(info) {
+                    if (info.event.extendedProps.createdBy !== currentUserId) {
+                        Swal.fire('Quyền hạn', 'Bạn không thể thay đổi thời lượng họp của người khác!', 'warning');
+                        info.revert();
+                        return;
+                    }
                     const evt = info.event;
                     $.ajax({
                         url: '/Meeting/Reschedule',
@@ -1019,6 +1055,14 @@
                     }
 
                     document.getElementById('editEventBtn').href = `/Meeting/Update/${event.id}`;
+                    
+                    // Permission Check
+                    if (props.createdBy === currentUserId) {
+                        document.getElementById('editEventBtn').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('editEventBtn').style.display = 'none';
+                    }
+
                     $('#eventModal').modal('show');
                 }
             });

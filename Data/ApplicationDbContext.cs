@@ -198,6 +198,37 @@ public class ApplicationDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
 
-        // modelBuilder.Entity<BaseModel>().HasQueryFilter(e => e.rowStatus == RowStatus.ACTIVE);
+        // --- GLOBAL QUERY FILTERS (Soft Delete) ---
+        // Tự động ẩn các record đã bị xóa (INACTIVE) ở mọi câu query
+        modelBuilder.Entity<CompanyModel>().HasQueryFilter(x => x.RowStatus == RowStatus.ACTIVE);
+        modelBuilder.Entity<DepartmentModel>().HasQueryFilter(x => x.RowStatus == RowStatus.ACTIVE);
+        modelBuilder.Entity<MeetingModel>().HasQueryFilter(x => x.RowStatus == RowStatus.ACTIVE);
+        modelBuilder.Entity<MeetingRoomModel>().HasQueryFilter(x => x.RowStatus == RowStatus.ACTIVE);
+        modelBuilder.Entity<UserModel>().HasQueryFilter(x => x.RowStatus == RowStatus.ACTIVE);
+
+        // --- PERFORMANCE INDEXES ---
+        
+        // Users: Tối ưu login và filter
+        modelBuilder.Entity<UserModel>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
+        
+        modelBuilder.Entity<UserModel>()
+            .HasIndex(u => new { u.CompanyId, u.DepartmentId });
+
+        // Meetings: Tối ưu lịch họp và kiểm tra trùng (Overlap search)
+        modelBuilder.Entity<MeetingModel>()
+            .HasIndex(m => new { m.RoomId, m.StartAt, m.EndAt });
+
+        modelBuilder.Entity<MeetingModel>()
+            .HasIndex(m => new { m.CompanyId, m.DepartmentId });
+
+        // Departments: Tối ưu lọc theo công ty
+        modelBuilder.Entity<DepartmentModel>()
+            .HasIndex(d => d.CompanyId);
+
+        // MeetingRooms: Tối ưu lọc theo công ty
+        modelBuilder.Entity<MeetingRoomModel>()
+            .HasIndex(r => r.CompanyId);
     }
 }

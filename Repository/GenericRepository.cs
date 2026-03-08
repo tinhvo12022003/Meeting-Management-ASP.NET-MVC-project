@@ -35,7 +35,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public virtual async Task<List<T>> GetAll()
     {
-        return await _dbSet.ToListAsync();
+        return await _dbSet.AsNoTracking().ToListAsync();
     }
 
 
@@ -56,7 +56,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         CancellationToken cancellationToken = default,
         params string[]? includes)
     {
-        IQueryable<T> query = _dbSet.AsQueryable();
+        IQueryable<T> query = _dbSet.AsNoTracking();
 
         if (includes != null)
         {

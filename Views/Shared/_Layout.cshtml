@@ -138,8 +138,16 @@
                             $('#sidebarBackdrop').on('click', function () {
                                 closeSidebar();
                             });
+
+                            // Global AJAX Antiforgery Setup
+                            $.ajaxSetup({
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader('X-XSRF-TOKEN', $('input:hidden[name="__RequestVerificationToken"]').val());
+                                }
+                            });
                         });
     </script>
+    @Html.AntiForgeryToken()
 
     @await RenderSectionAsync("Scripts", required: false)
     @await RenderSectionAsync("AfterBodyScripts", required: false)
