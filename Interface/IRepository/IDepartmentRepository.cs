@@ -6,5 +6,6 @@ public interface IDepartmentRepository : IGenericRepository<DepartmentModel>
 {
     public Task<DepartmentModel?> GetByName (string CompanyId, string DepartmentName);
     public Task<bool> Existed (string CompanyId, string DepartmentName);
+    public Task<bool> AnyActiveByCompanyId(string companyId);
     public Task<List<DepartmentModel>> GetAllActive();
 }

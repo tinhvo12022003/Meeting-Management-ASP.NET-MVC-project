@@ -135,10 +135,10 @@
                                         <a href="/Company/Update/@item.Id" class="btn-icon-link btn-edit" title="Chỉnh sửa">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form asp-action="Delete" asp-controller="Company" method="post" style="display:inline;">
+                                        <form asp-action="Delete" asp-controller="Company" method="post" id="deleteForm-@item.Id" style="display:inline;">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn-icon-link btn-delete" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa công ty \"@item.Name\"?');">
+                                            <button type="button" class="btn-icon-link btn-delete" title="Xóa" onclick="confirmDelete('@item.Id', '@item.Name')">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </form>
@@ -206,11 +206,45 @@
 
 @section Scripts {
     <script>
-        function deleteCompany(id, name) {
-            if (confirm('Bạn có chắc chắn muốn xóa công ty "' + name + '"?')) {
-                // Triển khai logic xóa ở đây (ví dụ: gọi API)
-                alert('Đang thực hiện xóa công ty có ID: ' + id);
-            }
+        function confirmDelete(id, name) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: `Bạn có chắc chắn muốn xóa công ty "${name}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm-' + id).submit();
+                }
+            });
         }
+
+        $(document).ready(function () {
+            var errorMessage = @Html.Raw(Json.Serialize(TempData["ErrorMessage"]));
+            var successMessage = @Html.Raw(Json.Serialize(TempData["SuccessMessage"]));
+
+            if (errorMessage) {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonText: 'Đóng'
+                });
+            }
+
+            if (successMessage) {
+                Swal.fire({
+                    title: 'Thành công!',
+                    text: successMessage,
+                    icon: 'success',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        });
     </script>
 }

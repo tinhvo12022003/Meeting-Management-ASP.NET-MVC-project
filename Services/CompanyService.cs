@@ -92,6 +92,13 @@ public class CompanyService : ICompanyService
         {
             throw new Exception(MessageConstant.INACTIVE);
         }
+
+        var hasDepartments = await _unitOfWork.Departments.AnyActiveByCompanyId(CompanyId);
+        if (hasDepartments)
+        {
+            throw new Exception(MessageConstant.COMPANY_HAS_DEPARTMENTS);
+        }
+
         company.RowStatus = RowStatus.INACTIVE;
         company.UpdateAt = DateTime.UtcNow;
         company.UpdateBy = _helper.GetCurrentUser();

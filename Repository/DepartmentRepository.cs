@@ -23,6 +23,10 @@ public class DepartmentRepository : GenericRepository<DepartmentModel>, IDepartm
     {
         return await _context.Department.AnyAsync(x => x.Company.Id == CompanyId && x.Name == DepartmentName && x.RowStatus == RowStatus.ACTIVE);
     }
+    public async Task<bool> AnyActiveByCompanyId(string companyId)
+    {
+        return await _context.Department.AnyAsync(x => x.CompanyId == companyId && x.RowStatus == RowStatus.ACTIVE);
+    }
 
     public async Task<List<DepartmentModel>> GetAllActive()
     {

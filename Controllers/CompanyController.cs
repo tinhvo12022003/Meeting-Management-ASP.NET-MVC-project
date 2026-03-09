@@ -96,7 +96,15 @@ public class CompanyController : Controller
         if (string.IsNullOrWhiteSpace(id))
             return RedirectToAction("Index");
 
-        await _companyService.Delete(id);
+        try
+        {
+            await _companyService.Delete(id);
+            TempData["SuccessMessage"] = "Xóa công ty thành công.";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
         return RedirectToAction("Index");
     }
 
