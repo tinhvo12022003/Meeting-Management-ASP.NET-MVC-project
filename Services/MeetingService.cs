@@ -184,11 +184,25 @@ public class MeetingService : IMeetingService
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task<PaginatedResponse<MeetingViewModel>> Find (PaginatedRequest request)
+    public async Task<PaginatedResponse<MeetingViewModel>> Find (PaginatedRequest request, string? companyId = null, string? departmentId = null)
     {
+        System.Linq.Expressions.Expression<Func<MeetingModel, bool>> filter = x => x.RowStatus == RowStatus.ACTIVE;
+        
+        if (!string.IsNullOrEmpty(companyId))
+        {
+            var originalFilter = filter;
+            filter = x => x.RowStatus == RowStatus.ACTIVE && x.CompanyId == companyId;
+        }
+        
+        if (!string.IsNullOrEmpty(departmentId))
+        {
+            var currentFilter = filter;
+            filter = x => x.RowStatus == RowStatus.ACTIVE && (string.IsNullOrEmpty(companyId) || x.CompanyId == companyId) && x.DepartmentId == departmentId;
+        }
+
         var paginatedResult = await _unitOfWork.Meetings.GetPaginated(
             request,
-            baseFilter: x => x.RowStatus == RowStatus.ACTIVE,
+            baseFilter: filter,
             searchFields: "Title",
             includes: new[] { "MeetingRoom", "Company", "Department" }
         );
@@ -244,10 +258,17 @@ public class MeetingService : IMeetingService
         };
     }
 
-    public async Task<List<MeetingViewModel>> GetCalendarEvents(DateTime start, DateTime end)
+    public async Task<List<MeetingViewModel>> GetCalendarEvents(DateTime start, DateTime end, string? companyId = null, string? departmentId = null)
     {
         var meetings = await _unitOfWork.Meetings.GetByDateRange(start, end);
-        return meetings.Select(x => new MeetingViewModel
+        
+        var query = meetings.AsQueryable();
+        if (!string.IsNullOrEmpty(companyId))
+            query = query.Where(x => x.CompanyId == companyId);
+        if (!string.IsNullOrEmpty(departmentId))
+            query = query.Where(x => x.DepartmentId == departmentId);
+
+        return query.Select(x => new MeetingViewModel
         {
             Id = x.Id,
             Title = x.Title,
@@ -259,9 +280,9 @@ public class MeetingService : IMeetingService
             Url = x.Url,
             Color = x.Color,
             CreatedBy = x.CreateBy,
-            RoomName = x.MeetingRoom?.Name ?? string.Empty,
-            CompanyName = x.Company?.Name ?? string.Empty,
-            DepartmentName = x.Department?.Name ?? string.Empty
+            RoomName = x.MeetingRoom.Name ?? string.Empty,
+            CompanyName = x.Company.Name ?? string.Empty,
+            DepartmentName = x.Department.Name ?? string.Empty
         }).ToList();
     }
 }

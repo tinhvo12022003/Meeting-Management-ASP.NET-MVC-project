@@ -201,12 +201,14 @@ body.sidebar-expanded main.content {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(15, 23, 42, 0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, 0.4);
     z-index: 900;
     display: none;
+    transition: var(--transition);
 }
 
-body.sidebar-expanded .sidebar-backdrop {
-    display: block;
+@media (max-width: 768px) {
+    body.sidebar-expanded .sidebar-backdrop {
+        display: block;
+    }
 }

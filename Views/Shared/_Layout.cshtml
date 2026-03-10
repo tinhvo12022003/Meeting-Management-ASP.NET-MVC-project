@@ -15,7 +15,7 @@
     @await RenderSectionAsync(name: "Styles", required: false)
 </head>
 
-<body>
+<body class="sidebar-expanded">
     <div class="d-flex" id="wrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -26,13 +26,21 @@
             </div>
             <ul class="menu">
 
-                <li>
+                @* <li>
                     <a asp-controller="Home" asp-action="Index"
                            class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
                         <i class="fas fa-home menu-icon"></i>
                         <span class="menu-text">Trang chủ</span>
                     </a>
+                </li> *@
+
+                <li>
+                    <a asp-controller="Meeting" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Meeting" ? "active" : "")">
+                        <i class="fas fa-calendar-alt menu-icon"></i>
+                        <span class="menu-text">Lịch họp</span>
+                    </a>
                 </li>
+
                 <li>
                     <a asp-controller="Company" asp-action="Index"
                            class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Company" ? "active" : "")">
@@ -67,12 +75,7 @@
                         <span class="menu-text">Phân quyền</span>
                     </a>
                 </li>
-                <li>
-                    <a asp-controller="Meeting" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Meeting" ? "active" : "")">
-                        <i class="fas fa-calendar-alt menu-icon"></i>
-                        <span class="menu-text">Lịch họp</span>
-                    </a>
-                </li>
+                
 
                 <li>
                     <a asp-controller="MeetingRoom" asp-action="Index"
@@ -81,12 +84,12 @@
                         <span class="menu-text">Phòng họp</span>
                     </a>
                 </li>
-                <li>
+                @* <li>
                     <a href="#" class="">
                         <i class="fas fa-cog menu-icon"></i>
                         <span class="menu-text">Cài đặt</span>
                     </a>
-                </li>
+                </li> *@
             </ul>
 
             <ul class="menu mt-auto">
@@ -117,26 +120,48 @@
 
     <script>
                         $(document).ready(function () {
-                            function closeSidebar() {
-                                $('body').removeClass('sidebar-expanded');
-                                $('#sidebarBackdrop').hide();
-                            }
+                            const isMobile = () => $(window).width() <= 768;
 
-                            function openSidebar() {
-                                $('body').addClass('sidebar-expanded');
-                                $('#sidebarBackdrop').show();
-                            }
-
-                            $('#sidebarToggle').on('click', function () {
-                                if ($('body').hasClass('sidebar-expanded')) {
-                                    closeSidebar();
+                            function updateSidebarState(state) {
+                                if (state === 'expanded') {
+                                    $('body').addClass('sidebar-expanded');
+                                    localStorage.setItem('sidebar-state', 'expanded');
                                 } else {
-                                    openSidebar();
+                                    $('body').removeClass('sidebar-expanded');
+                                    localStorage.setItem('sidebar-state', 'collapsed');
+                                }
+                            }
+
+                            // Initialize state from local storage or default
+                            const savedState = localStorage.getItem('sidebar-state');
+                            if (savedState) {
+                                if (savedState === 'expanded') {
+                                    $('body').addClass('sidebar-expanded');
+                                } else {
+                                    $('body').removeClass('sidebar-expanded');
+                                }
+                            } else {
+                                // Default: Expanded on Desktop, Collapsed on Mobile
+                                if (isMobile()) {
+                                    updateSidebarState('collapsed');
+                                } else {
+                                    updateSidebarState('expanded');
+                                }
+                            }
+
+                            $('#sidebarToggle').on('click', function (e) {
+                                e.preventDefault();
+                                if ($('body').hasClass('sidebar-expanded')) {
+                                    updateSidebarState('collapsed');
+                                } else {
+                                    updateSidebarState('expanded');
                                 }
                             });
 
                             $('#sidebarBackdrop').on('click', function () {
-                                closeSidebar();
+                                if (isMobile()) {
+                                    updateSidebarState('collapsed');
+                                }
                             });
 
                             // Global AJAX Antiforgery Setup

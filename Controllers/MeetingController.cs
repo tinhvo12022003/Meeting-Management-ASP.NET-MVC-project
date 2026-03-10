@@ -15,23 +15,39 @@ public class MeetingController : Controller
     private readonly IMeetingRoomService _meetingRoomService;
     private readonly ICompanyService _companyService;
     private readonly IDepartmentService _departmentService;
+    private readonly MeetingManagement.Helper.UserHelper _userHelper;
 
     public MeetingController(
         IMeetingService meetingService,
         IMeetingRoomService meetingRoomService,
         ICompanyService companyService,
-        IDepartmentService departmentService)
+        IDepartmentService departmentService,
+        MeetingManagement.Helper.UserHelper userHelper)
     {
         _meetingService = meetingService;
         _meetingRoomService = meetingRoomService;
         _companyService = companyService;
         _departmentService = departmentService;
+        _userHelper = userHelper;
     }
 
     [Permission("Meeting.Index.View")]
     public async Task<IActionResult> Index(PaginatedRequest request)
     {
-        var result = await _meetingService.Find(request);
+        string? companyId = null;
+        string? departmentId = null;
+
+        var user = await _userHelper.GetCurrentUserProfile();
+        var isAdmin = await _userHelper.IsAdmin();
+        var hasFullPermission = await _userHelper.HasPermission("Meeting.*") || await _userHelper.HasPermission("Meeting.Index.FullPermission");
+
+        if (!isAdmin && !hasFullPermission)
+        {
+            companyId = user?.CompanyId;
+            departmentId = user?.DepartmentId;
+        }
+
+        var result = await _meetingService.Find(request, companyId, departmentId);
         
         // Prepare data for filters or dropdowns
         ViewBag.Rooms = await _meetingRoomService.GetAll();
@@ -178,7 +194,20 @@ public class MeetingController : Controller
             DateTime from = start ?? DateTime.Now.AddMonths(-1);
             DateTime to = end ?? DateTime.Now.AddMonths(1);
 
-            var result = await _meetingService.GetCalendarEvents(from, to);
+            string? companyId = null;
+            string? departmentId = null;
+
+            var user = await _userHelper.GetCurrentUserProfile();
+            var isAdmin = await _userHelper.IsAdmin();
+            var hasFullPermission = await _userHelper.HasPermission("Meeting.*") || await _userHelper.HasPermission("Meeting.Index.FullPermission");
+
+            if (!isAdmin && !hasFullPermission)
+            {
+                companyId = user?.CompanyId;
+                departmentId = user?.DepartmentId;
+            }
+
+            var result = await _meetingService.GetCalendarEvents(from, to, companyId, departmentId);
             
             var events = result
                 .Select(m => new {

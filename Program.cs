@@ -194,7 +194,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Meeting}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 await DbSeeder.SeedAccount(app.Services);

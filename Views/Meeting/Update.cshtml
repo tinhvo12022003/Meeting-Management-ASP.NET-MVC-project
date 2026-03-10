@@ -1,13 +1,17 @@
 @using MeetingManagement.Models.DTOs
 @using MeetingManagement.Enum
 @model MeetingUpdateModel
-
+@inject MeetingManagement.Helper.UserHelper UserHelper
 @{
     ViewData["Title"] = "Cập nhật Cuộc họp";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var rooms = ViewBag.Rooms as List<MeetingRoomViewModel> ?? new List<MeetingRoomViewModel>();
     var companies = ViewBag.Companies as List<CompanyViewModel> ?? new List<CompanyViewModel>();
     var departments = ViewBag.Departments as List<DepartmentViewModel> ?? new List<DepartmentViewModel>();
+
+    var isAdmin = await UserHelper.IsAdmin();
+    var hasFullMeetingPermission = await UserHelper.HasPermission("Meeting.*") || await UserHelper.HasPermission("Meeting.Update.EditAll");
+    var showFilters = isAdmin || hasFullMeetingPermission;
 }
 
 <div class="container-fluid py-4">
@@ -116,28 +120,36 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <label asp-for="CompanyId" class="custom-label">Công ty <span class="text-danger">*</span></label>
-                                <select asp-for="CompanyId" id="companySelect" class="form-control custom-select" required>
-                                    <option value="">-- Chọn công ty --</option>
-                                    @foreach (var c in companies)
-                                    {
-                                        <option value="@c.Id">@c.Name</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="CompanyId" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6 mb-4">
-                                <label asp-for="DepartmentId" class="custom-label">Phòng ban <span class="text-danger">*</span></label>
-                                <select asp-for="DepartmentId" id="deptSelect" class="form-control custom-select" required>
-                                    <option value="">-- Chọn phòng ban --</option>
-                                    @foreach (var d in departments)
-                                    {
-                                        <option value="@d.Id" data-company-id="@d.CompanyId">@d.Name</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="DepartmentId" class="text-danger small"></span>
-                            </div>
+                            @if (showFilters)
+                            {
+                                <div class="col-md-6 mb-4">
+                                    <label asp-for="CompanyId" class="custom-label">Công ty <span class="text-danger">*</span></label>
+                                    <select asp-for="CompanyId" id="companySelect" class="form-control custom-select" required>
+                                        <option value="">-- Chọn công ty --</option>
+                                        @foreach (var c in companies)
+                                        {
+                                            <option value="@c.Id">@c.Name</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="CompanyId" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label asp-for="DepartmentId" class="custom-label">Phòng ban <span class="text-danger">*</span></label>
+                                    <select asp-for="DepartmentId" id="deptSelect" class="form-control custom-select" required>
+                                        <option value="">-- Chọn phòng ban --</option>
+                                        @foreach (var d in departments)
+                                        {
+                                            <option value="@d.Id" data-company-id="@d.CompanyId">@d.Name</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <input type="hidden" asp-for="CompanyId" />
+                                <input type="hidden" asp-for="DepartmentId" />
+                            }
                         </div>
 
                         <div class="form-group mb-4">
@@ -230,31 +242,33 @@
             });
 
             // Department filtering based on Company
-            const filterDepartments = () => {
-                const selectedCompanyId = $('#companySelect').val();
-                const $deptSelect = $('#deptSelect');
-                const currentDeptId = $deptSelect.val();
+            if ($('#companySelect').is('select') && $('#deptSelect').is('select')) {
+                const filterDepartments = () => {
+                    const selectedCompanyId = $('#companySelect').val();
+                    const $deptSelect = $('#deptSelect');
+                    const currentDeptId = $deptSelect.val();
 
-                $deptSelect.find('option').each(function() {
-                    const companyId = $(this).data('company-id');
-                    if (!companyId || companyId == selectedCompanyId) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
+                    $deptSelect.find('option').each(function() {
+                        const companyId = $(this).data('company-id');
+                        if (!companyId || companyId == selectedCompanyId) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+
+                    // If current selected department is hidden, reset to empty
+                    const $selectedOption = $deptSelect.find('option:selected');
+                    if ($selectedOption.css('display') === 'none') {
+                        $deptSelect.val('');
                     }
-                });
+                };
 
-                // If current selected department is hidden, reset to empty
-                const $selectedOption = $deptSelect.find('option:selected');
-                if ($selectedOption.css('display') === 'none') {
-                    $deptSelect.val('');
-                }
-            };
-
-            $('#companySelect').change(filterDepartments);
-            
-            // Re-run filter on page load to ensure consistency
-            filterDepartments();
+                $('#companySelect').change(filterDepartments);
+                
+                // Re-run filter on page load to ensure consistency
+                filterDepartments();
+            }
             
             // Re-select actual value after filtering if it was hidden by mistake
             $('#deptSelect').val('@Model.DepartmentId');

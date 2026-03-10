@@ -8,7 +8,7 @@ public interface IMeetingService
     public Task Update (MeetingUpdateModel model);
     public Task Reschedule(string id, DateTime startAt, DateTime endAt);
     public Task Delete (string Id);
-    public Task<PaginatedResponse<MeetingViewModel>> Find (PaginatedRequest request);
+    public Task<PaginatedResponse<MeetingViewModel>> Find (PaginatedRequest request, string? companyId = null, string? departmentId = null);
     public Task<MeetingUpdateModel> GetUpdateModel(string id);
-    public Task<List<MeetingViewModel>> GetCalendarEvents(DateTime start, DateTime end);
+    public Task<List<MeetingViewModel>> GetCalendarEvents(DateTime start, DateTime end, string? companyId = null, string? departmentId = null);
 }

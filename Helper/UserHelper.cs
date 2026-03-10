@@ -1,6 +1,9 @@
 using MeetingManagement.Interface.IService;
 using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
+using MeetingManagement.Interface.IUnitOfWork;
+using MeetingManagement.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MeetingManagement.Helper;
 
@@ -16,6 +19,7 @@ public class UserHelper
         _serviceProvider = serviceProvider;
         _cache = cache;
     }
+
     public string GetCurrentUser()
     {
         var userId = _httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -56,5 +60,21 @@ public class UserHelper
         if (req.EndsWith(".Insert") && permissions.Contains($"{controller}.{action}.InsertAll")) return true;
 
         return false;
+    }
+
+    public async Task<UserModel?> GetCurrentUserProfile()
+    {
+        var userId = GetCurrentUser();
+        if (userId == "System") return null;
+
+        using var scope = _serviceProvider.CreateScope();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        return await unitOfWork.Users.GetById(userId);
+    }
+
+    public async Task<bool> IsAdmin()
+    {
+        var user = await GetCurrentUserProfile();
+        return user?.userType == MeetingManagement.Enum.UserType.ADMIN;
     }
 }

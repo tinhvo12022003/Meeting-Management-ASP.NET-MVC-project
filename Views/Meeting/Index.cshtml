@@ -9,6 +9,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var currentUserId = UserHelper.GetCurrentUser();
     var canEditOthers = await UserHelper.HasPermission("Meeting.Update.EditAll");
+    var userProfile = await UserHelper.GetCurrentUserProfile();
+    var isAdmin = await UserHelper.IsAdmin();
+    var hasFullMeetingPermission = await UserHelper.HasPermission("Meeting.*") || await UserHelper.HasPermission("Meeting.Index.FullPermission");
+    var showFilters = isAdmin || hasFullMeetingPermission;
 }
 
 <div class="container-fluid py-4">
@@ -120,27 +124,25 @@
                                     <input id="q-title" type="text" class="form-control" placeholder="Tên cuộc họp (tối thiểu 5 ký tự)...">
                                 </div>
                                 
-                                <div class="row mb-3">
-                                    <div class="col-12 mb-3">
-                                        <label class="small text-muted">Thời gian bắt đầu <span class="text-danger">*</span></label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text bg-light border-right-0"><i class="far fa-calendar-alt"></i></span>
-                                            </div>
-                                            <input id="q-start" type="datetime-local" class="form-control border-left-0 q-input">
+                                <div class="form-group mb-3">
+                                    <label class="small text-muted">Thời gian bắt đầu <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-light border-right-0"><i class="far fa-calendar-alt"></i></span>
                                         </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="small text-muted">Thời gian kết thúc <span class="text-danger">*</span></label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text bg-light border-right-0"><i class="far fa-clock"></i></span>
-                                            </div>
-                                            <input id="q-end" type="datetime-local" class="form-control border-left-0 q-input">
-                                        </div>
+                                        <input id="q-start" type="datetime-local" class="form-control border-left-0 q-input">
                                     </div>
                                 </div>
-
+                                <div class="form-group mb-3">
+                                    <label class="small text-muted">Thời gian kết thúc <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-light border-right-0"><i class="far fa-clock"></i></span>
+                                        </div>
+                                        <input id="q-end" type="datetime-local" class="form-control border-left-0 q-input">
+                                    </div>
+                                </div>
+ 
                                 <div class="form-group mb-3">
                                     <label class="small text-muted">Phòng họp <span class="text-danger">*</span></label>
                                     <select id="q-room" class="form-control q-input">
@@ -150,49 +152,45 @@
                                         }
                                     </select>
                                 </div>
-
-                                <div class="row">
-                                    <div class="col-6 pr-2">
-                                        <div class="form-group mb-3">
-                                            <label class="small text-muted">Hình thức <span class="text-danger">*</span></label>
-                                            <select id="q-type" class="form-control q-input">
-                                                <option value="1">Trực tiếp (Offline)</option>
-                                                <option value="2">Trực tuyến (Online)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 pl-2" id="q-url-group" style="display: none;">
-                                        <div class="form-group mb-3">
-                                            <label class="small text-muted">URL cuộc họp</label>
-                                            <input id="q-url" type="text" class="form-control q-input" placeholder="https://...">
-                                        </div>
-                                    </div>
+ 
+                                <div class="form-group mb-3">
+                                    <label class="small text-muted">Hình thức <span class="text-danger">*</span></label>
+                                    <select id="q-type" class="form-control q-input">
+                                        <option value="1">Trực tiếp (Offline)</option>
+                                        <option value="2">Trực tuyến (Online)</option>
+                                    </select>
                                 </div>
-
-                                <div class="row">
-                                    <div class="col-6 pr-2">
-                                        <div class="form-group mb-3">
-                                            <label class="small text-muted">Công ty <span class="text-danger">*</span></label>
-                                            <select id="q-company" class="form-control q-input">
-                                                <option value="">-- Chọn --</option>
-                                                @foreach (var c in ViewBag.Companies) {
-                                                    <option value="@c.Id">@c.Name</option>
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 pl-2">
-                                        <div class="form-group mb-3">
-                                            <label class="small text-muted">Phòng ban <span class="text-danger">*</span></label>
-                                            <select id="q-dept" class="form-control q-input">
-                                                <option value="">-- Chọn --</option>
-                                                @foreach (var d in ViewBag.Departments) {
-                                                    <option value="@d.Id" data-company-id="@d.CompanyId">@d.Name</option>
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
+                                <div class="form-group mb-3" id="q-url-group" style="display: none;">
+                                    <label class="small text-muted">URL cuộc họp</label>
+                                    <input id="q-url" type="text" class="form-control q-input" placeholder="https://...">
                                 </div>
+ 
+                                @if (showFilters)
+                                {
+                                    <div class="form-group mb-3">
+                                        <label class="small text-muted">Công ty <span class="text-danger">*</span></label>
+                                        <select id="q-company" class="form-control q-input">
+                                            <option value="">-- Chọn --</option>
+                                            @foreach (var c in ViewBag.Companies) {
+                                                <option value="@c.Id">@c.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label class="small text-muted">Phòng ban <span class="text-danger">*</span></label>
+                                        <select id="q-dept" class="form-control q-input">
+                                            <option value="">-- Chọn --</option>
+                                            @foreach (var d in ViewBag.Departments) {
+                                                <option value="@d.Id" data-company-id="@d.CompanyId">@d.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="hidden" id="q-company" value="@userProfile?.CompanyId" />
+                                    <input type="hidden" id="q-dept" value="@userProfile?.DepartmentId" />
+                                }
                                 
                                 <div class="form-group mb-3">
                                     <label class="small text-muted mb-1">Màu sắc đánh dấu</label>
@@ -657,10 +655,13 @@
             });
 
             // --- DEPARTMENT FILTERING ---
+            const $companySelect = $('#q-company');
             const $deptSelect = $('#q-dept');
-            const $deptOptions = $deptSelect.find('option').clone();
+            
+            if ($companySelect.is('select') && $deptSelect.is('select')) {
+                const $deptOptions = $deptSelect.find('option').clone();
 
-            $('#q-company').change(function() {
+                $companySelect.change(function() {
                 const companyId = $(this).val();
                 const currentDept = $deptSelect.val();
                 
@@ -677,11 +678,11 @@
                     $deptOptions.filter('[value!=""]').appendTo($deptSelect);
                 }
                 
-                // Restore selection if possible
                 if (currentDept && $deptSelect.find(`option[value="${currentDept}"]`).length > 0) {
                     $deptSelect.val(currentDept);
                 }
             });
+        }
 
             // Handle Type toggle in Quick Create
             $('#q-type').change(function() {
