@@ -79,11 +79,11 @@
                                 <td>
                                     <div class="company-cell">
                                         <div class="company-logo">
-                                            @(item.Name?.Substring(0, 1).ToUpper() ?? "C")
+                                            @(item.Name?.Substring(startIndex: 0, length: 1).ToUpper() ?? "C")
                                         </div>
                                         <div class="company-info">
                                             <span class="name">@item.Name</span>
-                                            <span class="email text-muted small">@item.Id</span>
+                                            @* <span class="email text-muted small">@item.Id</span> *@
                                         </div>
                                     </div>
                                 </td>

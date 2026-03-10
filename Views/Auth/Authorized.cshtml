@@ -13,6 +13,29 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/authorized.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 50px !important;
+            border-radius: 12px !important;
+            border: none !important;
+            padding-top: 10px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            top: 12px !important;
+        }
+        .select2-dropdown {
+            border-radius: 12px !important;
+            border: none !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .select2-search__field {
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+        }
+    </style>
 }
 
 <div class="container-fluid py-4">
@@ -23,14 +46,14 @@
             <div class="user-selector-card">
                 <div class="row align-items-center">
                     <div class="col-md-7">
-                        <h2 class="font-weight-bold mb-3">Phân quyền Hệ thống</h2>
-                        <p class="mb-0 text-white-50">Chọn người dùng và cấp các quyền truy cập tương ứng cho từng chức năng của hệ thống.</p>
+                        <h2 class="font-weight-bold mb-3"><i class="fas fa-user-shield mr-2"></i>Phân quyền Hệ thống</h2>
+                        <p class="mb-0 text-white-50">Tìm kiếm nhân viên bằng tên hoặc tài khoản để thực hiện thiết lập quyền hạn.</p>
                     </div>
                     <div class="col-md-5 mt-3 mt-md-0">
                         <div class="form-group mb-0">
-                            <label class="small text-white-50 font-weight-bold mb-2">CHỌN NGƯỜI DÙNG CẦN PHÂN QUYỀN</label>
-                            <select id="userSelect" class="form-control form-control-lg border-0 shadow-sm" style="border-radius:12px;">
-                                <option value="">-- Chọn nhân viên --</option>
+                            <label class="small text-white-50 font-weight-bold mb-2">TÌM KIẾM NGƯỜI DÙNG</label>
+                            <select id="userSelect" class="form-control select2" style="width: 100%;">
+                                <option value="">-- Nhập tên hoặc username --</option>
                                 @foreach (var u in users)
                                 {
                                     <option value="@u.Id" selected="@(selectedUserId == u.Id)">[@u.Username] @u.FullName</option>
@@ -43,15 +66,57 @@
 
             @if (string.IsNullOrEmpty(selectedUserId))
             {
-                <div class="text-center py-5 bg-white border rounded-lg shadow-sm">
-                    @* <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-illustraion-download-in-svg-png-gif-file-formats--no-data-found-failure-error-web-interface-pack-user-illustrations-4712053.png" style="width: 200px; opacity:0.6" /> *@
-                    <i class="fas fa-folder-open fa-3x mb-3 opacity-20"></i>
-                    <h5 class="mt-4 text-muted">Vui lòng chọn một người dùng để bắt đầu phân quyền</h5>
+                <div class="search-hero-section text-center py-5">
+                    <div class="search-illustration mb-4">
+                        <div class="circle-bg">
+                            <i class="fas fa-search-plus fa-4x text-primary op-20"></i>
+                        </div>
+                    </div>
+                    <h3 class="font-weight-bold text-dark">Bắt đầu Phân quyền</h3>
+                    <p class="text-muted mx-auto mb-4" style="max-width: 500px;">
+                        Sử dụng thanh tìm kiếm phía trên để tìm nhân viên theo tên, email hoặc tài khoản đăng nhập để bắt đầu thiết lập quyền hạn truy cập hệ thống.
+                    </p>
+                    <div class="d-flex justify-content-center">
+                        <div class="badge-info-item mx-2">
+                            <i class="fas fa-check-circle mr-1"></i> Tìm nhanh bằng Username
+                        </div>
+                        <div class="badge-info-item mx-2">
+                            <i class="fas fa-check-circle mr-1"></i> Tìm bằng Tên đầy đủ
+                        </div>
+                    </div>
                 </div>
+
+                <style>
+                    .search-hero-section {
+                        background: white;
+                        border-radius: 20px;
+                        border: 1px dashed #cbd5e1;
+                        margin-top: 2rem;
+                    }
+                    .circle-bg {
+                        width: 120px;
+                        height: 120px;
+                        background: var(--bg-light);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto;
+                    }
+                    .op-20 { opacity: 0.2; }
+                    .badge-info-item {
+                        padding: 0.5rem 1rem;
+                        background: var(--bg-light);
+                        border-radius: 30px;
+                        font-size: 0.85rem;
+                        color: #64748b;
+                        font-weight: 500;
+                    }
+                </style>
             }
             else
             {
-                <div id="permissionGrid">
+                <div id="permissionGrid" class="mt-4">
                     @foreach (var config in permissionConfig)
                     {
                         var controllerPermissions = userPermissions.Where(p => p.Controller == config.Controller).ToList();
@@ -157,12 +222,33 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                placeholder: "-- Nhập tên hoặc username --",
+                allowClear: true,
+                language: {
+                    noResults: function () {
+                        return "Không tìm thấy người dùng nào";
+                    }
+                }
+            });
+
+            // Focus search field when select2 is opened
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+            });
+
             // Handle user change
             $('#userSelect').on('change', function () {
                 const userId = $(this).val();
-                window.location.href = '@Url.Action("Authorized", "Auth")?userId=' + userId;
+                if (userId) {
+                    window.location.href = '@Url.Action("Authorized", "Auth")?userId=' + userId;
+                } else {
+                    window.location.href = '@Url.Action("Authorized", "Auth")';
+                }
             });
 
             // Handle Full Permission (Controller level)

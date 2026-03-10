@@ -199,6 +199,9 @@
                                 </td>
                                 <td>
                                     <div class="action-btns justify-content-end">
+                                        <a asp-controller="Auth" asp-action="Authorized" asp-route-userId="@item.Id" class="btn-icon btn-permission" title="Phân quyền">
+                                            <i class="fas fa-shield-alt"></i>
+                                        </a>
                                         <a asp-action="Update" asp-route-id="@item.Id" class="btn-icon btn-edit" title="Chỉnh sửa">
                                             <i class="fas fa-pen"></i>
                                         </a>
