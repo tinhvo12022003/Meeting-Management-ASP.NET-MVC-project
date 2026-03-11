@@ -378,3 +378,17 @@
         height: 30px;
     }
 }
+
+
+.page-title{
+font-weight:700;
+}
+
+.btn-add{
+background:linear-gradient(135deg,#6366f1,#4f46e5);
+border:none;
+border-radius:10px;
+padding:10px 20px;
+font-weight:600;
+box-shadow:0 4px 10px rgba(79,70,229,0.25);
+}

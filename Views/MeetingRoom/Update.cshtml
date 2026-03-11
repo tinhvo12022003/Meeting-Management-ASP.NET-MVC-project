@@ -12,12 +12,12 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb">
+            @* <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-1 p-0 bg-transparent">
                     <li class="breadcrumb-item"><a asp-action="Index" class="text-muted small">Quản lý Phòng họp</a></li>
                     <li class="breadcrumb-item active small" aria-current="page">Cập nhật</li>
                 </ol>
-            </nav>
+            </nav> *@
 
             <div class="d-flex align-items-center mb-4">
                 <a asp-action="Index" class="btn btn-light btn-sm rounded-circle mr-3 shadow-sm" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
@@ -87,11 +87,19 @@
 
                         <hr class="my-4 border-light">
 
-                        <div class="d-flex justify-content-end align-items-center">
-                            <a asp-action="Index" class="btn-cancel mr-4">Hủy bỏ</a>
-                            <button type="submit" class="btn btn-primary px-5 py-2 font-weight-bold shadow-sm btn-save" style="border-radius: 10px; background: #4f46e5; border: none;">
-                                <i class="fas fa-save mr-2"></i> Lưu thay đổi
+                        <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-stretch align-items-md-center gap-2">
+
+                            <a asp-action="Index"
+                            class="btn btn-link text-muted text-decoration-none small font-weight-bold w-100 w-md-auto">
+                                Hủy bỏ
+                            </a>
+
+                            <button type="submit"
+                                class="btn btn-primary px-md-5 py-2 font-weight-bold shadow-sm w-100 w-md-auto"
+                                style="border-radius:10px;background:#4f46e5;border:none;">
+                                <i class="fas fa-save me-2"></i> Lưu thay đổi
                             </button>
+
                         </div>
                     </form>
                 </div>
