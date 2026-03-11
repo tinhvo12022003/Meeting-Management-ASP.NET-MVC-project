@@ -1,9 +1,17 @@
+/* =============================================
+   CSS Variables / Design Tokens
+   ============================================= */
 :root {
     --primary-color: #4f46e5;
     --primary-hover: #4338ca;
+    --primary-light: rgba(79, 70, 229, 0.12);
     --bg-color: #f8fafc;
     --sidebar-bg: #1e293b;
     --sidebar-hover: #2d3a4f;
+    --sidebar-active: #4f46e5;
+    --sidebar-width-expanded: 260px;
+    --sidebar-width-collapsed: 72px;
+    --mobile-header-height: 60px;
     --card-bg: #ffffff;
     --text-main: #1e293b;
     --text-muted: #64748b;
@@ -13,9 +21,19 @@
     --warning: #f59e0b;
     --radius: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sidebar: 4px 0 20px rgba(0, 0, 0, 0.15);
+    --shadow-mobile: 6px 0 30px rgba(0, 0, 0, 0.25);
 }
 
-/* Basic resets */
+/* =============================================
+   Base Reset
+   ============================================= */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body,
 html {
     margin: 0;
@@ -24,38 +42,105 @@ html {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-main);
+    overflow-x: hidden;
 }
 
-/* Sidebar Styling */
+/* =============================================
+   Mobile Top Header (visible only on mobile)
+   ============================================= */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--mobile-header-height);
+    background: var(--sidebar-bg);
+    z-index: 1100;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-header .mobile-logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.02em;
+}
+
+.mobile-header .mobile-toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: var(--transition);
+}
+
+.mobile-header .mobile-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* =============================================
+   Sidebar Core
+   ============================================= */
 aside.sidebar {
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
-    width: 80px;
+    width: var(--sidebar-width-collapsed);
     background-color: var(--sidebar-bg);
     color: #fff;
-    transition: width var(--transition);
+    transition: var(--transition);
     overflow-x: hidden;
+    overflow-y: auto;
     white-space: nowrap;
-    z-index: 1000;
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 1050;
+    box-shadow: var(--shadow-sidebar);
     display: flex;
     flex-direction: column;
+
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+aside.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+aside.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
 }
 
 body.sidebar-expanded aside.sidebar {
-    width: 260px;
+    width: var(--sidebar-width-expanded);
 }
 
-/* Sidebar Header */
+/* =============================================
+   Sidebar Header
+   ============================================= */
 .sidebar-header {
     height: 72px;
+    min-height: 72px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    flex-shrink: 0;
 }
 
 body.sidebar-expanded .sidebar-header {
@@ -63,7 +148,7 @@ body.sidebar-expanded .sidebar-header {
 }
 
 .logo-text {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 700;
     background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
     -webkit-background-clip: text;
@@ -71,8 +156,10 @@ body.sidebar-expanded .sidebar-header {
     -webkit-text-fill-color: transparent;
     opacity: 0;
     max-width: 0;
-    transition: var(--transition);
     overflow: hidden;
+    transition: var(--transition);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
 }
 
 body.sidebar-expanded .logo-text {
@@ -92,6 +179,8 @@ body.sidebar-expanded .logo-text {
     align-items: center;
     justify-content: center;
     transition: var(--transition);
+    flex-shrink: 0;
+    font-size: 1rem;
 }
 
 .toggle-btn:hover {
@@ -99,56 +188,108 @@ body.sidebar-expanded .logo-text {
     transform: scale(1.05);
 }
 
-/* Menu Items */
+/* =============================================
+   Menu
+   ============================================= */
 .menu {
     list-style: none;
-    padding: 12px;
+    padding: 10px 8px;
     margin: 0;
     flex-grow: 1;
 }
 
+.menu.mt-auto {
+    flex-grow: 0;
+    margin-top: auto !important;
+    padding-top: 6px;
+    padding-bottom: 10px;
+}
+
 .menu li {
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .menu a {
     display: flex;
     align-items: center;
-    padding: 12px;
+    padding: 11px 12px;
     text-decoration: none;
     color: #94a3b8;
     border-radius: 10px;
     transition: var(--transition);
     position: relative;
+    cursor: pointer;
 }
 
 .menu a:hover {
     background: var(--sidebar-hover);
-    color: #fff;
+    color: #e2e8f0;
+    text-decoration: none;
 }
 
 .menu a.active {
-    background: var(--primary-color);
+    background: var(--sidebar-active);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
 }
 
+.menu a.text-danger {
+    color: #f87171 !important;
+}
+
+.menu a.text-danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444 !important;
+}
+
+/* Tooltip on collapsed state (desktop) */
+body:not(.sidebar-expanded) .menu a[title]::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(var(--sidebar-width-collapsed) + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+body:not(.sidebar-expanded) .menu a[title]:hover::after {
+    opacity: 1;
+}
+
+/* =============================================
+   Menu Icon & Text
+   ============================================= */
 .menu-icon {
-    font-size: 1.25rem;
-    min-width: 32px;
+    font-size: 1.15rem;
+    min-width: 30px;
+    width: 30px;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .menu-text {
     margin-left: 12px;
     font-weight: 500;
+    font-size: 0.9rem;
     opacity: 0;
     max-width: 0;
-    transition: var(--transition);
     overflow: hidden;
+    transition: var(--transition);
+    white-space: nowrap;
 }
 
 body.sidebar-expanded .menu-text {
@@ -156,59 +297,155 @@ body.sidebar-expanded .menu-text {
     max-width: 180px;
 }
 
-/* Main Content Area */
+/* Separator */
+.menu li.border-top {
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin: 6px 4px;
+    padding-top: 6px !important;
+}
+
+/* =============================================
+   Main Content Area
+   ============================================= */
 main.content {
-    margin-left: 80px;
-    width: calc(100% - 80px);
+    margin-left: var(--sidebar-width-collapsed);
+    width: calc(100% - var(--sidebar-width-collapsed));
     min-height: 100vh;
     transition: var(--transition);
     padding: 2rem;
 }
 
 body.sidebar-expanded main.content {
-    margin-left: 260px;
-    width: calc(100% - 260px);
+    margin-left: var(--sidebar-width-expanded);
+    width: calc(100% - var(--sidebar-width-expanded));
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    aside.sidebar {
-        width: 0;
-        box-shadow: none;
-    }
-
-    body.sidebar-expanded aside.sidebar {
-        width: 260px;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
-    }
-
-    main.content {
-        margin-left: 0;
-        width: 100%;
-        padding: 1rem;
-    }
-
-    body.sidebar-expanded main.content {
-        margin-left: 0;
-        width: 100%;
-    }
-}
-
-/* Backdrop for Mobile */
+/* =============================================
+   Backdrop (Mobile Overlay)
+   ============================================= */
 .sidebar-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(15, 23, 42, 0.4);
-    z-index: 900;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1040;
     display: none;
-    transition: var(--transition);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
+/* =============================================
+   TABLET BREAKPOINT (768px – 1024px)
+   Sidebar stays icon-only by default, expands on toggle
+   ============================================= */
+@media (min-width: 769px) and (max-width: 1024px) {
+    aside.sidebar {
+        width: var(--sidebar-width-collapsed);
+    }
+
+    body.sidebar-expanded aside.sidebar {
+        width: var(--sidebar-width-expanded);
+        box-shadow: var(--shadow-sidebar);
+    }
+
+    main.content {
+        margin-left: var(--sidebar-width-collapsed);
+        width: calc(100% - var(--sidebar-width-collapsed));
+        padding: 1.5rem;
+    }
+
+    body.sidebar-expanded main.content {
+        margin-left: var(--sidebar-width-expanded);
+        width: calc(100% - var(--sidebar-width-expanded));
+    }
+}
+
+/* =============================================
+   MOBILE BREAKPOINT (≤ 768px)
+   Sidebar hidden off-screen; slides in as a drawer
+   ============================================= */
 @media (max-width: 768px) {
+    /* Show mobile top header */
+    .mobile-header {
+        display: flex;
+    }
+
+    /* Push content down below mobile header */
+    main.content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+        padding-top: calc(var(--mobile-header-height) + 1rem);
+    }
+
+    body.sidebar-expanded main.content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Sidebar becomes an off-canvas drawer */
+    aside.sidebar {
+        width: var(--sidebar-width-expanded);
+        transform: translateX(-100%);
+        top: 0;
+        box-shadow: none;
+        z-index: 1060;
+    }
+
+    /* Hide desktop toggle button on mobile (we use mobile-header's button) */
+    .sidebar .toggle-btn {
+        display: none;
+    }
+
+    /* Show sidebar drawer when expanded */
+    body.sidebar-expanded aside.sidebar {
+        transform: translateX(0);
+        box-shadow: var(--shadow-mobile);
+    }
+
+    /* Always show logo text in mobile drawer */
+    .logo-text {
+        opacity: 1 !important;
+        max-width: 200px !important;
+    }
+
+    /* Always show menu text in mobile drawer */
+    .menu-text {
+        opacity: 1 !important;
+        max-width: 200px !important;
+    }
+
+    /* Sidebar header aligns logo + close btn */
+    .sidebar-header {
+        justify-content: space-between !important;
+    }
+
+    /* Show backdrop when sidebar is open on mobile */
     body.sidebar-expanded .sidebar-backdrop {
         display: block;
+        opacity: 1;
+    }
+
+    /* Remove tooltips on mobile */
+    body:not(.sidebar-expanded) .menu a[title]::after {
+        display: none;
+    }
+}
+
+/* =============================================
+   SMALL MOBILE BREAKPOINT (≤ 480px)
+   ============================================= */
+@media (max-width: 480px) {
+    aside.sidebar {
+        width: min(280px, 85vw);
+    }
+
+    main.content {
+        padding: 0.75rem;
+        padding-top: calc(var(--mobile-header-height) + 0.75rem);
     }
 }
