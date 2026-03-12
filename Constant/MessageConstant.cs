@@ -17,4 +17,5 @@ public class MessageConstant
     public static string INACTIVE {get; set;} = "Data is disable";
     public static string EXISTED {get; set;} = "Data existed";
     public static string COMPANY_HAS_DEPARTMENTS { get; set; } = "Công ty đang có phòng ban trực thuộc. Vui lòng thay đổi phòng ban hoặc chỉnh sửa công ty trực thuộc trước khi xóa.";
+    public static string DEPARTMENT_HAS_USERS { get; set; } = "Phòng ban đang có nhân viên trực thuộc. Vui lòng thay đổi phòng ban của nhân viên trước khi xóa.";
 }

@@ -304,12 +304,13 @@
                                                     </a>
 
                                                     <!-- Nút Delete (giữ form để POST) -->
-                                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" 
-                                                        style="margin: 0; display: inline;" 
-                                                        onsubmit="return confirm('Bạn có chắc muốn xóa cuộc họp này?');">
-                                                        <button type="submit" 
+                                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" id="deleteForm-@item.Id"
+                                                        style="margin: 0; display: inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="button" 
                                                                 class="btn-icon btn-delete" 
-                                                                title="Xóa">
+                                                                title="Xóa"
+                                                                onclick="confirmDeleteMeeting('@item.Id', '@item.Title')">
                                                             <i class="fas fa-trash-alt"></i>
                                                         </button>
                                                     </form>
@@ -1125,5 +1126,25 @@
                 $('#toggleViewBtn').find('i').attr('class', 'fas fa-calendar-alt mr-1');
             }
         });
+
+        function confirmDeleteMeeting(id, title) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: `Bạn có chắc chắn muốn xóa cuộc họp "${title}" không? Hành động này không thể hoàn tác.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Hủy bỏ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var form = document.getElementById('deleteForm-' + id);
+                    if (form) {
+                        form.submit();
+                    }
+                }
+            });
+        }
     </script>
 }

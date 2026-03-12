@@ -154,7 +154,7 @@
                                         <form asp-action="Delete" asp-controller="Department" method="post" id="deleteForm-@item.Id" style="display:inline;">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="button" class="btn-icon-link btn-delete" title="Xóa" onclick="confirmDelete('@item.Id', '@item.Name')">
+                                            <button type="button" class="btn-icon-link btn-delete" title="Xóa" onclick="confirmDelete('@item.Id', '@item.Name', @item.TotalStaff)">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </form>
@@ -235,7 +235,17 @@
             }
         });
 
-        function confirmDelete(id, name) {
+        function confirmDelete(id, name, staffCount) {
+            if (staffCount > 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Không thể xóa!',
+                    text: `Phòng ban "${name}" đang có ${staffCount} nhân viên. Vui lòng chuyển nhân viên sang phòng ban khác trước khi xóa.`,
+                    confirmButtonColor: '#4f46e5'
+                });
+                return;
+            }
+
             Swal.fire({
                 title: 'Xác nhận xóa?',
                 text: `Bạn đang chuẩn bị xóa phòng ban "${name}". Dữ liệu nhân sự liên quan có thể bị ảnh hưởng.`,

@@ -80,6 +80,13 @@ public class DepartmentService : IDepartmentService
         {
             throw new Exception(MessageConstant.EMPTY_STRING);
         }
+
+        var hasUsers = await _unitOfWork.Users.AnyActiveByDepartmentId(DepartmentId);
+        if (hasUsers)
+        {
+            throw new Exception(MessageConstant.DEPARTMENT_HAS_USERS);
+        }
+
         var department = await _unitOfWork.Departments.GetById(DepartmentId);
         if (department == null)
         {
@@ -113,7 +120,7 @@ public class DepartmentService : IDepartmentService
             Name = x.Name,
             CompanyId = x.CompanyId,
             CompanyName = x.Company?.Name ?? string.Empty,
-            TotalStaff = x.Users?.Count ?? 0,
+            TotalStaff = x.Users?.Count(u => u.RowStatus == RowStatus.ACTIVE) ?? 0,
             Location = x.Location,
             ManagerName = x.Users?.FirstOrDefault(u => u.userType == UserType.MANAGER)?.FullName ?? "Chưa cập nhật"
 
