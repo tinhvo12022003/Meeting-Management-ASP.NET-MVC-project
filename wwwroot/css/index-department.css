@@ -392,3 +392,9 @@ padding:10px 20px;
 font-weight:600;
 box-shadow:0 4px 10px rgba(79,70,229,0.25);
 }
+
+@media (max-width:576px){
+    .btn-primary{
+        width:100%;
+    }
+}

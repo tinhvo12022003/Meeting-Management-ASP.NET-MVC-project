@@ -26,7 +26,7 @@ public class AuthController : Controller
     public IActionResult Login()
     {
         if (User.Identity != null && User.Identity.IsAuthenticated)
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Meeting");
         
         return View();
     }
@@ -45,7 +45,7 @@ public class AuthController : Controller
 
             SetAuthCookies(result.AccessToken, result.RefreshToken);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Meeting");
         }
         catch (UnauthorizedAccessException ex)
         {

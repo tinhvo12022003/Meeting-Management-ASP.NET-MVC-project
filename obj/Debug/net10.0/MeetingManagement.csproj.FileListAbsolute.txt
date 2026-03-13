@@ -12195,7 +12195,7 @@ C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\u6tz8ccpgw-{0}-7409avssgj-7409avssgj.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\xyiu86c0pg-{0}-75zw1ik7hi-75zw1ik7hi.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\aez2t2625k-{0}-sdgsd647ic-sdgsd647ic.gz
-C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\jof9o61ozw-{0}-wlgvjchak2-wlgvjchak2.gz
-C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\kdg0flrofl-{0}-nqlqawqssg-nqlqawqssg.gz
-C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\hl1zkolif8-{0}-iutmva6g6p-iutmva6g6p.gz
 C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\1pkpz8y1cs-{0}-9wq8l1498n-9wq8l1498n.gz
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\kdg0flrofl-{0}-rsypejyt5m-rsypejyt5m.gz
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\jof9o61ozw-{0}-7k6ukxeu5d-7k6ukxeu5d.gz
+C:\Users\tvo22\OneDrive\Máy tính\Projects\Main-Meeting\Meeting-Management-ASP.NET-MVC-project\obj\Debug\net10.0\compressed\hl1zkolif8-{0}-ljcdchdbsh-ljcdchdbsh.gz

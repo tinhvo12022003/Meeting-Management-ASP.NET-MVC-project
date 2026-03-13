@@ -147,3 +147,12 @@
 .btn-add-room:hover{
     transform:translateY(-1px);
 }
+
+
+
+@media (max-width:576px){
+    .btn-primary{
+        width:100%;
+        text-align:center;
+    }
+}

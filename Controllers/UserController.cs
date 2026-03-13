@@ -33,7 +33,7 @@ public class UserController : Controller
         if (model == null)
         {
             TempData["Error"] = "Không tìm thấy thông tin người dùng!";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "User");
         }
 
         ViewBag.Companies = await _companyService.GetAllActive();

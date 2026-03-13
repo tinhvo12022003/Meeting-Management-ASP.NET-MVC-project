@@ -9,29 +9,32 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/index-companies.css">
-}
+    }
 
-<div class="container-fluid">
-    <div class="breadcrumb-container d-flex justify-content-between align-items-end">
-        <div>
-            <p class="text-uppercase text-muted small font-weight-bold mb-1 tracking-wider">Hệ thống quản trị</p>
-            <h1 class="breadcrumb-label">Quản lý Công ty</h1>
-        </div>
-        <a asp-controller="Company" asp-action="Create" class="btn-add-new">
-            <i class="fas fa-plus"></i>
-            Thêm công ty mới
-        </a>
-    </div>
+    <div class="container-fluid">
+        <div class="breadcrumb-container d-flex flex-wrap justify-content-between align-items-center">
 
-    <div class="table-container">
-        <form method="get" action="/Company" id="filterForm" class="table-header">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" name="searchTerm" id="searchTerm"
-                       value="@Context.Request.Query["searchTerm"]"
-                       placeholder="Tìm kiếm theo tên hoặc địa chỉ công ty...">
+            <!-- Title -->
+            <div class="mb-2 mb-md-0">
+                <h1 class="breadcrumb-label">Quản lý Công ty</h1>
             </div>
-            @* <div class="d-flex gap-3 align-items-center">
+
+            <!-- Button -->
+            <a asp-controller="Company" asp-action="Create" class="btn-add-new">
+                <i class="fas fa-plus mr-1"></i>
+                Thêm công ty mới
+            </a>
+
+        </div>
+
+        <div class="table-container">
+            <form method="get" action="/Company" id="filterForm" class="table-header">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="searchTerm" id="searchTerm"         value="@Context.Request.Query["searchTerm"]"
+                           placeholder="Tìm kiếm theo tên hoặc địa chỉ công ty...">
+                </div>
+                @* <div class="d-flex gap-3 align-items-center">
                 @{
                     var currentStatus = Context.Request.Query["status"].ToString();
                 }
@@ -55,66 +58,66 @@
                     </a>
                 }
             </div> *@
-        </form>
+            </form>
 
 
-        <div class="table-responsive">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th style="width: 15%">Tên Công Ty</th>
-                        <th style="width: 20%">Địa Chỉ</th>
-                        <th style="width: 15%">Điện thoại</th>
-                        <th style="width: 15%">Email</th>
-                        <th style="width: 20%">Mã số thuế</th>
-                        <th style="width: 10%" class="text-right">Thao Tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Items != null && Model.Items.Any())
-                    {
-                        foreach (var item in Model.Items)
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%">Tên Công Ty</th>
+                            <th style="width: 20%">Địa Chỉ</th>
+                            <th style="width: 15%">Điện thoại</th>
+                            <th style="width: 15%">Email</th>
+                            <th style="width: 20%">Mã số thuế</th>
+                            <th style="width: 10%" class="text-right">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Items != null && Model.Items.Any())
                         {
-                            <tr>
-                                <td>
-                                    <div class="company-cell">
-                                        <div class="company-logo">
-                                            @(item.Name?.Substring(startIndex: 0, length: 1).ToUpper() ?? "C")
+                            foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="company-cell">
+                                            <div class="company-logo">
+                                                @(item.Name?.Substring(startIndex: 0, length: 1).ToUpper() ?? "C")
+                                            </div>
+                                            <div class="company-info">
+                                                <span class="name">@item.Name</span>
+                                                @* <span class="email text-muted small">@item.Id</span> *@
+                                            </div>
                                         </div>
-                                        <div class="company-info">
-                                            <span class="name">@item.Name</span>
-                                            @* <span class="email text-muted small">@item.Id</span> *@
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="fas fa-map-marker-alt mr-2 small"></i>
+                                            @item.Address
                                         </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center text-muted">
-                                        <i class="fas fa-map-marker-alt mr-2 small"></i>
-                                        @item.Address
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center text-muted">
-                                        <i class="fas fa-phone mr-2 small"></i>
-                                        @item.Phone
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center text-muted">
-                                        <i class="fas fa-envelope mr-2 small"></i>
-                                        @item.Email
-                                    </div>
-                                </td>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="fas fa-phone mr-2 small"></i>
+                                            @item.Phone
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="fas fa-envelope mr-2 small"></i>
+                                            @item.Email
+                                        </div>
+                                    </td>
 
-                                <td>
-                                    <div class="d-flex align-items-center text-muted">
-                                        <i class="fas fa-file-invoice mr-2 small"></i>
-                                        @item.TaxCode
-                                    </div>
-                                </td>
+                                    <td>
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="fas fa-file-invoice mr-2 small"></i>
+                                            @item.TaxCode
+                                        </div>
+                                    </td>
 
 
-                                @* <td>
+                                    @* <td>
                                     @if (item.rowStatus == RowStatus.ACTIVE)
                                     {
                                         <div class="badge-status status-active">
@@ -130,121 +133,123 @@
                                         </div>
                                     }
                                 </td> *@
-                                <td>
-                                    <div class="action-btns justify-content-end">
-                                        <a href="/Company/Update/@item.Id" class="btn-icon-link btn-edit" title="Chỉnh sửa">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form asp-action="Delete" asp-controller="Company" method="post" id="deleteForm-@item.Id" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="button" class="btn-icon-link btn-delete" title="Xóa" onclick="confirmDelete('@item.Id', '@item.Name')">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </form>
+                                    <td>
+                                        <div class="action-btns justify-content-end">
+                                            <a href="/Company/Update/@item.Id" class="btn-icon-link btn-edit" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form asp-action="Delete" asp-controller="Company" method="post"
+                                                  id="deleteForm-@item.Id" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="button" class="btn-icon-link btn-delete" title="Xóa"
+                                                        onclick="confirmDelete('@item.Id', '@item.Name')">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-folder-open fa-3x mb-3 opacity-20"></i>
+                                        <p>Không tìm thấy dữ liệu nào phù hợp</p>
                                     </div>
                                 </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="4" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="fas fa-folder-open fa-3x mb-3 opacity-20"></i>
-                                    <p>Không tìm thấy dữ liệu nào phù hợp</p>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        <div class="table-footer">
-            @{
-                var pSearch = Context.Request.Query["searchTerm"].ToString();
-                var pStatus = Context.Request.Query["status"].ToString();
-                string PageUrl(int page) => $"?pageNumber={page}&searchTerm={pSearch}&status={pStatus}";
-            }
-            <div class="pagination-info">
-                Hiển thị bản ghi từ <strong>@((Model.PageNumber - 1) * Model.PageSize + 1)</strong> đến 
-                <strong>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalRecords))</strong> trong tổng số 
-                <strong>@Model.TotalRecords</strong>
+                    </tbody>
+                </table>
             </div>
-            <div class="pagination-btns">
-                @if (Model.HasPreviousPage)
-                {
-                    <a href="@PageUrl(Model.PageNumber - 1)" class="btn-page">
-                        <i class="fas fa-chevron-left"></i>
-                    </a>
-                }
 
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    if (i == 1 || i == Model.TotalPages || (i >= Model.PageNumber - 1 && i <= Model.PageNumber + 1))
-                    {
-                        <a href="@PageUrl(i)" class="btn-page @(i == Model.PageNumber ? "active" : "")">@i</a>
-                    }
-                    else if (i == Model.PageNumber - 2 || i == Model.PageNumber + 2)
-                    {
-                        <span class="px-2">...</span>
-                    }
+            <div class="table-footer">
+                @{
+                    var pSearch = Context.Request.Query["searchTerm"].ToString();
+                    var pStatus = Context.Request.Query["status"].ToString();
+                    string PageUrl(int page) => $"?pageNumber={page}&searchTerm={pSearch}&status={pStatus}";
                 }
+                <div class="pagination-info">
+                    Hiển thị bản ghi từ <strong>@((Model.PageNumber - 1) * Model.PageSize + 1)</strong> đến
+                    <strong>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalRecords))</strong> trong tổng số
+                    <strong>@Model.TotalRecords</strong>
+                </div>
+                <div class="pagination-btns">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <a href="@PageUrl(Model.PageNumber - 1)" class="btn-page">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    }
 
-                @if (Model.HasNextPage)
-                {
-                    <a href="@PageUrl(Model.PageNumber + 1)" class="btn-page">
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                }
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        if (i == 1 || i == Model.TotalPages || (i >= Model.PageNumber - 1 && i <= Model.PageNumber + 1))
+                        {
+                            <a href="@PageUrl(i)" class="btn-page @(i == Model.PageNumber ? "active" : "")">@i</a>
+                        }
+                        else if (i == Model.PageNumber - 2 || i == Model.PageNumber + 2)
+                        {
+                            <span class="px-2">...</span>
+                        }
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        <a href="@PageUrl(Model.PageNumber + 1)" class="btn-page">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    }
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <script>
-        function confirmDelete(id, name) {
-            Swal.fire({
-                title: 'Xác nhận xóa?',
-                text: `Bạn có chắc chắn muốn xóa công ty "${name}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Xóa',
-                cancelButtonText: 'Hủy'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('deleteForm-' + id).submit();
+    @section Scripts {
+        <script>
+                function confirmDelete(id, name) {
+                    Swal.fire({
+                        title: 'Xác nhận xóa?',
+                        text: `Bạn có chắc chắn muốn xóa công ty "${name}"?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Xóa',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('deleteForm-' + id).submit();
+                        }
+                    });
                 }
-            });
-        }
 
-        $(document).ready(function () {
-            var errorMessage = @Html.Raw(Json.Serialize(TempData["ErrorMessage"]));
-            var successMessage = @Html.Raw(Json.Serialize(TempData["SuccessMessage"]));
+                $(document).ready(function () {
+                    var errorMessage = @Html.Raw(Json.Serialize(TempData["ErrorMessage"]));
+                    var successMessage = @Html.Raw(Json.Serialize(TempData["SuccessMessage"]));
 
-            if (errorMessage) {
-                Swal.fire({
-                    title: 'Lỗi!',
-                    text: errorMessage,
-                    icon: 'error',
-                    confirmButtonText: 'Đóng'
+                    if (errorMessage) {
+                        Swal.fire({
+                            title: 'Lỗi!',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonText: 'Đóng'
+                        });
+                    }
+
+                    if (successMessage) {
+                        Swal.fire({
+                            title: 'Thành công!',
+                            text: successMessage,
+                            icon: 'success',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    }
                 });
-            }
-
-            if (successMessage) {
-                Swal.fire({
-                    title: 'Thành công!',
-                    text: successMessage,
-                    icon: 'success',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            }
-        });
-    </script>
-}
+        </script>
+    }

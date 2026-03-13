@@ -8,15 +8,28 @@
 
 <div class="container-fluid px-4 py-4">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="font-weight-bold text-dark mb-1">Hệ thống Phòng họp</h2>
-            <p class="text-muted small mb-0">Quản lý không gian họp nội bộ tối giản & hiệu quả</p>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <!-- Title -->
+        <div class="mb-3 mb-md-0">
+            <h2 class="font-weight-bold text-dark mb-1">
+                Hệ thống Phòng họp
+            </h2>
+            <p class="text-muted small mb-0">
+                Quản lý không gian họp nội bộ tối giản & hiệu quả
+            </p>
         </div>
-        <a asp-action="Create" class="btn btn-primary px-4 py-2 shadow-sm"
-               style="border-radius: 12px; font-weight: 600;">
-            <i class="fas fa-plus mr-2"></i> Thêm phòng
-        </a>
+
+        <!-- Button -->
+        <div>
+            <a asp-action="Create"       class="btn btn-primary px-4 py-2 shadow-sm"
+                   style="border-radius:12px;font-weight:600;">
+                <i class="fas fa-plus mr-2"></i>
+                Thêm phòng
+            </a>
+        </div>
+
     </div>
 
     <!-- Minimal Stats -->
@@ -148,41 +161,41 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/index-meetingRoom.css">
-}
-<style>
-    
-</style>
+    }
+    <style>
 
-@section Scripts {
-    <script>
-            function deleteRoom(id) {
-                Swal.fire({
-                    title: 'Xác nhận xóa?',
-                    text: "Phòng họp sẽ tạm dừng hoạt động và ẩn khỏi danh sách.",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Đồng ý xóa',
-                    cancelButtonText: 'Bỏ qua'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.post(`/MeetingRoom/Delete/${id}`, function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    title: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => location.reload());
-                            } else {
-                                Swal.fire('Lỗi', response.message, 'error');
+    </style>
+
+    @section Scripts {
+        <script>
+                    function deleteRoom(id) {
+                        Swal.fire({
+                            title: 'Xác nhận xóa?',
+                            text: "Phòng họp sẽ tạm dừng hoạt động và ẩn khỏi danh sách.",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            cancelButtonColor: '#64748b',
+                            confirmButtonText: 'Đồng ý xóa',
+                            cancelButtonText: 'Bỏ qua'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.post(`/MeetingRoom/Delete/${id}`, function (response) {
+                                    if (response.success) {
+                                        Swal.fire({
+                                            toast: true,
+                                            position: 'top-end',
+                                            icon: 'success',
+                                            title: response.message,
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => location.reload());
+                                    } else {
+                                        Swal.fire('Lỗi', response.message, 'error');
+                                    }
+                                });
                             }
                         });
                     }
-                });
-            }
-    </script>
-}
+        </script>
+    }
