@@ -60,7 +60,7 @@
                 </div>
             }
 
-            <form asp-action="Profile" method="post">
+            <form id="profileForm" asp-action="Profile" method="post">
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="Username" />
@@ -212,6 +212,27 @@
     <link rel="stylesheet" href="~/css/profile-user.css">
 }
 
-@* @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-} *@
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#profileForm').on('submit', function(e) {
+                e.preventDefault();
+                var form = this;
+                Swal.fire({
+                    title: 'Xác nhận thay đổi?',
+                    text: 'Bạn có chắc chắn muốn lưu các thay đổi thông tin cá nhân này không?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4f46e5',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy bỏ'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

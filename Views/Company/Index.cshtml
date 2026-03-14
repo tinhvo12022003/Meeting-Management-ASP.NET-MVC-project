@@ -12,20 +12,17 @@
     }
 
     <div class="container-fluid">
-        <div class="breadcrumb-container d-flex flex-wrap justify-content-between align-items-center">
-
-            <!-- Title -->
-            <div class="mb-2 mb-md-0">
-                <h1 class="breadcrumb-label">Quản lý Công ty</h1>
-            </div>
-
-            <!-- Button -->
-            <a asp-controller="Company" asp-action="Create" class="btn-add-new">
-                <i class="fas fa-plus mr-1"></i>
-                Thêm công ty mới
-            </a>
-
+    <div class="page-header py-4">
+        <div class="header-title">
+            <h3>Quản lý Công ty</h3>
+            <p class="text-muted small">Quản lý danh sách các công ty trong hệ thống</p>
         </div>
+        <div class="header-actions">
+            <a asp-controller="Company" asp-action="Create" class="btn-header btn-header-primary">
+                <i class="fas fa-plus"></i> Thêm công ty mới
+            </a>
+        </div>
+    </div>
 
         <div class="table-container">
             <form method="get" action="/Company" id="filterForm" class="table-header">

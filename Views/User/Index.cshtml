@@ -9,23 +9,16 @@
 }
 
 <div class="container-fluid py-4">
-    <!-- Page Header -->
-    <div class="row align-items-center mb-4">
-        
-        <!-- Title -->
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
-            <h3 class="font-weight-bold mb-0">Quản lý Người dùng</h3>
+    <div class="page-header">
+        <div class="header-title">
+            <h3>Quản lý Người dùng</h3>
+            <p class="text-muted small">Quản lý tài khoản và quyền hạn nhân viên</p>
         </div>
-
-        <!-- Button -->
-        <div class="col-12 col-md-6 text-md-right">
-            <a asp-action="Register"
-            class="btn btn-primary px-4 w-100 w-md-auto"
-            style="border-radius:8px; background:#4f46e5; border:none;">
-                <i class="fas fa-plus mr-1"></i> Thêm người dùng
+        <div class="header-actions">
+            <a asp-action="Register" class="btn-header btn-header-primary">
+                <i class="fas fa-plus"></i> Thêm người dùng
             </a>
         </div>
-
     </div>
 
     <!-- Quick Stats -->
@@ -165,7 +158,7 @@
                                         </div>
                                         <div class="user-info">
                                             <span class="name">@item.FullName</span>
-                                            <span class="username">@@@item.Username</span>
+                                            @* <span class="username">@@@item.Username</span> *@
                                         </div>
                                     </div>
                                 </td>

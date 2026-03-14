@@ -73,7 +73,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text bg-light border-right-0"><i class="fas fa-building text-muted"></i></span>
                                     </div>
-                                    <select asp-for="CompanyId" class="form-control bg-light border-left-0" style="border-radius: 0 8px 8px 0;" required>
+                                    <select asp-for="CompanyId" class="form-control custom-select bg-light border-left-0" style="border-radius: 0 8px 8px 0; height: calc(1.5em + 1.25rem + 2px);" required>
                                         <option value="">-- Chọn công ty --</option>
                                         @foreach (var c in companies)
                                         {

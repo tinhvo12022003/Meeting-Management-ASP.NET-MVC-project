@@ -16,48 +16,26 @@
 }
 
 <div class="container-fluid py-4">
-    <!-- Page Header -->
-
-    <div class="row align-items-center">
-
-        <!-- Title -->
-        <div class="col-12 col-md">
-            <h3 class="font-weight-bold mb-3 mb-md-0">
-                Quản lý Lịch họp
-            </h3>
+    <div class="page-header">
+        <div class="header-title">
+            <h3>Quản lý Lịch họp</h3>
+            <p class="text-muted small">Theo dõi và sắp xếp các cuộc họp hiệu quả</p>
         </div>
-
-        <!-- Buttons -->
-        <div class="col-12 col-md-auto">
-            <div class="d-flex flex-wrap justify-content-md-end">
-
-                <button class="btn btn-outline-secondary mr-2 mb-2"
-                        style="border-radius:8px;" id="toggleViewBtn">
-                    <i class="fas fa-list mr-1"></i>
-                    <span id="toggleText">Chế độ Danh sách</span>
-                </button>
-
-                <button class="btn btn-outline-primary mr-2 mb-2"
-                        style="border-radius:8px;" id="refreshCalendarBtn"
-                        title="Làm mới lịch từ server">
-                    <i class="fas fa-sync-alt mr-1"></i>
-                    Làm mới
-                </button>
-
-                <a asp-action="Create"
-                   class="btn btn-primary px-4 mb-2"
-                   style="border-radius:8px;background:#4f46e5;border:none;">
-                    <i class="fas fa-plus mr-1"></i>
-                    Tạo cuộc họp
-                </a>
-
-            </div>
+        <div class="header-actions">
+            <button class="btn-header btn-header-outline" id="toggleViewBtn">
+                <i class="fas fa-list"></i>
+                <span id="toggleText">Chế độ Danh sách</span>
+            </button>
+            @* <button class="btn-header btn-header-outline" id="refreshCalendarBtn" title="Làm mới lịch từ server">
+                <i class="fas fa-sync-alt"></i>
+                Làm mới
+            </button> *@
+            @* <a asp-action="Create" class="btn-header btn-header-primary">
+                <i class="fas fa-plus"></i>
+                Tạo cuộc họp
+            </a> *@
         </div>
-
     </div>
-
-</div>
-
     <!-- Quick Stats -->
     <div class="stats-grid">
         <div class="stat-card">

@@ -283,74 +283,87 @@
                     return;
                 }
 
-                const payload = {
-                    userId: userId,
-                    permissions: []
-                };
+                Swal.fire({
+                    title: 'Xác nhận thay đổi?',
+                    text: 'Bạn có chắc chắn muốn cập nhật quyền hạn cho người dùng này không?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4f46e5',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Đồng ý cập nhật',
+                    cancelButtonText: 'Hủy bỏ'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const payload = {
+                            userId: userId,
+                            permissions: []
+                        };
 
-                $('.permission-card').each(function () {
-                    const controller = $(this).data('controller');
-                    const isFull = $(this).find('.controller-full').prop('checked');
+                        $('.permission-card').each(function () {
+                            const controller = $(this).data('controller');
+                            const isFull = $(this).find('.controller-full').prop('checked');
 
-                    if (isFull) {
-                        // All permissions for this controller
-                        payload.permissions.push({
-                            controller: controller,
-                            action: "*",
-                            fullPermission: true,
-                            view: true, insert: true, edit: true, delete: true,
-                            insertAll: true, editAll: true, deleteAll: true
-                        });
-                    } else {
-                        // Collect per-action permissions
-                        $(this).find('.action-row').each(function () {
-                            const action = $(this).data('action');
-                            const row = $(this);
-                            
-                            const p = {
-                                controller: controller,
-                                action: action,
-                                fullPermission: false,
-                                view: row.find('[data-type="View"]').prop('checked'),
-                                insert: row.find('[data-type="Insert"]').prop('checked'),
-                                edit: row.find('[data-type="Edit"]').prop('checked'),
-                                delete: row.find('[data-type="Delete"]').prop('checked'),
-                                insertAll: row.find('[data-type="InsertAll"]').prop('checked'),
-                                editAll: row.find('[data-type="EditAll"]').prop('checked'),
-                                deleteAll: row.find('[data-type="DeleteAll"]').prop('checked')
-                            };
+                            if (isFull) {
+                                // All permissions for this controller
+                                payload.permissions.push({
+                                    controller: controller,
+                                    action: "*",
+                                    fullPermission: true,
+                                    view: true, insert: true, edit: true, delete: true,
+                                    insertAll: true, editAll: true, deleteAll: true
+                                });
+                            } else {
+                                // Collect per-action permissions
+                                $(this).find('.action-row').each(function () {
+                                    const action = $(this).data('action');
+                                    const row = $(this);
+                                    
+                                    const p = {
+                                        controller: controller,
+                                        action: action,
+                                        fullPermission: false,
+                                        view: row.find('[data-type="View"]').prop('checked'),
+                                        insert: row.find('[data-type="Insert"]').prop('checked'),
+                                        edit: row.find('[data-type="Edit"]').prop('checked'),
+                                        delete: row.find('[data-type="Delete"]').prop('checked'),
+                                        insertAll: row.find('[data-type="InsertAll"]').prop('checked'),
+                                        editAll: row.find('[data-type="EditAll"]').prop('checked'),
+                                        deleteAll: row.find('[data-type="DeleteAll"]').prop('checked')
+                                    };
 
-                            // Only add if at least one permission is checked
-                            if (p.view || p.insert || p.edit || p.delete || p.insertAll || p.editAll || p.deleteAll) {
-                                payload.permissions.push(p);
+                                    // Only add if at least one permission is checked
+                                    if (p.view || p.insert || p.edit || p.delete || p.insertAll || p.editAll || p.deleteAll) {
+                                        payload.permissions.push(p);
+                                    }
+                                });
                             }
                         });
-                    }
-                });
 
-                // Send to API
-                Swal.fire({
-                    title: 'Đang xử lý...',
-                    allowOutsideClick: false,
-                    didOpen: () => { Swal.showLoading(); }
-                });
+                        // Send to API
+                        Swal.fire({
+                            title: 'Đang xử lý...',
+                            allowOutsideClick: false,
+                            didOpen: () => { Swal.showLoading(); }
+                        });
 
-                $.ajax({
-                    url: '/auth/save-permissions',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function (res) {
-                        if (res.success) {
-                            Swal.fire('Thành công', res.message, 'success').then(() => {
-                                window.location.reload();
-                            });
-                        } else {
-                            Swal.fire('Lỗi', res.message, 'error');
-                        }
-                    },
-                    error: function (err) {
-                        Swal.fire('Lỗi', 'Có lỗi xảy ra khi kết nối server.', 'error');
+                        $.ajax({
+                            url: '/auth/save-permissions',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(payload),
+                            success: function (res) {
+                                if (res.success) {
+                                    Swal.fire('Thành công', res.message, 'success').then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Lỗi', res.message, 'error');
+                                }
+                            },
+                            error: function (err) {
+                                Swal.fire('Lỗi', 'Có lỗi xảy ra khi kết nối server.', 'error');
+                            }
+                        });
                     }
                 });
             });
