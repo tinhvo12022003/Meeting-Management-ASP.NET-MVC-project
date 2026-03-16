@@ -83,41 +83,33 @@ public class AuthService : IAuthService
             existingTokenEntity = await _unitOfWork.RefreshTokens.GetByTokenHash(oldHash);
         }
 
-        // KỊCH BẢN 1: Tái sử dụng dòng cũ (Token Rotation) nếu token cũ thuộc về chính user này
+        // KỊCH BẢN 1: Thu hồi token tĩnh cũ nếu có từ Cookie
         if (existingTokenEntity != null && existingTokenEntity.UserId == account.Id)
         {
-            existingTokenEntity.TokenHash = newRefreshTokenHash;
-            existingTokenEntity.ExpiresAt = DateTime.UtcNow.AddDays(expirationDays);
-            existingTokenEntity.LoginAt = DateTime.UtcNow;
-            existingTokenEntity.RevokedAt = null;      // Reset trạng thái revoked
-            existingTokenEntity.ReplacedByToken = null; // Reset trạng thái replaced
-            
+            existingTokenEntity.RevokedAt = DateTime.UtcNow;
+            existingTokenEntity.ReplacedByToken = newRefreshTokenHash;
             await _unitOfWork.RefreshTokens.Update(existingTokenEntity);
         }
-        // KỊCH BẢN 2: Tạo mới hoàn toàn (Máy mới hoặc Cookie đã bị xóa)
-        else
+
+        // Tạo Refresh Token mới
+        var refreshTokenEntity = new RefreshTokenModel
         {
-            var refreshTokenEntity = new RefreshTokenModel
-            {
-                TokenHash = newRefreshTokenHash,
-                UserId = account.Id,
-                ExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
-                LoginAt = DateTime.UtcNow,
-                RevokedAt = null,
-                ReplacedByToken = null,
-            };
+            TokenHash = newRefreshTokenHash,
+            UserId = account.Id,
+            ExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
+            LoginAt = DateTime.UtcNow,
+        };
 
-            // Giới hạn 5 thiết bị đăng nhập cùng lúc
-            var activeTokens = await _unitOfWork.RefreshTokens.GetActiveByUserId(account.Id);
-            if (activeTokens.Count() >= 5)
-            {
-                var oldest = activeTokens.OrderBy(t => t.LoginAt).First();
-                oldest.RevokedAt = DateTime.UtcNow;
-                await _unitOfWork.RefreshTokens.Update(oldest);
-            }
-
-            await _unitOfWork.RefreshTokens.Add(refreshTokenEntity);
+        // Giới hạn 5 thiết bị đăng nhập cùng lúc
+        var activeTokens = await _unitOfWork.RefreshTokens.GetActiveByUserId(account.Id);
+        if (activeTokens.Count() >= 5)
+        {
+            var oldest = activeTokens.OrderBy(t => t.LoginAt).First();
+            oldest.RevokedAt = DateTime.UtcNow;
+            await _unitOfWork.RefreshTokens.Update(oldest);
         }
+
+        await _unitOfWork.RefreshTokens.Add(refreshTokenEntity);
 
         // Housekeeping: xóa token đã hết hạn/bị thu hồi quá 30 ngày của user này
         // Dùng ExecuteDeleteAsync — xóa trực tiếp ở DB, không load vào RAM
@@ -157,14 +149,28 @@ public class AuthService : IAuthService
         var newRefreshHash = _hashing.HashRefreshToken(newRefreshPlain);
         var expirationDays = _configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays");
 
-        // Cập nhật token hiện tại thay vì tạo mới để tránh làm đầy database
-        tokenData.TokenHash = newRefreshHash;
-        tokenData.ExpiresAt = now.AddDays(expirationDays);
-        tokenData.LoginAt = now;
+        // Thu hồi token cũ và đánh dấu đã bị thay thế
+        tokenData.RevokedAt = now;
+        tokenData.ReplacedByToken = newRefreshHash;
         tokenData.UpdateBy = _helper.GetCurrentUser();
         tokenData.UpdateAt = now;
-        
         await _unitOfWork.RefreshTokens.Update(tokenData);
+
+        // Tạo Refresh Token mới cho token rotation
+        var newRefreshTokenEntity = new RefreshTokenModel
+        {
+            TokenHash = newRefreshHash,
+            UserId = tokenData.UserId,
+            ExpiresAt = now.AddDays(expirationDays),
+            LoginAt = now,
+            CreateBy = _helper.GetCurrentUser(),
+            CreateAt = now
+        };
+        await _unitOfWork.RefreshTokens.Add(newRefreshTokenEntity);
+
+        // Dọn dẹp token rác định kỳ (tránh làm đầy database)
+        await _unitOfWork.RefreshTokens.PurgeExpiredByUserId(tokenData.UserId, olderThanDays: 30);
+
         await _unitOfWork.CommitAsync();
 
         // Fetch user using UserId from the token record directly (safe, no navigation property dependency)

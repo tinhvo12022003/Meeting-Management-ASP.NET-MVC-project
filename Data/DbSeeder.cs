@@ -52,17 +52,105 @@ public static class DbSeeder
                 HashPassword = "AQAAAAIAAYagAAAAECR3DscyOfXBdUWF3h6AZAFjF08kw2xrlysZTL5Y2Wx29h4qay07ZTohhhUXicYR/A=="
             };
 
-            var permissions = new PermissionModel
+            var COM_permissions = new PermissionModel
             {
                 FullPermission = true,
+                Controller = "Company",
+                View = true,
+                Edit = true,
+                Delete = true,
+                Insert = true,
+                EditAll = true,
+                DeleteAll = true,
+                InsertAll = true,
                 User = user,
             };
 
+
+            var DEP_permissions = new PermissionModel
+            {
+                FullPermission = true,
+                Controller = "Department",
+                View = true,
+                Edit = true,
+                Delete = true,
+                Insert = true,
+                EditAll = true,
+                DeleteAll = true,
+                InsertAll = true,
+                User = user,
+            };
+
+            var MR_permissions = new PermissionModel
+            {
+                FullPermission = true,
+                Controller = "MeetingRoom",
+                View = true,
+                Edit = true,
+                Delete = true,
+                Insert = true,
+                EditAll = true,
+                DeleteAll = true,
+                InsertAll = true,
+                User = user,
+            };
+
+            var Meeting_permissions = new PermissionModel
+            {
+                FullPermission = true,
+                Controller = "Meeting",
+                View = true,
+                Edit = true,
+                Delete = true,
+                Insert = true,
+                EditAll = true,
+                DeleteAll = true,
+                InsertAll = true,
+                User = user,
+            };
+
+
+            var User_permissions = new PermissionModel
+            {
+                FullPermission = true,
+                Controller = "User",
+                View = true,
+                Edit = true,
+                Delete = true,
+                Insert = true,
+                EditAll = true,
+                DeleteAll = true,
+                InsertAll = true,
+                User = user,
+            };
+
+            var Auth_permissions = new PermissionModel
+            {
+                FullPermission = true,
+                Controller = "Auth",
+                View = true,
+                Edit = true,
+                Delete = true,
+                Insert = true,
+                EditAll = true,
+                DeleteAll = true,
+                InsertAll = true,
+                User = user,
+            };
+
+
             context.Company.Add(company);
+            
             context.Department.Add(department);
 
             context.User.Add(user);
-            context.Permission.Add(permissions);
+
+            context.Permission.Add(COM_permissions);
+            context.Permission.Add(DEP_permissions);
+            context.Permission.Add(MR_permissions);
+            context.Permission.Add(Meeting_permissions);
+            context.Permission.Add(User_permissions);
+            context.Permission.Add(Auth_permissions);
 
             await context.SaveChangesAsync();
         }
