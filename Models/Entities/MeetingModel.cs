@@ -19,7 +19,7 @@ public class MeetingModel : BaseModel
 
 
     // relationship
-    public ICollection<MeetingUserModel> MeetingUser {get; set;} = new List<MeetingUserModel>();
+    // public ICollection<MeetingUserModel> MeetingUser {get; set;} = new List<MeetingUserModel>();
 
     public string CompanyId {get; set;} = string.Empty;
     public CompanyModel? Company {get; set;}

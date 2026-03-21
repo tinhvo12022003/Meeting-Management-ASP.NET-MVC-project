@@ -525,33 +525,6 @@ namespace MeetingManagement.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("MeetingUserModel", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("UserId");
-
-                    b.Property<string>("MeetingId")
-                        .HasColumnType("NVARCHAR(100)")
-                        .HasColumnName("MeetingId");
-
-                    b.Property<bool>("IsConfirmed")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("BIT")
-                        .HasDefaultValue(true)
-                        .HasColumnName("IsConfirmed");
-
-                    b.Property<byte>("Role")
-                        .HasColumnType("TINYINT")
-                        .HasColumnName("Role");
-
-                    b.HasKey("UserId", "MeetingId");
-
-                    b.HasIndex("MeetingId");
-
-                    b.ToTable("MeetingUsers", (string)null);
-                });
-
             modelBuilder.Entity("MeetingManagement.Models.DepartmentModel", b =>
                 {
                     b.HasOne("MeetingManagement.Models.CompanyModel", "Company")
@@ -642,25 +615,6 @@ namespace MeetingManagement.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("MeetingUserModel", b =>
-                {
-                    b.HasOne("MeetingManagement.Models.MeetingModel", "Meeting")
-                        .WithMany("MeetingUser")
-                        .HasForeignKey("MeetingId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("MeetingManagement.Models.UserModel", "User")
-                        .WithMany("MeetingUser")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Meeting");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("MeetingManagement.Models.CompanyModel", b =>
                 {
                     b.Navigation("Departments");
@@ -679,11 +633,6 @@ namespace MeetingManagement.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("MeetingManagement.Models.MeetingModel", b =>
-                {
-                    b.Navigation("MeetingUser");
-                });
-
             modelBuilder.Entity("MeetingManagement.Models.MeetingRoomModel", b =>
                 {
                     b.Navigation("Meetings");
@@ -691,8 +640,6 @@ namespace MeetingManagement.Migrations
 
             modelBuilder.Entity("MeetingManagement.Models.UserModel", b =>
                 {
-                    b.Navigation("MeetingUser");
-
                     b.Navigation("Permissions");
 
                     b.Navigation("RefreshTokens");

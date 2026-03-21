@@ -31,5 +31,5 @@ public class PermissionPolicyProvider : IAuthorizationPolicyProvider
         => FallbackPolicyProvider.GetDefaultPolicyAsync();
 
     public Task<AuthorizationPolicy?> GetFallbackPolicyAsync()
-        => Task.FromResult<AuthorizationPolicy?>(null);
+        => FallbackPolicyProvider.GetFallbackPolicyAsync();
 }

@@ -18,7 +18,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<DepartmentModel> Department { get; set; }
     public DbSet<MeetingModel> Meeting { get; set; }
     public DbSet<MeetingRoomModel> MeetingRoom { get; set; }
-    public DbSet<MeetingUserModel> MeetingUser { get; set; }
+    // public DbSet<MeetingUserModel> MeetingUser { get; set; }
     public DbSet<PermissionModel> Permission { get; set; }
     public DbSet<UserModel> User { get; set; }
     public DbSet<RefreshTokenModel> RefreshToken { get; set; }
@@ -130,17 +130,17 @@ public class ApplicationDbContext : DbContext
         });
 
 
-        modelBuilder.Entity<MeetingUserModel>(entity =>
-        {
-            entity.ToTable(name: "MeetingUsers");
-            entity.HasKey(mu => new { mu.UserId, mu.MeetingId });
-            entity.Property(e => e.UserId).IsRequired().HasColumnName(name: "UserId").HasColumnType(typeName: "NVARCHAR(100)");
-            entity.HasOne(a => a.User).WithMany(p => p.MeetingUser).HasForeignKey(a => a.UserId);
-            entity.Property(e => e.MeetingId).IsRequired().HasColumnName(name: "MeetingId").HasColumnType(typeName: "NVARCHAR(100)");
-            entity.HasOne(a => a.Meeting).WithMany(p => p.MeetingUser).HasForeignKey(a => a.MeetingId).OnDelete(DeleteBehavior.NoAction);
-            entity.Property(e => e.Role).HasColumnName(name: "Role").HasColumnType(typeName: "TINYINT").HasConversion<int>();
-            entity.Property(e => e.IsConfirmed).HasColumnName(name: "IsConfirmed").HasColumnType(typeName: "BIT").HasDefaultValue(true);
-        });
+        // modelBuilder.Entity<MeetingUserModel>(entity =>
+        // {
+        //     entity.ToTable(name: "MeetingUsers");
+        //     entity.HasKey(mu => new { mu.UserId, mu.MeetingId });
+        //     entity.Property(e => e.UserId).IsRequired().HasColumnName(name: "UserId").HasColumnType(typeName: "NVARCHAR(100)");
+        //     entity.HasOne(a => a.User).WithMany(p => p.MeetingUser).HasForeignKey(a => a.UserId);
+        //     entity.Property(e => e.MeetingId).IsRequired().HasColumnName(name: "MeetingId").HasColumnType(typeName: "NVARCHAR(100)");
+        //     entity.HasOne(a => a.Meeting).WithMany(p => p.MeetingUser).HasForeignKey(a => a.MeetingId).OnDelete(DeleteBehavior.NoAction);
+        //     entity.Property(e => e.Role).HasColumnName(name: "Role").HasColumnType(typeName: "TINYINT").HasConversion<int>();
+        //     entity.Property(e => e.IsConfirmed).HasColumnName(name: "IsConfirmed").HasColumnType(typeName: "BIT").HasDefaultValue(true);
+        // });
 
 
         modelBuilder.Entity<PermissionModel>(entity =>

@@ -35,15 +35,15 @@ public class AutoMapperConfig : Profile
         );
 
 
-        CreateMap<MeetingUserModel, MeetingUserViewModel>().ForMember(
-            des => des.Title, opt => opt.MapFrom(s => s.Meeting != null ? s.Meeting.Title : "")
-        ).ForMember(
-            des => des.StartAt, opt => opt.MapFrom(s => s.Meeting != null ? s.Meeting.StartAt : DateTime.MinValue)
-        ).ForMember(
-            des => des.EndAt, opt => opt.MapFrom(s => s.Meeting != null ? s.Meeting.EndAt : DateTime.MinValue)
-        ).ForMember(
-            des => des.RoomName, opt => opt.MapFrom(s => s.Meeting != null && s.Meeting.MeetingRoom != null ? s.Meeting.MeetingRoom.Name : "")
-        );
+        // CreateMap<MeetingUserModel, MeetingUserViewModel>().ForMember(
+        //     des => des.Title, opt => opt.MapFrom(s => s.Meeting != null ? s.Meeting.Title : "")
+        // ).ForMember(
+        //     des => des.StartAt, opt => opt.MapFrom(s => s.Meeting != null ? s.Meeting.StartAt : DateTime.MinValue)
+        // ).ForMember(
+        //     des => des.EndAt, opt => opt.MapFrom(s => s.Meeting != null ? s.Meeting.EndAt : DateTime.MinValue)
+        // ).ForMember(
+        //     des => des.RoomName, opt => opt.MapFrom(s => s.Meeting != null && s.Meeting.MeetingRoom != null ? s.Meeting.MeetingRoom.Name : "")
+        // );
 
 
         CreateMap<UserModel, UserViewModel>().ForMember(

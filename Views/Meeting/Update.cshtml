@@ -39,9 +39,10 @@
             <div class="card border-0 shadow-sm main-card">
                 <div class="card-body p-4 p-md-5">
                     <form asp-action="Update" method="post" id="updateMeetingForm">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4" style="border-radius: 12px;"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger border-0 small mb-4" style="border-radius: 12px;"></div>
                         
                         <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="RowStatus" />
 
                         <!-- Basic Information Section -->
                         <div class="section-title mb-4">

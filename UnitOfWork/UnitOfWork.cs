@@ -10,7 +10,7 @@ public class UnitOfWork : IUnitOfWork
     public IDepartmentRepository Departments {get; }
     public IMeetingRepository Meetings { get; }
     public IMeetingRoomRepository MeetingRooms {get; }
-    public IMeetingUserRepository MeetingUsers {get; }
+    // public IMeetingUserRepository MeetingUsers {get; }
     public IPermissionRepository Permissions {get; }
     public IRefreshTokenRepository RefreshTokens {get; }
     public IUserRepository Users {get; }
@@ -20,7 +20,7 @@ public class UnitOfWork : IUnitOfWork
                       IDepartmentRepository departmentRepo,
                       IMeetingRepository meetingRepo,
                       IMeetingRoomRepository meetingRoomRepo,
-                      IMeetingUserRepository meetingUserRepo,
+                    //   IMeetingUserRepository meetingUserRepo,
                       IPermissionRepository permissionRepo,
                       IRefreshTokenRepository refreshTokenRepo, 
                       IUserRepository userRepo
@@ -31,7 +31,7 @@ public class UnitOfWork : IUnitOfWork
         Departments = departmentRepo;
         Meetings = meetingRepo;
         MeetingRooms = meetingRoomRepo;
-        MeetingUsers = meetingUserRepo;
+        // MeetingUsers = meetingUserRepo;
         Permissions = permissionRepo;
         RefreshTokens = refreshTokenRepo;
         Users = userRepo;

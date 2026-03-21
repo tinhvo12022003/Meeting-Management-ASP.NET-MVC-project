@@ -282,5 +282,39 @@
     @await RenderSectionAsync("Scripts", required: false)
     @await RenderSectionAsync("AfterBodyScripts", required: false)
 
+    @if (TempData["Success"] != null || TempData["Error"] != null)
+    {
+        <script>
+            $(document).ready(function () {
+                @if (TempData["Success"] != null)
+                {
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công',
+                            text: '@Html.Raw(TempData["Success"])',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            toast: true,
+                            position: 'top-end'
+                        });
+                    </text>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: '@Html.Raw(TempData["Error"])',
+                            confirmButtonColor: '#4f46e5'
+                        });
+                    </text>
+                }
+            });
+        </script>
+    }
+
 </body>
 </html>

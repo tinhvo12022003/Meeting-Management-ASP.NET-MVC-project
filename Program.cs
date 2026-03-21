@@ -16,6 +16,7 @@ using MeetingManagement.Service;
 using MeetingManagement.Service.Jwt;
 using MeetingManagement.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -28,10 +29,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add(new AuthorizeFilter());
+    // options.Filters.Add(new AuthorizeFilter());
     // Global Antiforgery: Tự động yêu cầu token cho tất cả POST/PUT/DELETE
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
 });
+
+
 
 builder.Services.AddAntiforgery(options =>
 {
@@ -73,10 +76,16 @@ builder.Services.AddSingleton(jwtSettings);
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    // Cấu hình Scheme mặc định là "Mixed" để hỗ trợ cả Cookie và JWT
+    options.DefaultAuthenticateScheme = "Mixed";
+    options.DefaultChallengeScheme = "Mixed";
 
-}).AddJwtBearer(options =>
+}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath = "/auth/login";
+    options.AccessDeniedPath = "/auth/login";
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -93,7 +102,6 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-            // Nếu Header đã có Authorization (do TokenRefreshMiddleware gán sau khi refresh), thì dùng nó.
             if (context.Request.Headers.ContainsKey("Authorization"))
             {
                 return Task.CompletedTask;
@@ -104,6 +112,19 @@ builder.Services.AddAuthentication(options =>
         }
     };
 
+})
+.AddPolicyScheme("Mixed", "Mixed", options =>
+{
+    options.ForwardDefaultSelector = context =>
+    {
+        // Nếu có header Authorization hoặc có cookie access_token thì ưu tiên JWT
+        if (context.Request.Headers.ContainsKey("Authorization") || context.Request.Cookies.ContainsKey("access_token"))
+        {
+            return JwtBearerDefaults.AuthenticationScheme;
+        }
+        // Mặc định dùng Cookie để xử lý redirect login cho trình duyệt
+        return CookieAuthenticationDefaults.AuthenticationScheme;
+    };
 });
 
 
@@ -122,7 +143,7 @@ builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
 builder.Services.AddScoped<IMeetingRoomRepository, MeetingRoomRepository>();
-builder.Services.AddScoped<IMeetingUserRepository, MeetingUserRepository>();
+// builder.Services.AddScoped<IMeetingUserRepository, MeetingUserRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -137,7 +158,7 @@ builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IMeetingRoomService, MeetingRoomService>();
 builder.Services.AddScoped<IMeetingService, MeetingService>();
-builder.Services.AddScoped<IMeetingUserService, MeetingUserService>();
+// builder.Services.AddScoped<IMeetingUserService, MeetingUserService>();
 
 
 builder.Services.AddScoped<UserHelper>();
@@ -176,10 +197,15 @@ app.Use(async (context, next) =>
 {
     await next();
 
-    if (context.Response.StatusCode == 401 &&
+    // Xử lý chuyển hướng nếu gặp lỗi 401 hoặc 403 khi truy cập giao diện web
+    if ((context.Response.StatusCode == 401 || context.Response.StatusCode == 403) &&
         context.Request.Headers["Accept"].ToString().Contains("text/html"))
     {
-        context.Response.Redirect("/auth/login");
+        var path = context.Request.Path.Value ?? "";
+        if (!path.Contains("/auth/login", StringComparison.OrdinalIgnoreCase))
+        {
+            context.Response.Redirect("/auth/login");
+        }
     }
 });
 

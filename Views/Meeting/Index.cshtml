@@ -515,6 +515,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const currentUserId = '@currentUserId';
             const canEditOthers = @canEditOthers.ToString().ToLower();
+            const hasFullMeetingPermission = @hasFullMeetingPermission.ToString().ToLower();
             var Calendar = FullCalendar.Calendar;
             var Draggable = FullCalendar.Draggable;
 
@@ -589,7 +590,7 @@
                 
                 const total = window.globalAllEvents.length;
                 let upcoming = 0;
-                let busyRooms = new Set();
+                let busyRooms = [];
                 let online = 0;
 
                 window.globalAllEvents.forEach(ev => {
@@ -604,7 +605,12 @@
                     // 2. Ongoing (Busy Rooms)
                     if (start.isSameOrBefore(now) && end.isSameOrAfter(now)) {
                         if (ev.extendedProps && ev.extendedProps.room && ev.extendedProps.room !== 'N/A') {
-                            busyRooms.add(ev.extendedProps.room);
+                            busyRooms.push({
+                                room: ev.extendedProps.room,
+                                title: ev.title,
+                                start: start.format('HH:mm'),
+                                end: end.format('HH:mm')
+                            });
                         }
                     }
 
@@ -617,7 +623,7 @@
                 // Update DOM
                 $('#stat-total-meetings').text(total);
                 $('#stat-upcoming-meetings').text(upcoming);
-                $('#stat-busy-rooms-count').text(busyRooms.size);
+                $('#stat-busy-rooms-count').text(busyRooms.length);
                 $('#stat-online-meetings').text(online);
 
                 // Update Tooltip
@@ -626,12 +632,16 @@
                 const $card = $('#stat-busy-rooms-card');
                 
                 $tooltipItems.empty();
-                if (busyRooms.size > 0) {
-                    busyRooms.forEach(room => {
-                        $tooltipItems.append(`<span style="display: block; margin-left: 5px; opacity: 0.9;">- ${room}</span>`);
+                if (busyRooms.length > 0) {
+                    busyRooms.forEach(item => {
+                        $tooltipItems.append(`<div style="margin-bottom: 6px; border-left: 3px solid #ea580c; padding-left: 8px;">
+                            <strong style="display: block; color: #fb923c;">${item.room}</strong>
+                            <span style="font-size: 11px; opacity: 0.8; display: block;">${item.title}</span>
+                            <span style="font-size: 11px; opacity: 0.6;">${item.start} - ${item.end}</span>
+                        </div>`);
                     });
                     $tooltipList.show();
-                    $card.attr('title', 'Phòng đang bận: ' + Array.from(busyRooms).join(', '));
+                    $card.attr('title', 'Các phòng đang có cuộc họp diễn ra');
                 } else {
                     $tooltipList.hide();
                     $card.attr('title', 'Không có phòng nào đang bận');
@@ -934,17 +944,23 @@
                 eventDidMount: function(info) {
                     // Add tooltip and custom styling to events
                     const props = info.event.extendedProps;
-                    const canEdit = props.createdBy === currentUserId || canEditOthers;
-                    const creator = props.createdBy ? `<br/>ID Người tạo: ${props.createdBy}` : '';
-                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}${creator} ${!canEdit ? '<br/>(Chỉ xem)' : ''}`;
+                    const isCreator = props.createdBy === currentUserId;
+                    const canEdit = isCreator || canEditOthers;
                     
-                    $(info.el).css('cursor', canEdit ? 'pointer' : 'default');
-
-                    if (!canEdit) {
-                        $(info.el).addClass('event-blurred');
+                    const creatorStr = props.createdBy ? `<br/>Người tạo: ${props.createdBy}` : '';
+                    const tooltipContent = `<strong>${info.event.title}</strong><br/>Phòng: ${props.room || 'N/A'}<br/>Công ty: ${props.company || 'N/A'}${creatorStr} ${!canEdit ? '<br/>(Chỉ xem)' : ''}`;
+                    
+                    // Logic hiển thị: Toàn quyền OR Người tạo -> Hiện bình thường. KHÔNG thì hiện mờ.
+                    if (hasFullMeetingPermission || isCreator) {
+                        $(info.el).css('opacity', '1');
+                        $(info.el).css('cursor', 'pointer');
+                    } else {
+                        $(info.el).addClass('event-blurred'); // CSS opacity 0.45
+                        $(info.el).css('border-style', 'dashed');
+                        $(info.el).css('cursor', 'default');
                     }
-                    
-                    // Force the color again if needed (FullCalendar handles it but just in case)
+
+                    // Force color if available
                     if (props.color) {
                         $(info.el).css('background-color', props.color);
                         $(info.el).css('border-color', props.color);

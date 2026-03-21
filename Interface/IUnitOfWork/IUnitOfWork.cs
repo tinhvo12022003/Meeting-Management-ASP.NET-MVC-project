@@ -8,7 +8,7 @@ public interface IUnitOfWork : IDisposable
     IDepartmentRepository Departments {get; }
     IMeetingRepository Meetings { get; }
     IMeetingRoomRepository MeetingRooms {get; }
-    IMeetingUserRepository MeetingUsers {get; }
+    // IMeetingUserRepository MeetingUsers {get; }
     IPermissionRepository Permissions {get; }
     IRefreshTokenRepository RefreshTokens {get; }
     IUserRepository Users {get; }

@@ -39,6 +39,7 @@ namespace MeetingManagement.Migrations
                 {
                     Id = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     Name = table.Column<string>(type: "NVARCHAR(255)", nullable: false),
+                    Location = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     TotalStaff = table.Column<int>(type: "INT", nullable: false),
                     CompanyId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
@@ -64,6 +65,7 @@ namespace MeetingManagement.Migrations
                     Id = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     Name = table.Column<string>(type: "NVARCHAR(255)", nullable: false),
                     Capacity = table.Column<int>(type: "INT", nullable: false),
+                    Location = table.Column<string>(type: "NVARCHAR(255)", nullable: false),
                     CompanyId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
@@ -86,17 +88,17 @@ namespace MeetingManagement.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    FullName = table.Column<string>(type: "NVARCHAR(50)", nullable: false),
+                    FullName = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     Address = table.Column<string>(type: "NVARCHAR(255)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "NVARCHAR(50)", nullable: true),
                     Birthday = table.Column<DateOnly>(type: "DATE", nullable: true),
                     Gender = table.Column<byte>(type: "TINYINT", nullable: false),
                     Type = table.Column<byte>(type: "TINYINT", nullable: false),
+                    Username = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
+                    Password = table.Column<string>(type: "NVARCHAR(512)", nullable: false),
                     DepartmentId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     CompanyId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    Password = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    Username = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     CreateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     UpdateBy = table.Column<string>(type: "NVARCHAR(100)", nullable: false, defaultValue: "SYSTEM"),
                     CreateAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETUTCDATE()"),
@@ -127,10 +129,10 @@ namespace MeetingManagement.Migrations
                     StartAt = table.Column<DateTime>(type: "DATETIME2", nullable: false),
                     EndAt = table.Column<DateTime>(type: "DATETIME2", nullable: false),
                     Type = table.Column<byte>(type: "TINYINT", nullable: false),
-                    MeetingStatus = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "NVARCHAR(255)", nullable: true),
                     Organization = table.Column<string>(type: "NVARCHAR(255)", nullable: true),
                     Url = table.Column<string>(type: "NVARCHAR(255)", nullable: true),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanyId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     DepartmentId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
                     RoomId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
@@ -215,31 +217,6 @@ namespace MeetingManagement.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "MeetingUsers",
-                columns: table => new
-                {
-                    UserId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    MeetingId = table.Column<string>(type: "NVARCHAR(100)", nullable: false),
-                    Role = table.Column<byte>(type: "TINYINT", nullable: false),
-                    IsConfirmed = table.Column<bool>(type: "BIT", nullable: false, defaultValue: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MeetingUsers", x => new { x.UserId, x.MeetingId });
-                    table.ForeignKey(
-                        name: "FK_MeetingUsers_Meetings_MeetingId",
-                        column: x => x.MeetingId,
-                        principalTable: "Meetings",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_MeetingUsers_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Departments_CompanyId",
                 table: "Departments",
@@ -251,9 +228,9 @@ namespace MeetingManagement.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Meetings_CompanyId",
+                name: "IX_Meetings_CompanyId_DepartmentId",
                 table: "Meetings",
-                column: "CompanyId");
+                columns: new[] { "CompanyId", "DepartmentId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Meetings_DepartmentId",
@@ -261,14 +238,9 @@ namespace MeetingManagement.Migrations
                 column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Meetings_RoomId",
+                name: "IX_Meetings_RoomId_StartAt_EndAt",
                 table: "Meetings",
-                column: "RoomId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MeetingUsers_MeetingId",
-                table: "MeetingUsers",
-                column: "MeetingId");
+                columns: new[] { "RoomId", "StartAt", "EndAt" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Permissions_UserId",
@@ -287,21 +259,27 @@ namespace MeetingManagement.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_CompanyId",
+                name: "IX_Users_CompanyId_DepartmentId",
                 table: "Users",
-                column: "CompanyId");
+                columns: new[] { "CompanyId", "DepartmentId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_DepartmentId",
                 table: "Users",
                 column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Username",
+                table: "Users",
+                column: "Username",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "MeetingUsers");
+                name: "Meetings");
 
             migrationBuilder.DropTable(
                 name: "Permissions");
@@ -310,13 +288,10 @@ namespace MeetingManagement.Migrations
                 name: "RefreshToken");
 
             migrationBuilder.DropTable(
-                name: "Meetings");
+                name: "MeetingRooms");
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "MeetingRooms");
 
             migrationBuilder.DropTable(
                 name: "Departments");

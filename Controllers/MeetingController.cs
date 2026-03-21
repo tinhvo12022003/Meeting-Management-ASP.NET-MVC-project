@@ -32,11 +32,8 @@ public class MeetingController : Controller
     }
 
     [Permission("Meeting.Index.View")]
-    public async Task<IActionResult> Index(PaginatedRequest request)
+    public async Task<IActionResult> Index(PaginatedRequest request, string? companyId = null, string? departmentId = null)
     {
-        string? companyId = null;
-        string? departmentId = null;
-
         var user = await _userHelper.GetCurrentUserProfile();
         var isAdmin = await _userHelper.IsAdmin();
         var hasFullPermission = await _userHelper.HasPermission("Meeting.*") || await _userHelper.HasPermission("Meeting.Index.FullPermission");
@@ -44,7 +41,8 @@ public class MeetingController : Controller
         if (!isAdmin && !hasFullPermission)
         {
             companyId = user?.CompanyId;
-            departmentId = user?.DepartmentId;
+            // Bỏ lọc theo phòng ban để mọi người trong cùng công ty có thể xem lịch của nhau
+            departmentId = null; 
         }
 
         var result = await _meetingService.Find(request, companyId, departmentId);
@@ -185,17 +183,12 @@ public class MeetingController : Controller
 
     [HttpGet]
     [Permission("Meeting.Index.View")]
-    public async Task<IActionResult> GetCalendarEvents(DateTime? start, DateTime? end)
+    public async Task<IActionResult> GetCalendarEvents(DateTime? start, DateTime? end, string? companyId = null, string? departmentId = null)
     {
         try
         {
-            // FullCalendar sends 'start' and 'end' parameters as ISO8601 strings.
-            // If they are null, we fall back to a reasonable default range (e.g., current month).
             DateTime from = start ?? DateTime.Now.AddMonths(-1);
             DateTime to = end ?? DateTime.Now.AddMonths(1);
-
-            string? companyId = null;
-            string? departmentId = null;
 
             var user = await _userHelper.GetCurrentUserProfile();
             var isAdmin = await _userHelper.IsAdmin();
@@ -204,7 +197,8 @@ public class MeetingController : Controller
             if (!isAdmin && !hasFullPermission)
             {
                 companyId = user?.CompanyId;
-                departmentId = user?.DepartmentId;
+                // Bỏ lọc theo phòng ban để hiển thị lịch chung của cả công ty
+                departmentId = null; 
             }
 
             var result = await _meetingService.GetCalendarEvents(from, to, companyId, departmentId);

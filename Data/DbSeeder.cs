@@ -56,6 +56,7 @@ public static class DbSeeder
             {
                 FullPermission = true,
                 Controller = "Company",
+                Action = "*",
                 View = true,
                 Edit = true,
                 Delete = true,
@@ -72,6 +73,7 @@ public static class DbSeeder
                 FullPermission = true,
                 Controller = "Department",
                 View = true,
+                Action = "*",
                 Edit = true,
                 Delete = true,
                 Insert = true,
@@ -86,6 +88,7 @@ public static class DbSeeder
                 FullPermission = true,
                 Controller = "MeetingRoom",
                 View = true,
+                Action = "*",
                 Edit = true,
                 Delete = true,
                 Insert = true,
@@ -99,6 +102,7 @@ public static class DbSeeder
             {
                 FullPermission = true,
                 Controller = "Meeting",
+                Action = "*",
                 View = true,
                 Edit = true,
                 Delete = true,
@@ -114,6 +118,7 @@ public static class DbSeeder
             {
                 FullPermission = true,
                 Controller = "User",
+                Action = "*",
                 View = true,
                 Edit = true,
                 Delete = true,
@@ -128,6 +133,7 @@ public static class DbSeeder
             {
                 FullPermission = true,
                 Controller = "Auth",
+                Action = "*",
                 View = true,
                 Edit = true,
                 Delete = true,

@@ -31,7 +31,7 @@ public class UserModel : BaseModel
     public CompanyModel? Company {get; set;}
 
 
-    public ICollection<MeetingUserModel> MeetingUser { get; set; } = new List<MeetingUserModel>();
+    // public ICollection<MeetingUserModel> MeetingUser { get; set; } = new List<MeetingUserModel>();
     public ICollection<PermissionModel> Permissions { get; set; } = new List<PermissionModel>();
     public ICollection<RefreshTokenModel> RefreshTokens {get; set;} = new List<RefreshTokenModel>();
 

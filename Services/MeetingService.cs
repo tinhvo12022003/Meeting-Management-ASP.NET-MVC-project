@@ -186,19 +186,10 @@ public class MeetingService : IMeetingService
 
     public async Task<PaginatedResponse<MeetingViewModel>> Find (PaginatedRequest request, string? companyId = null, string? departmentId = null)
     {
-        System.Linq.Expressions.Expression<Func<MeetingModel, bool>> filter = x => x.RowStatus == RowStatus.ACTIVE;
-        
-        if (!string.IsNullOrEmpty(companyId))
-        {
-            var originalFilter = filter;
-            filter = x => x.RowStatus == RowStatus.ACTIVE && x.CompanyId == companyId;
-        }
-        
-        if (!string.IsNullOrEmpty(departmentId))
-        {
-            var currentFilter = filter;
-            filter = x => x.RowStatus == RowStatus.ACTIVE && (string.IsNullOrEmpty(companyId) || x.CompanyId == companyId) && x.DepartmentId == departmentId;
-        }
+        System.Linq.Expressions.Expression<Func<MeetingModel, bool>> filter = x => 
+            x.RowStatus == RowStatus.ACTIVE &&
+            (string.IsNullOrEmpty(companyId) || x.CompanyId == companyId) &&
+            (string.IsNullOrEmpty(departmentId) || x.DepartmentId == departmentId);
 
         var paginatedResult = await _unitOfWork.Meetings.GetPaginated(
             request,
