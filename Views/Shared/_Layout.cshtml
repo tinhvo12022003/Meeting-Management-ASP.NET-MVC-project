@@ -1,3 +1,7 @@
+@{
+    var sidebarState = Context.Request.Cookies["sidebar_state"] ?? "expanded";
+    var isExpanded = sidebarState == "expanded";
+}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -14,7 +18,7 @@
     @await RenderSectionAsync(name: "Styles", required: false)
 </head>
 
-<body>
+<body class="@(isExpanded ? "sidebar-expanded" : "")">
 
     <!-- ========== MOBILE TOP HEADER (visible only on ≤768px) ========== -->
     <header class="mobile-header" id="mobileHeader">
@@ -149,13 +153,25 @@
             function isTablet() { return window.innerWidth > MOBILE_BP && window.innerWidth <= TABLET_BP; }
 
             // ---- State Management ----
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
+            }
+
             function setSidebarExpanded(expanded) {
                 if (expanded) {
                     document.body.classList.add('sidebar-expanded');
                     localStorage.setItem('sidebar-state', 'expanded');
+                    setCookie('sidebar_state', 'expanded', 30);
                 } else {
                     document.body.classList.remove('sidebar-expanded');
                     localStorage.setItem('sidebar-state', 'collapsed');
+                    setCookie('sidebar_state', 'collapsed', 30);
                 }
             }
 
@@ -179,16 +195,15 @@
 
             // ---- Initialize sidebar state ----
             function initSidebar() {
-                var saved = localStorage.getItem('sidebar-state');
+                var state = document.cookie.match(/sidebar_state=([^;]+)/);
+                var saved = state ? state[1] : localStorage.getItem('sidebar-state');
 
                 if (isMobile()) {
-                    // Always start collapsed on mobile (drawer)
                     setSidebarExpanded(false);
                 } else if (isTablet()) {
-                    // Tablet: respect saved or default to collapsed
                     setSidebarExpanded(saved === 'expanded');
                 } else {
-                    // Desktop: respect saved or default to expanded
+                    // Desktop: expanded is default
                     setSidebarExpanded(saved !== 'collapsed');
                 }
 

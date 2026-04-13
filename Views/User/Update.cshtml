@@ -28,7 +28,10 @@
             <div class="card border-0 shadow-sm main-card">
                 <div class="card-body p-4 p-md-5">
                     <form id="updateForm" asp-action="Update" method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4" style="border-radius: 12px;"></div>
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4" style="border-radius: 12px;"></div>
+                        }
                         <input type="hidden" asp-for="Id" />
 
                         <div class="row">

@@ -40,7 +40,10 @@
                         @Html.AntiForgeryToken()
                         <input asp-for="Id" type="hidden" />
 
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4 validation-alert"></div>
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4 validation-alert"></div>
+                        }
 
                         <!-- Section: Thông tin cơ bản -->
                         <div class="section-label mb-3">
