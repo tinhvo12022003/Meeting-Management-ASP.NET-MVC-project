@@ -160,47 +160,91 @@
                                             var p = controllerPermissions.FirstOrDefault(cp => cp.Action == action);
                                             <tr class="action-row" data-action="@action">
                                                 <td><span class="action-name">@action</span></td>
+                                                
+                                                @* Helper to check relevance *@
+                                                @{
+                                                    bool IsRelevant(string act, string type) {
+                                                        act = act.ToLower();
+                                                        type = type.ToLower();
+                                                        return type switch {
+                                                            "view" => act is "index" or "details" or "profile" or "me" or "authorized" or "create" or "update" or "register",
+                                                            "insert" or "insertall" => act is "create" or "register",
+                                                            "edit" or "editall" => act is "update" or "reschedule" or "authorized" or "profile",
+                                                            "delete" or "deleteall" => act is "delete",
+                                                            _ => false
+                                                        };
+                                                    }
+                                                }
+
                                                 <td class="text-center">
-                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
-                                                        <input type="checkbox" class="custom-control-input perm-check" id="v_@config.Controller@action" data-type="View" @(p?.View == true ? "checked" : "")>
-                                                        <label class="custom-control-label" for="v_@config.Controller@action"></label>
-                                                    </div>
+                                                    @if (IsRelevant(action, "View")) {
+                                                        <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                            <input type="checkbox" class="custom-control-input perm-check" id="v_@config.Controller@action" data-type="View" @(p?.View == true ? "checked" : "")>
+                                                            <label class="custom-control-label" for="v_@config.Controller@action"></label>
+                                                        </div>
+                                                    } else {
+                                                        <span class="text-muted opacity-50">-</span>
+                                                    }
                                                 </td>
                                                 <td class="text-center">
-                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
-                                                        <input type="checkbox" class="custom-control-input perm-check" id="i_@config.Controller@action" data-type="Insert" @(p?.Insert == true ? "checked" : "")>
-                                                        <label class="custom-control-label" for="i_@config.Controller@action"></label>
-                                                    </div>
+                                                    @if (IsRelevant(action, "Insert")) {
+                                                        <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                            <input type="checkbox" class="custom-control-input perm-check" id="i_@config.Controller@action" data-type="Insert" @(p?.Insert == true ? "checked" : "")>
+                                                            <label class="custom-control-label" for="i_@config.Controller@action"></label>
+                                                        </div>
+                                                    } else {
+                                                        <span class="text-muted opacity-50">-</span>
+                                                    }
                                                 </td>
                                                 <td class="text-center">
-                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
-                                                        <input type="checkbox" class="custom-control-input perm-check" id="e_@config.Controller@action" data-type="Edit" @(p?.Edit == true ? "checked" : "")>
-                                                        <label class="custom-control-label" for="e_@config.Controller@action"></label>
-                                                    </div>
+                                                    @if (IsRelevant(action, "Edit")) {
+                                                        <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                            <input type="checkbox" class="custom-control-input perm-check" id="e_@config.Controller@action" data-type="Edit" @(p?.Edit == true ? "checked" : "")>
+                                                            <label class="custom-control-label" for="e_@config.Controller@action"></label>
+                                                        </div>
+                                                    } else {
+                                                        <span class="text-muted opacity-50">-</span>
+                                                    }
                                                 </td>
                                                 <td class="text-center">
-                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
-                                                        <input type="checkbox" class="custom-control-input perm-check" id="d_@config.Controller@action" data-type="Delete" @(p?.Delete == true ? "checked" : "")>
-                                                        <label class="custom-control-label" for="d_@config.Controller@action"></label>
-                                                    </div>
+                                                    @if (IsRelevant(action, "Delete")) {
+                                                        <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                            <input type="checkbox" class="custom-control-input perm-check" id="d_@config.Controller@action" data-type="Delete" @(p?.Delete == true ? "checked" : "")>
+                                                            <label class="custom-control-label" for="d_@config.Controller@action"></label>
+                                                        </div>
+                                                    } else {
+                                                        <span class="text-muted opacity-50">-</span>
+                                                    }
                                                 </td>
                                                 <td class="text-center">
-                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
-                                                        <input type="checkbox" class="custom-control-input perm-check" id="ia_@config.Controller@action" data-type="InsertAll" @(p?.InsertAll == true ? "checked" : "")>
-                                                        <label class="custom-control-label" for="ia_@config.Controller@action"></label>
-                                                    </div>
+                                                    @if (IsRelevant(action, "InsertAll")) {
+                                                        <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                            <input type="checkbox" class="custom-control-input perm-check" id="ia_@config.Controller@action" data-type="InsertAll" @(p?.InsertAll == true ? "checked" : "")>
+                                                            <label class="custom-control-label" for="ia_@config.Controller@action"></label>
+                                                        </div>
+                                                    } else {
+                                                        <span class="text-muted opacity-50">-</span>
+                                                    }
                                                 </td>
                                                 <td class="text-center">
-                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
-                                                        <input type="checkbox" class="custom-control-input perm-check" id="ea_@config.Controller@action" data-type="EditAll" @(p?.EditAll == true ? "checked" : "")>
-                                                        <label class="custom-control-label" for="ea_@config.Controller@action"></label>
-                                                    </div>
+                                                    @if (IsRelevant(action, "EditAll")) {
+                                                        <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                            <input type="checkbox" class="custom-control-input perm-check" id="ea_@config.Controller@action" data-type="EditAll" @(p?.EditAll == true ? "checked" : "")>
+                                                            <label class="custom-control-label" for="ea_@config.Controller@action"></label>
+                                                        </div>
+                                                    } else {
+                                                        <span class="text-muted opacity-50">-</span>
+                                                    }
                                                 </td>
                                                 <td class="text-center">
-                                                    <div class="custom-control custom-checkbox custom-control-inline mx-0">
-                                                        <input type="checkbox" class="custom-control-input perm-check" id="da_@config.Controller@action" data-type="DeleteAll" @(p?.DeleteAll == true ? "checked" : "")>
-                                                        <label class="custom-control-label" for="da_@config.Controller@action"></label>
-                                                    </div>
+                                                    @if (IsRelevant(action, "DeleteAll")) {
+                                                        <div class="custom-control custom-checkbox custom-control-inline mx-0">
+                                                            <input type="checkbox" class="custom-control-input perm-check" id="da_@config.Controller@action" data-type="DeleteAll" @(p?.DeleteAll == true ? "checked" : "")>
+                                                            <label class="custom-control-label" for="da_@config.Controller@action"></label>
+                                                        </div>
+                                                    } else {
+                                                        <span class="text-muted opacity-50">-</span>
+                                                    }
                                                 </td>
                                             </tr>
                                         }
@@ -322,13 +366,13 @@
                                         controller: controller,
                                         action: action,
                                         fullPermission: false,
-                                        view: row.find('[data-type="View"]').prop('checked'),
-                                        insert: row.find('[data-type="Insert"]').prop('checked'),
-                                        edit: row.find('[data-type="Edit"]').prop('checked'),
-                                        delete: row.find('[data-type="Delete"]').prop('checked'),
-                                        insertAll: row.find('[data-type="InsertAll"]').prop('checked'),
-                                        editAll: row.find('[data-type="EditAll"]').prop('checked'),
-                                        deleteAll: row.find('[data-type="DeleteAll"]').prop('checked')
+                                        view: row.find('[data-type="View"]').prop('checked') || false,
+                                        insert: row.find('[data-type="Insert"]').prop('checked') || false,
+                                        edit: row.find('[data-type="Edit"]').prop('checked') || false,
+                                        delete: row.find('[data-type="Delete"]').prop('checked') || false,
+                                        insertAll: row.find('[data-type="InsertAll"]').prop('checked') || false,
+                                        editAll: row.find('[data-type="EditAll"]').prop('checked') || false,
+                                        deleteAll: row.find('[data-type="DeleteAll"]').prop('checked') || false
                                     };
 
                                     // Only add if at least one permission is checked

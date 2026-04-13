@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MeetingManagement.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260321011721_CreateInit")]
+    [Migration("20260413065548_CreateInit")]
     partial class CreateInit
     {
         /// <inheritdoc />
